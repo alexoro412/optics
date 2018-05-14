@@ -50,3 +50,12 @@ svg.sim {
     stroke-width: 1px;
     fill: none;
 }
+
+blockquote{
+    background-color: rgb(235, 235, 235);
+    padding: 10px;
+}
+
+blockquote > h6 {
+    text-align: center;
+}

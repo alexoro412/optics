@@ -2,7 +2,7 @@ var w = 400,
     h = 350,
     angle_radius = 35;
 
-var svg = d3.select("body")
+var svg = d3.select("#main")
     .append("svg")
     .attr("class", "sim")
     .attr("width", w)
@@ -110,7 +110,7 @@ function updateAngles(){
     angles.attr("d", "M " + coords.x3 + " " + coords.h
         + " L " + (coords.x3 + angle_radius * Math.abs(Math.cos(Math.atan(coords.m)))) + " " + (coords.h - angle_radius * Math.abs(Math.sin(Math.atan(coords.m))))
         + " A " + angle_radius + " " + angle_radius + " 0 0 1 " + (coords.x3 + angle_radius) + " " + coords.h
-        + "M " + coords.x3 + " " + coords.h
+        + "L " + coords.x3 + " " + coords.h
         + " L " + (coords.x3 - angle_radius * Math.abs(Math.cos(Math.atan(coords.m)))) + " " + (coords.h - angle_radius * Math.abs(Math.sin(Math.atan(coords.m))))
         + " A " + angle_radius + " " + angle_radius + " 0 0 0 " + (coords.x3 - angle_radius) + " " + coords.h
         + " Z");
