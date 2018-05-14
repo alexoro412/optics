@@ -32,6 +32,27 @@ var rays = [
     { x1: 60, y1: 70, x2: 90, y2: 130 }
 ]
 
+var coords = {};
+
+function updateCoords(){
+    coords.m = ((handles[0].y - handles[1].y) / (handles[0].x - handles[1].x))
+
+    coords.x1 = handles[0].x;
+    coords.y1 = handles[0].y;
+
+    coords.x2 = handles[1].x;
+    coords.y2 = handles[1].y;
+
+    coords.h = 2 * h / 3;
+    coords.x3 = (coords.h - coords.y1) / coords.m + coords.x1;
+
+    coords.x4 = coords.x1 > coords.x2 ? 0 : w;
+    coords.y4 = -coords.m * (coords.x4 - ((coords.h - coords.y1) / coords.m + coords.x1)) + coords.h;
+
+}
+
+updateCoords();
+
 svg.selectAll("circle")
     .data(handles)
     .enter().append("circle")
@@ -44,29 +65,32 @@ svg.selectAll("circle")
             .on("drag", dragged)
             .on("end", dragended));
 
-svg.append("g")
-    .attr("class", "incident-rays")
-    .selectAll("line")
-    .data([handles])
-    .enter().append("line")
-        .attr("x1", function(d) {return d[0].x})
-        .attr("y1", function (d) { return d[0].y; /*return d[0].y - ((d[0].y - d[1].y) / (d[0].x - d[1].x)) * d[0].x*/ })
-        .attr("x2", function(d){return ((2*h/3) - d[0].y)/((d[0].y - d[1].y)/(d[0].x - d[1].x)) + d[0].x })
-        .attr("y2", 2 * h / 3)
+svg.append("line")
+    .attr("id", "incident")
+        .attr("x1", coords.x1)
+        .attr("y1", coords.y1)
+        .attr("x2", coords.x3)
+        .attr("y2", coords.h)
         .attr("class", "ray");
 
-svg.append("g")
-    .attr("class", "reflection-rays")
-    .selectAll("line")
-    .data([handles])
-    .enter().append("line")
-        .attr("x1", function (d) { return ((2 * h / 3) - d[0].y) / ((d[0].y - d[1].y) / (d[0].x - d[1].x)) + d[0].x })
-        .attr("y1", 2 * h / 3)
-        .attr("x2", function(d) {return d[0].x > d[1].x ? 0 : w})
-        .attr("y2", function (d) { return -((d[0].y - d[1].y) / (d[0].x - d[1].x)) * ((d[0].x > d[1].x ? 0 : w) - (((2 * h / 3) - d[0].y) / ((d[0].y - d[1].y) / (d[0].x - d[1].x)) + d[0].x)) + 2 * h / 3})
+svg.append("line")
+    .attr("id", "reflection")
+        .attr("x1", coords.x3)
+        .attr("y1", coords.h)
+        .attr("x2", coords.x4)
+        .attr("y2", coords.y4)
         .attr("class", "ray");
 
-svg.append("g")
+// svg.append("path")
+//     .attr("class", "arc")
+//     .attr("d", "M " + 
+//         (((2 * h / 3) - handles[0].y) / ((handles[0].y - handles[1].y) / (handles[0].x - handles[1].x)) + handles[0].x) 
+//         + " " + (2*h/3) 
+//         + " L "
+//         + 10 * Math.cos(Math.atan2(handles[0].y - handles[1].y, handles[0].x - handles[1].x))
+//         + " " + 10 * Math.sin(Math.atan2(handles[0].y - handles[1].y, handles[0].x - handles[1].x)) 
+//         + " Z");
+    //M115,115 L115,0 A115,115 1 0,1 196.317, 33.6827 z
 
 function dragstarted(d){
     d3.select(this).raise().classed("active", true);
@@ -78,15 +102,17 @@ function dragged(d, i){
         .attr("cx", d.x = d3.event.x)
         .attr("cy", d.y = i == 1 ? Math.max(d3.event.y, handles[0].y + 20) : Math.min(d3.event.y, handles[1].y - 20));
 
-    svg.select(".incident-rays").selectAll("line").data([handles])
-        .attr("x1", function(d) {return d[0].x;})
-        .attr("y1", function (d) { return d[0].y;/*return d[0].y - ((d[0].y - d[1].y) / (d[0].x - d[1].x)) * d[0].x*/ })
-        .attr("x2", function (d) { return ((2 * h / 3) - d[0].y) / ((d[0].y - d[1].y) / (d[0].x - d[1].x)) + d[0].x });
+    updateCoords();
+
+    svg.select("#incident")
+        .attr("x1", coords.x1)
+        .attr("y1", coords.y1)
+        .attr("x2", coords.x3)
     
-    svg.select(".reflection-rays").selectAll("line").data([handles])
-        .attr("x1", function (d) { return ((2 * h / 3) - d[0].y) / ((d[0].y - d[1].y) / (d[0].x - d[1].x)) + d[0].x })
-        .attr("x2", function (d) { return d[0].x > d[1].x ? 0 : w })
-        .attr("y2", function (d) { return -((d[0].y - d[1].y) / (d[0].x - d[1].x)) * ((d[0].x > d[1].x ? 0 : w) - (((2 * h / 3) - d[0].y) / ((d[0].y - d[1].y) / (d[0].x - d[1].x)) + d[0].x)) + 2 * h / 3 });
+    svg.select("#reflection")
+        .attr("x1", coords.x3)
+        .attr("x2", coords.x4)
+        .attr("y2", coords.y4);
 }
 
 function dragended(d){
