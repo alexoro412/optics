@@ -1,5 +1,6 @@
 var w = 400,
-    h = 350;
+    h = 350,
+    angle_radius = 35;
 
 var svg = d3.select("body")
     .append("svg")
@@ -81,16 +82,42 @@ svg.append("line")
         .attr("y2", coords.y4)
         .attr("class", "ray");
 
-// svg.append("path")
-//     .attr("class", "arc")
-//     .attr("d", "M " + 
-//         (((2 * h / 3) - handles[0].y) / ((handles[0].y - handles[1].y) / (handles[0].x - handles[1].x)) + handles[0].x) 
-//         + " " + (2*h/3) 
-//         + " L "
-//         + 10 * Math.cos(Math.atan2(handles[0].y - handles[1].y, handles[0].x - handles[1].x))
-//         + " " + 10 * Math.sin(Math.atan2(handles[0].y - handles[1].y, handles[0].x - handles[1].x)) 
-//         + " Z");
-    //M115,115 L115,0 A115,115 1 0,1 196.317, 33.6827 z
+svg.append("text")
+    .attr("id", "thetai")
+    .attr("x", coords.x3 - 2*angle_radius/3)
+    .attr("y", coords.h + 15)
+    .attr("font-size", "14")
+    .text("θ")
+    .append("tspan")
+        .attr("baseline-shift", "sub")
+        .attr("font-size", "10")
+        .text("i");
+
+svg.append("text")
+    .attr("id", "thetaf")
+    .attr("x", coords.x3 + angle_radius / 3)
+    .attr("y", coords.h + 15)
+    .attr("font-size", "14")
+    .text("θ")
+    .append("tspan")
+        .attr("baseline-shift", "sub")
+        .attr("font-size", "10")
+        .text("r");
+
+var angles = svg.append("path").attr("id", "arc");
+
+function updateAngles(){
+    angles.attr("d", "M " + coords.x3 + " " + coords.h
+        + " L " + (coords.x3 + angle_radius * Math.abs(Math.cos(Math.atan(coords.m)))) + " " + (coords.h - angle_radius * Math.abs(Math.sin(Math.atan(coords.m))))
+        + " A " + angle_radius + " " + angle_radius + " 0 0 1 " + (coords.x3 + angle_radius) + " " + coords.h
+        + "M " + coords.x3 + " " + coords.h
+        + " L " + (coords.x3 - angle_radius * Math.abs(Math.cos(Math.atan(coords.m)))) + " " + (coords.h - angle_radius * Math.abs(Math.sin(Math.atan(coords.m))))
+        + " A " + angle_radius + " " + angle_radius + " 0 0 0 " + (coords.x3 - angle_radius) + " " + coords.h
+        + " Z");
+}
+
+updateAngles();
+
 
 function dragstarted(d){
     d3.select(this).raise().classed("active", true);
@@ -101,6 +128,8 @@ function dragged(d, i){
     d3.select(this)
         .attr("cx", d.x = d3.event.x)
         .attr("cy", d.y = i == 1 ? Math.max(d3.event.y, handles[0].y + 20) : Math.min(d3.event.y, handles[1].y - 20));
+
+    if(handles[0].x == handles[1].x) return;
 
     updateCoords();
 
@@ -113,6 +142,14 @@ function dragged(d, i){
         .attr("x1", coords.x3)
         .attr("x2", coords.x4)
         .attr("y2", coords.y4);
+
+    svg.select("#thetai")
+        .attr("x", coords.x3 + (coords.x2 - coords.x1 > 0 ? -2*angle_radius/3 : angle_radius/3) )
+
+    svg.select("#thetaf")
+        .attr("x", coords.x3 + (coords.x2 - coords.x1 < 0 ? -2 * angle_radius / 3 : angle_radius / 3) )
+
+    updateAngles();
 }
 
 function dragended(d){
