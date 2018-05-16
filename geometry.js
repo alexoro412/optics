@@ -89,14 +89,19 @@ function raycast(x1, y1, x2, y2, geometry) {
 }
 
 function reflect(m1, mn) {
+    // Explanation in notebook
+    // return 2 * theta - alpha;
+
     // m1 is the slope of the incident ray 
     // mn is the slope of the normal ray
+
+    // return -Infinity;
 
     if (isFinite(m1)) {
         // non-vertical incident ray
         if (isFinite(mn)) {
             // non-vertical normal ray
-            return (2 * mn - m1 + m1 * mn ** 2) / (2 * m1 * mn - mn ** 2 + 1);
+            return -(2 * mn - m1 + m1 * mn ** 2) / (2 * m1 * mn - mn ** 2 + 1);
         } else {
             // vertical normal ray
             return -m1;
@@ -153,9 +158,9 @@ class Line {
 
                 // Calculate points
                 let x1 = (D * dy + sign(dy) * dx * Math.sqrt(delta)) / (dr ** 2) + other.cx,
-                    y1 = (D * dx + Math.abs(dy) * Math.sqrt(delta)) / (dr ** 2) + other.cy,
+                    y1 = (-D * dx + Math.abs(dy) * Math.sqrt(delta)) / (dr ** 2) + other.cy,
                     x2 = (D * dy - sign(dy) * dx * Math.sqrt(delta)) / (dr ** 2) + other.cx,
-                    y2 = (D * dx - Math.abs(dy) * Math.sqrt(delta)) / (dr ** 2) + other.cy;
+                    y2 = (-D * dx - Math.abs(dy) * Math.sqrt(delta)) / (dr ** 2) + other.cy;
 
                 // Calculate normals
                 let n1 = (y1 - other.cy) / (x1 - other.cx),

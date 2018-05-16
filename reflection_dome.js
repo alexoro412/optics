@@ -5,10 +5,15 @@
         handle_radius = 10,
         dome_radius = 120;
 
-    let handle = {
-        x: 277,
-        y: 40
-    }
+    let handles = [{
+            x: 277,
+            y: 40
+        },
+        {
+            x: 277,
+            y: 50
+        }
+    ]
 
     let coords = {
         h: 4 * h / 5
@@ -65,7 +70,7 @@
         .attr("class", "solid");
 
     svg.selectAll("circle")
-        .data([handle])
+        .data(handles)
         .enter().append("circle")
         .attr("cx", function (d) {
             return d.x;
@@ -80,15 +85,15 @@
             .on("drag", dragged)
             .on("end", dragended));
 
-    let incident = svg.append("line")
-        .attrs({
-            id: "incident",
-            x1: handle.x,
-            y1: handle.y,
-            x2: handle.x,
-            y2: surface(handle.x),
-            class: ""
-        })
+    // let incident = svg.append("line")
+    //     .attrs({
+    //         id: "incident",
+    //         x1: handle.x,
+    //         y1: handle.y,
+    //         x2: handle.x,
+    //         y2: surface(handle.x),
+    //         class: ""
+    //     })
 
     let reflected = svg.append("path")
         .attrs({
@@ -120,7 +125,7 @@
     //         }).attr("cy", function (d) {
     //             return d.y;
     //         });
-    
+
     // }
 
 
@@ -131,15 +136,15 @@
 
     function updateAngles() {
 
-        theta = (Math.atan2(Math.sqrt(dome_radius ** 2 - (handle.x - w / 2) ** 2), (handle.x - w / 2)));
+        // theta = (Math.atan2(Math.sqrt(dome_radius ** 2 - (handle.x - w / 2) ** 2), (handle.x - w / 2)));
 
-        if (!isFinite(theta)) {
-            angles.attr("d", "");
-            return;
-        };
+        // if (!isFinite(theta)) {
+        //     angles.attr("d", "");
+        //     return;
+        // };
 
-        angles.attr("d", "M " + (handle.x) + " " + (surface(handle.x)) +
-            " L " + (w / 2 + (dome_radius + angle_radius) * Math.cos(theta)) + " " + (coords.h - (dome_radius + angle_radius) * Math.sin(theta)));
+        // angles.attr("d", "M " + (handle.x) + " " + (surface(handle.x)) +
+        //     " L " + (w / 2 + (dome_radius + angle_radius) * Math.cos(theta)) + " " + (coords.h - (dome_radius + angle_radius) * Math.sin(theta)));
     }
 
     updateAngles();
@@ -155,7 +160,7 @@
         new Line(0, coords.h, w, coords.h, true),
         // Walls
         new Line(0, 0, 0, coords.h, false),
-        new Line(0, 0, w, 0, false),
+        new Line(0, 0, w, 0, true),
         new Line(w, 0, w, coords.h, false)
     ]
 
@@ -163,31 +168,32 @@
 
     function dragged(d) {
         d3.select(this)
-            .attr("cx", d.x = clamp(d3.event.x, 0, w));
+            .attr("cx", d.x = clamp(d3.event.x, 0, w))
+            .attr("cy", d.y = clamp(d3.event.y, 0, h));
 
         updateAngles();
 
-        incident
-            .attrs({
-                x1: handle.x,
-                x2: handle.x,
-                y2: surface(handle.x)
-            })
-console.log("NOW CASTING")
-        path = raycast(handle.x, handle.y, handle.x, handle.y + 10, space, -1);
+        // incident
+        //     .attrs({
+        //         x1: handles[0].x,
+        //         x2: handle.x,
+        //         y2: surface(handle.x)
+        //     })
+        console.log("NOW CASTING")
+        path = raycast(handles[0].x, handles[0].y, handles[1].x, handles[1].y, space);
 
         // console.log(p);
         // console.log(path);
         // console.log(path[0]);
 
-        
 
-        path_string = "M " + handle.x + " " + handle.y + " L ";
-        for(let i = 0; i < path.length; i++){
+
+        path_string = "M " + handles[0].x + " " + handles[0].y + " L ";
+        for (let i = 0; i < path.length; i++) {
             path_string += (path[i].x + " " + path[i].y + " ");
-            if(i == path.length - 1){
-                path_string += ("M " + handle.x + " " + handle.y + " z")
-            }else{
+            if (i == path.length - 1) {
+                path_string += ("M " + handles[0].x + " " + handles[0].y + " z")
+            } else {
                 path_string += ("L ")
             }
         }
