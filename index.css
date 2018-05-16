@@ -3,7 +3,6 @@ svg.sim {
 }
 
 .mirror {
-    fill: none;
     stroke: black;
     stroke-width: 1;
 }
@@ -11,7 +10,6 @@ svg.sim {
 .solid {
     fill: lightgray;
     fill-opacity: 0.4;
-    stroke: none;
 }
 
 .ray {
@@ -45,7 +43,7 @@ svg.sim {
     transition: fill 0.3s;
 }
 
-#arc {
+.arc {
     stroke: black;
     stroke-width: 1px;
     fill: none;
