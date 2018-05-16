@@ -10,42 +10,14 @@
             y: 40
         },
         {
-            x: 277,
-            y: 50
+            x: 272,
+            y: 70
         }
     ]
 
     let coords = {
         h: 4 * h / 5
     }
-
-    let surface = function (x) {
-        if (Math.abs(x - w / 2) > dome_radius) {
-            return coords.h;
-        } else {
-            return coords.h - Math.sqrt(dome_radius ** 2 - (x - w / 2) ** 2);
-        }
-    }
-
-    let reflection = function (x) {
-        // FIXME 
-        // Update to use slope based formula
-
-        // return 0;
-        if (Math.abs(x - w / 2) > dome_radius) {
-            return Infinity;
-        }
-        if (x < w / 2) {
-            return Math.tan(3 * Math.PI / 2 - 2 * Math.atan2(Math.sqrt(dome_radius ** 2 - (x - w / 2) ** 2), (x - w / 2)))
-        } else {
-            return -Math.tan(2 * Math.atan2(Math.sqrt(dome_radius ** 2 - (x - w / 2) ** 2), (x - w / 2)) - Math.PI / 2)
-        }
-
-    }
-
-    // for(let i = 0; i < 30; i ++){
-    //     console.log(i, reflection(i*10));
-    // }
 
     let svg = d3.select("#reflection_dome")
         .append("svg")
@@ -69,6 +41,24 @@
         .attr("height", h)
         .attr("class", "solid");
 
+    svg.append("rect")
+        .attrs({
+            x: 0,
+            y: 0, 
+            width: w,
+            height: 10,
+            class: "solid"
+        });
+
+    svg.append("line")
+        .attrs({
+            x1: 0,
+            y1: 10,
+            x2: w,
+            y2: 10,
+            class: "mirror"
+        });
+
     svg.selectAll("circle")
         .data(handles)
         .enter().append("circle")
@@ -85,110 +75,43 @@
             .on("drag", dragged)
             .on("end", dragended));
 
-    // let incident = svg.append("line")
-    //     .attrs({
-    //         id: "incident",
-    //         x1: handle.x,
-    //         y1: handle.y,
-    //         x2: handle.x,
-    //         y2: surface(handle.x),
-    //         class: ""
-    //     })
-
     let reflected = svg.append("path")
         .attrs({
             id: "reflected",
             d: "",
-            // x1: handle.x,
-            // y1: surface(handle.x),
-            // x2: w,
-            // y2: surface(handle.x) + reflection(handle.x) * (w / 2 - Math.abs(handle.x - w / 2)) * (handle.x < (w / 2) ? -1 : 1),
             class: "ray"
         })
 
     let path = [];
 
-    // let helpers = svg.append("g").attr("id", "helpers").selectAll("circle")
-    //     .data(path);
-
-    // function updateHelpers() {
-
-    //     svg.select("#helpers").selectAll("circle").data(path)
-    //         .exit().remove();
-
-    //     helpers.data(path).enter().append("circle")
-    //         .attr("class", "handle")
-    //         .attr("r", handle_radius)
-    //         .merge(helpers)
-    //         .attr("cx", function (d) {
-    //             return d.x;
-    //         }).attr("cy", function (d) {
-    //             return d.y;
-    //         });
-
-    // }
-
-
-
-    let angles = svg.append("path").attr("class", "arc")
-
-    let theta = 0;
-
-    function updateAngles() {
-
-        // theta = (Math.atan2(Math.sqrt(dome_radius ** 2 - (handle.x - w / 2) ** 2), (handle.x - w / 2)));
-
-        // if (!isFinite(theta)) {
-        //     angles.attr("d", "");
-        //     return;
-        // };
-
-        // angles.attr("d", "M " + (handle.x) + " " + (surface(handle.x)) +
-        //     " L " + (w / 2 + (dome_radius + angle_radius) * Math.cos(theta)) + " " + (coords.h - (dome_radius + angle_radius) * Math.sin(theta)));
-    }
-
-    updateAngles();
-
     function dragstarted(d) {
         d3.select(this).raise().classed("active", true);
     }
-
+    let dome = new Circle(w / 2, coords.h, dome_radius, true);
+    dome.setAngles(0, -Math.PI);
     space = [
         // Dome
-        new Circle(w / 2, coords.h, dome_radius, true),
+        dome,
         // Flat area
-        new Line(0, coords.h, w, coords.h, true),
+        new Line(0, coords.h, w / 2 - dome_radius, coords.h, true),
+        new Line(w / 2 + dome_radius, coords.h, w, coords.h, true),
+        new Line(0,10,w,10,true),
         // Walls
-        new Line(0, 0, 0, coords.h, false),
-        new Line(0, 0, w, 0, true),
-        new Line(w, 0, w, coords.h, false)
+        new Line(0, 0, 0, h, false),
+        new Line(0, 0, w, 0, false),
+        new Line(w, 0, w, h, false),
+        new Line(0, h, w, h, false)
     ]
 
-    console.log(space);
+    let incident_ray = new Line(handles[0].x, handles[0].y, handles[1].x, handles[1].y, false)
 
-    function dragged(d) {
-        d3.select(this)
-            .attr("cx", d.x = clamp(d3.event.x, 0, w))
-            .attr("cy", d.y = clamp(d3.event.y, 0, h));
+    function updateRay(){
+        incident_ray.moveTo(handles[0].x, handles[0].y, handles[1].x, handles[1].y);
 
-        updateAngles();
-
-        // incident
-        //     .attrs({
-        //         x1: handles[0].x,
-        //         x2: handle.x,
-        //         y2: surface(handle.x)
-        //     })
-        console.log("NOW CASTING")
-        path = raycast(handles[0].x, handles[0].y, handles[1].x, handles[1].y, space);
-
-        // console.log(p);
-        // console.log(path);
-        // console.log(path[0]);
-
-
+        path = raycast(incident_ray, space);
 
         path_string = "M " + handles[0].x + " " + handles[0].y + " L ";
+
         for (let i = 0; i < path.length; i++) {
             path_string += (path[i].x + " " + path[i].y + " ");
             if (i == path.length - 1) {
@@ -197,71 +120,22 @@
                 path_string += ("L ")
             }
         }
-        console.log(path_string);
 
         reflected.attr("d", path_string);
+    }
 
-        // updateHelpers();
+    console.log(space);
+    updateRay();
 
-        // reflected.attr("d", "M " + p[0].x, p[0].y 
-        // + " L " )
+    function dragged(d) {
+        d3.select(this)
+            .attr("cx", d.x = clamp(d3.event.x, 0, w))
+            .attr("cy", d.y = clamp(d3.event.y, 0, h));
 
-        // let m = reflect(-Infinity, p.n);
-
-        // reflected.attrs({
-        //     x1: p.x,
-        //     y1: p.y
-        // });
-
-        // if(isFinite(m)){
-        //     reflected.attrs({
-        //         x2: handle.x < (w / 2) ? 0 : w,
-        //         y2: p.y + m * (w / 2 - Math.abs(handle.x - w / 2)) * (handle.x < (w / 2) ? 1 : -1)
-        //     })
-        // }else{
-        //     reflected.attrs({
-        //         x2: p.x, 
-        //         y2: 0
-        //     })
-        // }
-
-        // reflected.attrs({
-        //     x1: handle.x,
-        //     y1: surface(handle.x)
-        // })
-
-
-
-        // if (reflection(handle.x) == Infinity) {
-        //     reflected.attrs({
-        //         x2: handle.x,
-        //         y2: 0
-        //     })
-        // } else {
-        //     let y2 = surface(handle.x) + reflection(handle.x) * (w / 2 - Math.abs(handle.x - w / 2)) * (handle.x < (w / 2) ? -1 : 1);
-
-        //     if (y2 > coords.h) {
-        //         reflected.attrs({
-        //             y2: coords.h,
-        //             x2: handle.x + (coords.h - surface(handle.x)) / reflection(handle.x)
-        //         })
-        //     } else {
-        //         reflected
-        //             .attrs({
-        //                 x2: handle.x < (w / 2) ? 0 : w,
-        //                 y2: y2
-        //             })
-        //     }
-
-
-        // }
-
-
-
+        updateRay();        
     }
 
     function dragended(d) {
         d3.select(this).classed("active", false);
-        // console.log(theta * 180 / Math.PI)
     }
 })();
