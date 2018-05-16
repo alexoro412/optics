@@ -16,8 +16,8 @@ function closest(x, y) {
     }
 }
 
-function raycast(x1, y1, m, geometry) {
-    let ray = new Line(x1, y1, x1 + 1, y1 + m);
+function raycast(x1, y1, x2, y2, geometry) {
+    let ray = new Line(x1, y1, x2, y2);
 
     intersections = [];
 
@@ -25,7 +25,37 @@ function raycast(x1, y1, m, geometry) {
         intersections = intersections.concat(ray.intersect(g));
     }
 
-    intersections.sort(closest(x1, y1));
+    let theta = ray.angle();
+    
+    intersections = (intersections.filter(function(point){
+        if(-90 < theta && theta < 90){
+            // Pointing to the right
+
+            // NB:
+            // Positive y is down in this world
+
+            if(theta < 0){
+                // Down and to the right
+                return point.x > ray.x1 && point.y > ray.y1;
+            }else{
+                // Up and to the right
+                return point.x > ray.x1 && point.y < ray.y1;
+            }
+        }else if(theta < -90 || theta > 90){
+            // To the left
+            if(theta < 0){
+                // Down and left
+                return point.x < ray.x1 && point.y > ray.y1;
+            }else{
+                // Up and left
+                return point.x < ray.x1 && point.y < ray.y1;
+            }
+        }else if(theta == 90){
+            return point.x == ray.x1 && point.y < ray.y1;
+        }else if(theta == -90){
+            return point.x == ray.x1 && point.y > ray.y1;
+        }
+    })).sort(closest(x1, y1));
 
     return intersections[0];
 }
@@ -57,11 +87,24 @@ function reflect(m1, mn) {
 }
 
 class Line {
-    constructor(x1, y1, x2, y2) {
+    constructor(x1, y1, x2, y2, reflective) {
         this.x1 = x1;
         this.x2 = x2;
         this.y1 = y1;
         this.y2 = y2;
+        this.r = reflective;
+    }
+
+    slope(){
+        return (this.y1 - this.y2) / (this.x1 - this.x2);
+    }
+
+    f(x){
+        return this.slope() * (x - this.x1) + this.y1;
+    }
+
+    angle(x){
+        return Math.atan2(this.y1 - this.y2, this.x1 - this.x2) * 180 / Math.PI;
     }
 
     intersect(other) {
@@ -93,25 +136,71 @@ class Line {
                 return [{
                     x: x1,
                     y: y2,
-                    n: n1
+                    n: n1,
+                    r: other.reflective
                 }, {
                     x: x2,
                     y: y2,
-                    n: n2
+                    n: n2,
+                    r: other.reflective
                 }]
             }
 
         } else if (other instanceof Line) {
-
+            if(this.slope() == other.slope()){
+                return [];
+            }else{
+                if(isFinite(this.slope())){
+                    if(isFinite(other.slope())){
+                        let x = (other.slope() * other.x1 - this.slope() * this.x1 + this.y1 - other.y1) / (other.slope() - this.slope());
+                        let y = this.f(x);
+                        let n = -1 / other.slope();
+                        return [{
+                            x: x,
+                            y: y,
+                            n: n,
+                            r: other.reflective
+                        }]
+                    }else{
+                        // ray non vertical
+                        // surface vertical 
+                        let n = 0;
+                        let x = other.x1;
+                        let y = this.f(x);
+                        return [{
+                            x:x, 
+                            y:y,
+                            n:n,
+                            r: other.reflective
+                        }]
+                    }
+                }else{
+                    if(isFinite(other.slope())){
+                        let n = -1 / other.slope();
+                        let x = this.x1;
+                        let y = other.f(x);
+                        return [{
+                            x:x,
+                            y:y, 
+                            n:n,
+                            r: other.reflective
+                        }]
+                    }else{
+                        return [];
+                    }
+                }
+                
+            }
         }
     }
 }
 
 class Circle {
-    constructor(cx, cy, r) {
+    constructor(cx, cy, r, reflective) {
         this.cx = cx;
         this.cy = cy;
         this.r = r;
+        this.reflective = reflective;
     }
 
     intersect(other) {

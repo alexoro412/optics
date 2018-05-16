@@ -105,10 +105,13 @@
     let theta = 0;
 
     function updateAngles() {
-        // TODO 
-        // Add arrowhead
 
         theta = (Math.atan2(Math.sqrt(dome_radius ** 2 - (handle.x - w / 2) ** 2), (handle.x - w / 2)));
+
+        if (!isFinite(theta)){
+            angles.attr("d", "");
+            return;
+        };
 
         angles.attr("d", "M " + (handle.x) + " " + (surface(handle.x))
             + " L " + (w / 2 + (dome_radius + angle_radius) * Math.cos(theta)) + " " + (coords.h - (dome_radius + angle_radius) * Math.sin(theta)));
@@ -119,6 +122,11 @@
     function dragstarted(d) {
         d3.select(this).raise().classed("active", true);
     }
+
+    space = [
+        new Circle(w/2, coords.h, dome_radius),
+        new Line(0,coords.h,w,coords.h)
+    ]
 
     function dragged(d) {
         d3.select(this)
@@ -133,34 +141,57 @@
                 y2: surface(handle.x)
             })
 
-        reflected.attrs({
-            x1: handle.x,
-            y1: surface(handle.x)
-        })
+        let p = raycast(handle.x, handle.y, handle.x, handle.y + 10, space);
 
-        if (reflection(handle.x) == Infinity) {
+        let m = reflect(-Infinity, p.n);
+
+        reflected.attrs({
+            x1: p.x,
+            y1: p.y
+        });
+
+        if(isFinite(m)){
             reflected.attrs({
-                x2: handle.x,
+                x2: handle.x < (w / 2) ? 0 : w,
+                y2: p.y + m * (w / 2 - Math.abs(handle.x - w / 2)) * (handle.x < (w / 2) ? 1 : -1)
+            })
+        }else{
+            reflected.attrs({
+                x2: p.x, 
                 y2: 0
             })
-        } else {
-            let y2 = surface(handle.x) + reflection(handle.x) * (w / 2 - Math.abs(handle.x - w / 2)) * (handle.x < (w / 2) ? -1 : 1);
-
-            if (y2 > coords.h) {
-                reflected.attrs({
-                    y2: coords.h,
-                    x2: handle.x + (coords.h - surface(handle.x)) / reflection(handle.x)
-                })
-            } else {
-                reflected
-                    .attrs({
-                        x2: handle.x < (w / 2) ? 0 : w,
-                        y2: y2
-                    })
-            }
-
-
         }
+
+        // reflected.attrs({
+        //     x1: handle.x,
+        //     y1: surface(handle.x)
+        // })
+
+
+
+        // if (reflection(handle.x) == Infinity) {
+        //     reflected.attrs({
+        //         x2: handle.x,
+        //         y2: 0
+        //     })
+        // } else {
+        //     let y2 = surface(handle.x) + reflection(handle.x) * (w / 2 - Math.abs(handle.x - w / 2)) * (handle.x < (w / 2) ? -1 : 1);
+
+        //     if (y2 > coords.h) {
+        //         reflected.attrs({
+        //             y2: coords.h,
+        //             x2: handle.x + (coords.h - surface(handle.x)) / reflection(handle.x)
+        //         })
+        //     } else {
+        //         reflected
+        //             .attrs({
+        //                 x2: handle.x < (w / 2) ? 0 : w,
+        //                 y2: y2
+        //             })
+        //     }
+
+
+        // }
 
 
 
@@ -168,6 +199,6 @@
 
     function dragended(d) {
         d3.select(this).classed("active", false);
-        console.log(theta * 180 / Math.PI)
+        // console.log(theta * 180 / Math.PI)
     }
 })();
