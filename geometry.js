@@ -71,14 +71,17 @@ function raycast(ray, geometry, bounce = max_bounce) {
     })).sort(closest(ray.x1, ray.y1));
 
     let points = [];
-    if(bounce == max_bounce){
-        points.push({x: ray.x1, y: ray.y1})
+    if (bounce == max_bounce) {
+        points.push({
+            x: ray.x1,
+            y: ray.y1
+        })
     }
 
     if (intersections.length > 0) {
         points.push(intersections[0]);
         if (intersections[0].r) {
-            
+
 
             let phi = reflect(ray.angle(), intersections[0].n)
             let reflected_ray = new Line(intersections[0].x, intersections[0].y, 0, 0, false);
@@ -153,7 +156,7 @@ class Line {
     }
 
     intersect(other) {
-        if (other instanceof Circle) {
+        if (other instanceof Circle || other instanceof Arc) {
             // http://mathworld.wolfram.com/Circle-LineIntersection.html
 
             let dx = this.x2 - this.x1,
@@ -184,24 +187,33 @@ class Line {
 
                 let points = [];
 
-                // if (other.theta1 < n1 && n1 < other.theta2) {
-                if (other.inAngles(n1)) {
-                    points.push({
-                        x: x1,
-                        y: y1,
-                        n: n1,
-                        r: other.reflective
-                    })
+                let p1 = {
+                    x: x1,
+                    y: y1,
+                    n: n1,
+                    r: other.reflective
                 }
 
-                // if (other.theta1 < n2 && n2 < other.theta2) {
-                if (other.inAngles(n2)) {
-                    points.push({
-                        x: x2,
-                        y: y2,
-                        n: n2,
-                        r: other.reflective
-                    })
+                let p2 = {
+                    x: x2,
+                    y: y2,
+                    n: n2,
+                    r: other.reflective
+                }
+
+                if (other instanceof Circle) {
+                    points.push(p1);
+                    points.push(p2);
+                } else if (other instanceof Arc) {
+                    // if (other.theta1 < n1 && n1 < other.theta2) {
+                    if (other.inAngles(n1)) {
+                        points.push(p1)
+                    }
+
+                    // if (other.theta1 < n2 && n2 < other.theta2) {
+                    if (other.inAngles(n2)) {
+                        points.push(p2)
+                    }
                 }
 
                 return points;
@@ -260,6 +272,96 @@ class Line {
                 }
 
             }
+        }
+    }
+}
+
+class Arc {
+
+    // I don't understand this
+    // I got it from:
+    // https://stackoverflow.com/questions/43825414/draw-an-svg-arc-using-d3-knowing-3-points-on-the-arc?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+
+
+    constructor(x1, y1, x2, y2, x3, y3) {
+        // a : (x1,y1) start
+        // b : (x2,y2) end 
+        // c : (x3,y3) via
+
+        let A = distance(x2, y2, x3, y3),
+            B = distance(x3, y3, x1, y1),
+            C = distance(x1, y1, x2, y2);
+
+        let angle = Math.acos((A * A + B * B - C * C) / (2 * A * B))
+
+        let K = .5 * A * B * Math.sin(angle);
+        this.r = A * B * C / 4 / K
+
+        this.x1 = x1;
+        this.y1 = y1;
+        this.x2 = x2;
+        this.y2 = y2;
+        this.x3 = x3;
+        this.y3 = y3;
+
+        let q = distance(x1, y1, x2, y2),
+            xm = (x1 + x2) / 2,
+            ym = (y1 + y2) / 2;
+
+        let r = this.r;
+
+        let deltax = Math.sqrt(r ** 2 - (q / 2) ** 2) * (y1 - y2) / q,
+            deltay = Math.sqrt(r ** 2 - (q / 2) ** 2) * (x2 - x1) / q;
+
+        this.laf = +(Math.PI / 2 > angle);
+        this.saf = +((x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1) < 0);
+
+        if (this.saf) {
+            this.cx = xm + deltax;
+            this.cy = ym + deltay;
+        } else {
+            this.cx = xm - deltax;
+            this.cy = ym - deltay;
+        }
+
+        this.angle_flag = true;
+
+        this.angle1 = Math.atan2(y2 - this.cy, x2 - this.cx);
+        this.angle2 = Math.atan2(y1 - this.cy, x1 - this.cx);
+
+        this.angle3 = Math.atan2(y3 - this.cy, x3 - this.cx);
+
+        if(!this.inAngles(this.angle3)){
+            this.angle_flag = false;
+        }
+
+        // console.log(this.angle1, this.angle2, this.angle3, this.angle_flag);
+
+    }
+
+    draw(move) {
+        if(move){
+            return `M ${this.x1} ${this.y1} A ${this.r} ${this.r} 0 ${this.laf} ${this.saf} ${this.x2} ${this.y2}`
+        }else{
+            return `A ${this.r} ${this.r} 0 ${this.laf} ${this.saf} ${this.x2} ${this.y2}`
+        }
+        
+    }
+
+    maxAngle(){
+        return Math.max(this.angle1, this.angle2)
+    }
+
+    minAngle(){
+        return Math.min(this.angle1, this.angle2)
+    }
+
+    inAngles(angle) {
+        // console.log("now trying", "1", this.minAngle(), "n", angle, "2", this.maxAngle(), this.angle_flag);
+        if (this.angle_flag) {
+            return angle < this.minAngle() || this.maxAngle() < angle;
+        } else {
+            return this.minAngle() < angle && angle < this.maxAngle();
         }
     }
 }
@@ -334,7 +436,7 @@ class Circle {
             xm = (x1 + x2) / 2,
             ym = (y1 + y2) / 2;
 
-        console.log(q, xm, ym);
+        console.log("q,m", q, xm, ym);
 
         let deltax = Math.sqrt(r ** 2 - (q / 2) ** 2) * (y1 - y2) / q,
             deltay = Math.sqrt(r ** 2 - (q / 2) ** 2) * (x2 - x1) / q;
@@ -377,7 +479,7 @@ class Circle {
 class Ray {
 
     // path is a list of points where the ray turns
-    constructor(path){
+    constructor(path) {
         this.path = "M " + path[0].x + " " + path[0].y + " L ";
 
         for (let i = 1; i < path.length; i++) {
@@ -390,18 +492,18 @@ class Ray {
         }
     }
 
-    draw(){
+    draw() {
         return this.path;
     }
 }
 
-class Space{
+class Space {
     // TODO
     // This class should support adding both solid and flat mirrors
     // It should also support solid and flat absorbers
     // It should expose a geometry list for use in raycasting
     // It should also expose a draw function
-    constructor(){
+    constructor() {
         this.paths = []
         this.geometry = []
     }
@@ -415,27 +517,28 @@ class Space{
         })
     }
 
-    add_thins(shapes, reflective, style){
+    add_thins(shapes, reflective, style) {
         this.paths.push({
             path: "",
             class: "hollow " + style
         })
         let last = this.paths.length - 1
-        for(let i = 0; i < shapes.length; i++){
+        console.log(shapes);
+        for (let i = 0; i < shapes.length; i++) {
             shapes[i].reflective = reflective
             this.geometry.push(shapes[i]);
             this.paths[last].path += shapes[i].draw(true)
-            this.paths[last].path += " Z "
+            // this.paths[last].path += " Z "
         }
     }
 
-    add_solid(shapes, reflective, style){
+    add_solid(shapes, reflective, style) {
         this.paths.push({
             path: "",
             class: "solid " + style
         })
 
-        for(let i = 0; i < shapes.length; i++){
+        for (let i = 0; i < shapes.length; i++) {
             shapes[i].reflective = reflective;
             this.geometry.push(shapes[i]);
             this.paths[this.paths.length - 1].path += shapes[i].draw(i == 0)
@@ -443,11 +546,129 @@ class Space{
         this.paths[this.paths.length - 1].path += " Z "
     }
 
-    get_geometry(){
+    get_geometry() {
         return this.geometry;
     }
 
-    draw(){
+    draw() {
         return this.paths;
     }
+
+    install(svg){
+        this.svg_object = svg.append("g")
+            .selectAll("path").data(this.draw())
+            .enter().append("path")
+            .attrs({
+                class: function(d){
+                    return d.class
+                },
+                d: function(d){
+                    return d.path;
+                }
+            })
+    }
+}
+
+class Beam {
+    constructor(x1, y1, x2, y2, num_rays, beam_width) {
+        this.ray_gap = beam_width / num_rays;
+        this.num_rays = num_rays;
+        this.rays = [];
+        this.radius = 10;
+        this.data = [{
+            x: x1,
+            y: y1
+        }, {
+            x: x2,
+            y: y2
+        }]
+
+        this.h = 350;
+        this.w = 400;
+    }
+
+    setBounds(w, h) {
+        this.w = w;
+        this.h = h;
+    }
+
+    updateRays() {
+        this.angle = Math.atan2(this.data[1].y - this.data[0].y, this.data[1].x - this.data[0].x);
+
+        for (let i = 0; i < this.num_rays; i++) {
+            // incident_rays[i].moveTo(handles[0].x + (i - 2) * 5 * Math.sin(angle), handles[0].y - (i - 2) * 5 * Math.cos(angle), handles[1].x + (i - 2) * 5 * Math.sin(angle), handles[1].y - (i - 2) * 5 * Math.cos(angle));
+
+            this.rays[i] = new Ray(raycast(new Line(
+                this.data[0].x + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
+                this.data[0].y - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle),
+                this.data[1].x + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
+                this.data[1].y - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle)
+            ), this.space.get_geometry()));
+        }
+
+    }
+
+    drawRays() {
+        this.svg_group.selectAll("path").data(this.rays)
+            .attrs({
+                d: function (d) {
+                    return d.draw()
+                }
+            })
+    }
+
+    install(svg, space) {
+        this.space = space;
+        this.svg_group = svg.append("g");
+
+        this.updateRays();
+
+        this.svg_group.selectAll("path").data(this.rays)
+            .enter().append("path")
+            .attrs({
+                d: "",
+                class: "ray"
+            });
+
+        this.drawRays();
+
+        let self = this;
+
+        this.svg_group.selectAll("circle")
+            .data(this.data)
+            .enter().append("circle")
+            .attrs({
+                cx: function (d) {
+                    return d.x;
+                },
+                cy: function (d) {
+                    return d.y;
+                },
+                r: this.radius,
+                class: "handle"
+            }).call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", function (d) {
+                    (dragged.bind(this))(d, self.w, self.h);
+                    self.updateRays();
+                    self.drawRays();
+                })
+                .on("end", dragended))
+    }
+}
+
+function dragstarted(d) {
+    d3.select(this).raise().classed("active", true);
+}
+
+function dragged(d, w, h) {
+    d3.select(this)
+        .attr("cx", d.x = clamp(d3.event.x, 0, w))
+        .attr("cy", d.y = clamp(d3.event.y, 0, h));
+
+    // updateRays();
+}
+
+function dragended(d) {
+    d3.select(this).classed("active", false);
 }
