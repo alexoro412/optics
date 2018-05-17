@@ -26,6 +26,7 @@ svg.sim {
 
 .ray:hover {
     stroke-width: 2;
+    stroke: #c0392b;
 }
 
 .handle {

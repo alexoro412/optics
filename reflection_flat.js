@@ -54,22 +54,6 @@
         .attr("height", h - coords.h)
         .attr("class", "solid");
 
-    svg.selectAll("circle")
-        .data([handle])
-        .enter().append("circle")
-        .attr("cx", function (d) {
-            return d.x;
-        })
-        .attr("cy", function (d) {
-            return d.y;
-        })
-        .attr("r", handle_radius)
-        .attr("class", "handle")
-        .call(d3.drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended));
-
     svg.append("line")
         .attr("id", "incident")
         .attr("x1", coords.x1)
@@ -170,6 +154,22 @@
     function dragended(d) {
         d3.select(this).classed("active", false);
     }
+
+     svg.selectAll("circle")
+         .data([handle])
+         .enter().append("circle")
+         .attr("cx", function (d) {
+             return d.x;
+         })
+         .attr("cy", function (d) {
+             return d.y;
+         })
+         .attr("r", handle_radius)
+         .attr("class", "handle")
+         .call(d3.drag()
+             .on("start", dragstarted)
+             .on("drag", dragged)
+             .on("end", dragended));
 })();
 
 // FOR PARABOLIC REFLECTOR

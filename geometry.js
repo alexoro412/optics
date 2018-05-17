@@ -331,7 +331,7 @@ class Arc {
 
         this.angle3 = Math.atan2(y3 - this.cy, x3 - this.cx);
 
-        if(!this.inAngles(this.angle3)){
+        if (!this.inAngles(this.angle3)) {
             this.angle_flag = false;
         }
 
@@ -340,19 +340,19 @@ class Arc {
     }
 
     draw(move) {
-        if(move){
+        if (move) {
             return `M ${this.x1} ${this.y1} A ${this.r} ${this.r} 0 ${this.laf} ${this.saf} ${this.x2} ${this.y2}`
-        }else{
+        } else {
             return `A ${this.r} ${this.r} 0 ${this.laf} ${this.saf} ${this.x2} ${this.y2}`
         }
-        
+
     }
 
-    maxAngle(){
+    maxAngle() {
         return Math.max(this.angle1, this.angle2)
     }
 
-    minAngle(){
+    minAngle() {
         return Math.min(this.angle1, this.angle2)
     }
 
@@ -373,105 +373,13 @@ class Circle {
         this.cy = cy;
         this.r = r;
         this.reflective = reflective;
-        this.theta1 = -Math.PI;
-        this.theta2 = Math.PI;
-        this.large_arc = false;
     }
-
-    setAngles(theta1, theta2, large_arc) {
-        this.theta1 = theta1;
-        this.theta2 = theta2;
-        this.large_arc = large_arc;
-    }
-
-    minAngle() {
-        return Math.min(this.theta1, this.theta2);
-    }
-
-    maxAngle() {
-        return Math.max(this.theta1, this.theta2)
-    }
-
-    inAngles(angle) {
-        // I DO NOT KNOW WHY THIS WORKS
-        // DO NOT ASK ME ABOUT THIS
-        // IT IS LATE AND I AM TIRED
-        // IT WORKS
-        if ((this.large_arc && (Math.abs(this.theta2 - this.theta1) < Math.PI)) ||
-            (!this.large_arc && (Math.abs(this.theta2 - this.theta1) > Math.PI))) {
-            return angle < this.minAngle() || this.maxAngle() < angle;
-        } else {
-            return this.minAngle() < angle && angle < this.maxAngle();
-        }
-    }
-
 
     draw(move) {
-        // if(this.large_arc){
-
-        if (move) {
-            return "M " + (this.cx + Math.cos(this.theta2) * this.r) + " " + (this.cy + Math.sin(this.theta2) * this.r) +
-                " A " + this.r + " " + this.r + " 0 " + (this.large_arc ? 1 : 0) + " " + (this.flip ? 0 : 1) +
-                " " + (this.cx + this.r * Math.cos(this.theta1)) + " " + (this.cy + this.r * Math.sin(this.theta1)) + " ";
-        } else {
-            return "A " + this.r + " " + this.r + " 0 " + (this.large_arc ? 1 : 0) + " " + (this.flip ? 0 : 1) +
-                " " + (this.cx + this.r * Math.cos(this.theta1)) + " " + (this.cy + this.r * Math.sin(this.theta1)) + " ";
-        }
-
-
-        // }else{
-        //     return "M " + (this.cx - Math.cos(this.theta1) * this.r) + " " + (this.cy - Math.sin(this.theta1) * this.r) +
-        //         " A " + this.r + " " + this.r + " 0 " + (this.large_arc ? 1 : 0) + " " + (this.large_arc ? 0 : 1) +
-        //         " " + (this.cx - this.r * Math.cos(this.theta2)) + " " + (this.cy - this.r * Math.sin(this.theta2));
-        // }
-
-    }
-
-    arc(x1, y1, x2, y2, r, large_arc, flip) {
-
-        // flip = 1 => clockwise
-
-        this.r = r;
-        let q = distance(x1, y1, x2, y2),
-            xm = (x1 + x2) / 2,
-            ym = (y1 + y2) / 2;
-
-        console.log("q,m", q, xm, ym);
-
-        let deltax = Math.sqrt(r ** 2 - (q / 2) ** 2) * (y1 - y2) / q,
-            deltay = Math.sqrt(r ** 2 - (q / 2) ** 2) * (x2 - x1) / q;
-
-        console.log(r ** 2 - (q / 2) ** 2);
-
-        this.flip = flip;
-        this.large_arc = large_arc;
-
-        if (flip == large_arc) {
-            this.cx = xm + deltax;
-            this.cy = ym + deltay;
-        } else {
-            this.cx = xm - deltax;
-            this.cy = ym - deltay;
-        }
-
-        // if(flip == large_arc){
-        this.setAngles(Math.atan2(y2 - this.cy, x2 - this.cx),
-            Math.atan2(y1 - this.cy, x1 - this.cx),
-            large_arc);
-        // }else{
-        //      this.setAngles(Math.atan2(this.cy - y2, this.cx - x2),
-        //          Math.atan2(this.cy - y1, this.cx - x1),
-        //          large_arc);
-        // }
-
-
-
+        throw "Can not draw circles in paths"
     }
 
     intersect(other) {
-        // if (other instanceof Line) {
-        //     return other.intersect(this);
-        // }
         return null;
     }
 }
@@ -498,14 +406,10 @@ class Ray {
 }
 
 class Space {
-    // TODO
-    // This class should support adding both solid and flat mirrors
-    // It should also support solid and flat absorbers
-    // It should expose a geometry list for use in raycasting
-    // It should also expose a draw function
     constructor() {
         this.paths = []
         this.geometry = []
+        this.circles = []
     }
 
     add_thin(shape, reflective, style) {
@@ -546,6 +450,13 @@ class Space {
         this.paths[this.paths.length - 1].path += " Z "
     }
 
+    add_circle(circle, reflective = false, style = "") {
+        circle.reflective = reflective;
+        circle.style = style;
+        this.geometry.push(circle);
+        this.circles.push(circle);
+    }
+
     get_geometry() {
         return this.geometry;
     }
@@ -554,17 +465,36 @@ class Space {
         return this.paths;
     }
 
-    install(svg){
-        this.svg_object = svg.append("g")
-            .selectAll("path").data(this.draw())
+    install(svg) {
+        this.svg_object = svg.append("g");
+
+        this.svg_object.selectAll("path").data(this.draw())
             .enter().append("path")
             .attrs({
-                class: function(d){
+                class: function (d) {
                     return d.class
                 },
-                d: function(d){
+                d: function (d) {
                     return d.path;
                 }
+            });
+
+        this.svg_object.selectAll("circle").data(this.circles)
+            .enter().append("circle")
+            .attrs({
+                cx: function(d){
+                    return d.cx;
+                },
+                cy: function(d){
+                    return d.cy;
+                },
+                r: function(d){
+                    return d.r;
+                },
+                class: function(d){
+                    return d.style;
+                }
+
             })
     }
 }
