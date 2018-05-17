@@ -27,37 +27,55 @@
             width: w
         })
 
-    // let mirror = svg.append("path")
-    //     .attr("d", "M " + 0 + " " + coords.h +
-    //         " L " + ((w / 2) - dome_radius) + " " + coords.h +
-    //         " A " + dome_radius + " " + dome_radius + " 0 0 1 " + ((w / 2) + dome_radius) + " " + coords.h +
-    //         " L " + w + " " + coords.h)
-    //     .attr("class", "solid mirror");
+    // let dome = new Circle(w / 2, coords.h, dome_radius, true);
+    // dome.setAngles(0, -Math.PI);
 
-    // svg.append("rect")
-    //     .attr("x", 0)
-    //     .attr("y", coords.h)
-    //     .attr("width", w)
-    //     .attr("height", h)
-    //     .attr("class", "solid");
+    let space = new Space();
 
-    // svg.append("rect")
-    //     .attrs({
-    //         x: 0,
-    //         y: 0,
-    //         width: w,
-    //         height: 10,
-    //         class: "solid"
-    //     });
+    let dome_left = new Circle();
+    dome_left.reflective = true;
+    dome_left.arc(w / 2 - dome_radius, coords.h, w / 2, coords.h - dome_radius, dome_radius, 0, 1);
+    // dome_left.arc(w / 2 + dome_radius, coords.h, w / 2, coords.h - dome_radius, dome_radius, 0, 0);
 
-    // svg.append("line")
-    //     .attrs({
-    //         x1: 0,
-    //         y1: 10,
-    //         x2: w,
-    //         y2: 10,
-    //         class: "mirror"
-    //     });
+    let dome_right = new Circle();
+    dome_right.reflective = true;
+    dome_right.arc(w / 2, coords.h - dome_radius, w / 2 + dome_radius, coords.h, dome_radius, 0, 0);
+
+    space.add_solid([
+        new Line(0, coords.h, w / 2 - dome_radius, coords.h, true),
+        dome_left,
+        dome_right,
+        new Line(w / 2 + dome_radius, coords.h, w, coords.h, true),
+        new Line(w, coords.h, w, h, true),
+        new Line(w, h, 0, h, true),
+        new Line(0, h, 0, coords.h, true)
+    ], true, "mirror")
+
+    // space.add_solid([
+    //     new Line(100,100,100,200),
+    //     new Line(100,200,200,200),
+    //     new Line(200,200,200,100),
+    //     new Line(200,100,100,100)
+    // ], true, "mirror");
+
+    space.add_thins([
+        new Line(0, 0, 0, coords.h, false),
+        new Line(0, 0, w, 0, false),
+        new Line(w, 0, w, coords.h, false),
+    ], false, "arc")
+
+    svg.append("g").attr("id", "space")
+        .selectAll("path").data(space.draw()).enter().append("path")
+        .attrs({
+            class: function (d) {
+                return d.class;
+            },
+            d: function (d) {
+                return d.path;
+            }
+        })
+
+    console.log(space.draw())
 
     svg.selectAll("circle")
         .data(handles)
@@ -82,56 +100,14 @@
             class: "ray"
         })
 
-    let path = [];
 
-    function dragstarted(d) {
-        d3.select(this).raise().classed("active", true);
-    }
-    // let dome = new Circle(w / 2, coords.h, dome_radius, true);
-    // dome.setAngles(0, -Math.PI);
-
-    let dome_left = new Circle();
-    dome_left.reflective = true;
-    dome_left.arc(w / 2 - dome_radius, coords.h, w / 2, coords.h - dome_radius, dome_radius, 0, 1);
-    // dome_left.arc(w / 2 + dome_radius, coords.h, w / 2, coords.h - dome_radius, dome_radius, 0, 0);
-
-    let dome_right = new Circle();
-    dome_right.reflective = true;
-    dome_right.arc(w / 2, coords.h - dome_radius, w / 2 + dome_radius, coords.h, dome_radius, 0, 0);
-
-    let dome = new Circle();
-    dome.reflective = true;
-    dome.arc(w / 2 - dome_radius, coords.h, w / 2 + dome_radius, coords.h, dome_radius, 0, 0);
-
-    console.log("left", dome_left);
-    console.log("right", dome_right);
-
-    space = [
-        // Dome
-        
-        // dome,
-        // Flat area
-        new Line(0, coords.h, w / 2 - dome_radius, coords.h, true),
-        dome_left,
-        dome_right,
-        new Line(w / 2 + dome_radius, coords.h, w, coords.h, true),
-        new Line(w, coords.h, w, h, true),
-        new Line(w, h, 0, h, true),
-        new Line(0, h, 0, coords.h, true),
-        // new Line(0, 10, w, 10, true),
-        // Walls
-        new Line(0, 0, 0, coords.h, false),
-        new Line(0, 0, w, 0, false),
-        new Line(w, 0, w, coords.h, false),
-        // new Line(0, h, w, h, false)
-    ]
 
     let incident_ray = new Line(handles[0].x, handles[0].y, handles[1].x, handles[1].y, false)
 
     function updateRay() {
         incident_ray.moveTo(handles[0].x, handles[0].y, handles[1].x, handles[1].y);
 
-        path = raycast(incident_ray, space);
+        let path = raycast(incident_ray, space.get_geometry());
 
         path_string = "M " + handles[0].x + " " + handles[0].y + " L ";
 
@@ -147,23 +123,11 @@
         reflected.attr("d", path_string);
     }
 
-    console.log(dome_left.draw());
     updateRay();
 
-
-    mirror_string = "";
-    for(let i = 0; i < space.length; i++){
-        if(space[i].reflective)
-        mirror_string += space[i].draw(i == 0)
+    function dragstarted(d) {
+        d3.select(this).raise().classed("active", true);
     }
-
-    mirror_string += " z";
-
-    let arc_test = svg.append("path")
-        .attrs({
-            class: "solid mirror",
-            d: mirror_string
-        })
 
     function dragged(d) {
         d3.select(this)

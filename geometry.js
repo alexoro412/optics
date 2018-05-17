@@ -366,3 +366,60 @@ class Circle {
         return null;
     }
 }
+
+class Space{
+    // TODO
+    // This class should support adding both solid and flat mirrors
+    // It should also support solid and flat absorbers
+    // It should expose a geometry list for use in raycasting
+    // It should also expose a draw function
+    constructor(){
+        this.paths = []
+        this.geometry = []
+    }
+
+    add_thin(shape, reflective, style) {
+        shape.reflective = reflective;
+        this.geometry.push(shape);
+        this.paths.push({
+            path: shape.draw(true),
+            class: "hollow " + style
+        })
+    }
+
+    add_thins(shapes, reflective, style){
+        this.paths.push({
+            path: "",
+            class: "hollow " + style
+        })
+        let last = this.paths.length - 1
+        for(let i = 0; i < shapes.length; i++){
+            shapes[i].reflective = reflective
+            this.geometry.push(shapes[i]);
+            this.paths[last].path += shapes[i].draw(true)
+            this.paths[last].path += " Z "
+        }
+    }
+
+    add_solid(shapes, reflective, style){
+        this.paths.push({
+            path: "",
+            class: "solid " + style
+        })
+
+        for(let i = 0; i < shapes.length; i++){
+            shapes[i].reflective = reflective;
+            this.geometry.push(shapes[i]);
+            this.paths[this.paths.length - 1].path += shapes[i].draw(i == 0)
+        }
+        this.paths[this.paths.length - 1].path += " Z "
+    }
+
+    get_geometry(){
+        return this.geometry;
+    }
+
+    draw(){
+        return this.paths;
+    }
+}

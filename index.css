@@ -20,6 +20,12 @@ svg.sim {
     fill: none;
     stroke: red;
     stroke-width: 1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.ray:hover {
+    stroke-width: 2;
 }
 
 .handle {
