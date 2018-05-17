@@ -77,6 +77,47 @@
 
     console.log(space.draw())
 
+    let incident_ray = new Line(handles[0].x, handles[0].y, handles[1].x, handles[1].y, false)
+
+    let incident_rays = [];
+    let reflected_rays = [];
+
+    for (let i = 0; i < 5; i++) {
+        incident_rays.push(new Line());
+        reflected_rays.push(new Line());
+    }
+
+    let rays = svg.append("g").attr("id", "rays")
+        .selectAll("path").data(reflected_rays)
+        .enter().append("path")
+        .attrs({
+            d: "",
+            class: "ray"
+        })
+
+    console.log(reflected_rays, incident_rays);
+
+
+    function updateRay() {
+        let angle = Math.atan2(handles[1].y - handles[0].y, handles[1].x - handles[0].x);
+
+        for (let i = 0; i < 5; i++) {
+            incident_rays[i].moveTo(handles[0].x + (i-2) * 5 * Math.sin(angle), handles[0].y - (i-2) * 5 * Math.cos(angle), handles[1].x + (i-2) * 5 * Math.sin(angle), handles[1].y - (i-2) * 5 * Math.cos(angle));
+
+            reflected_rays[i] = new Ray(raycast(incident_rays[i], space.get_geometry()))
+        }
+
+        rays.data(reflected_rays)
+            .attrs({
+                d: function (d) {
+                    return d.draw()
+                }
+            })
+
+    }
+
+    updateRay();
+
     svg.selectAll("circle")
         .data(handles)
         .enter().append("circle")
@@ -92,38 +133,6 @@
             .on("start", dragstarted)
             .on("drag", dragged)
             .on("end", dragended));
-
-    let reflected = svg.append("path")
-        .attrs({
-            id: "reflected",
-            d: "",
-            class: "ray"
-        })
-
-
-
-    let incident_ray = new Line(handles[0].x, handles[0].y, handles[1].x, handles[1].y, false)
-
-    function updateRay() {
-        incident_ray.moveTo(handles[0].x, handles[0].y, handles[1].x, handles[1].y);
-
-        let path = raycast(incident_ray, space.get_geometry());
-
-        path_string = "M " + handles[0].x + " " + handles[0].y + " L ";
-
-        for (let i = 0; i < path.length; i++) {
-            path_string += (path[i].x + " " + path[i].y + " ");
-            if (i == path.length - 1) {
-                path_string += ("M " + handles[0].x + " " + handles[0].y + " z")
-            } else {
-                path_string += ("L ")
-            }
-        }
-
-        reflected.attr("d", path_string);
-    }
-
-    updateRay();
 
     function dragstarted(d) {
         d3.select(this).raise().classed("active", true);

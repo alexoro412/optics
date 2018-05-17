@@ -16,7 +16,9 @@ function closest(x, y) {
     }
 }
 
-function raycast(ray, geometry, bounce = 10) {
+const max_bounce = 10;
+
+function raycast(ray, geometry, bounce = max_bounce) {
     if (bounce == 0) return [];
 
     intersections = [];
@@ -68,20 +70,25 @@ function raycast(ray, geometry, bounce = 10) {
         }
     })).sort(closest(ray.x1, ray.y1));
 
+    let points = [];
+    if(bounce == max_bounce){
+        points.push({x: ray.x1, y: ray.y1})
+    }
 
     if (intersections.length > 0) {
+        points.push(intersections[0]);
         if (intersections[0].r) {
-            let p = intersections[0];
+            
 
-            let phi = reflect(ray.angle(), p.n)
-            let reflected_ray = new Line(p.x, p.y, 0, 0, false);
+            let phi = reflect(ray.angle(), intersections[0].n)
+            let reflected_ray = new Line(intersections[0].x, intersections[0].y, 0, 0, false);
             reflected_ray.polar(1, phi);
 
-            return ([p])
+            return points
                 // .concat([{x:reflected_ray.x1, y: reflected_ray.y1}, {x:reflected_ray.x2, y: reflected_ray.y2}])
                 .concat(raycast(reflected_ray, geometry, bounce - 1))
         } else {
-            return [intersections[0]];
+            return points;
         }
     } else {
         return [];
@@ -364,6 +371,27 @@ class Circle {
         //     return other.intersect(this);
         // }
         return null;
+    }
+}
+
+class Ray {
+
+    // path is a list of points where the ray turns
+    constructor(path){
+        this.path = "M " + path[0].x + " " + path[0].y + " L ";
+
+        for (let i = 1; i < path.length; i++) {
+            this.path += (path[i].x + " " + path[i].y + " ");
+            if (i == path.length - 1) {
+                this.path += ("M " + path[0].x + " " + path[0].y + " z")
+            } else {
+                this.path += ("L ")
+            }
+        }
+    }
+
+    draw(){
+        return this.path;
     }
 }
 
