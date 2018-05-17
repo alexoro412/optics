@@ -156,6 +156,32 @@ class Line {
     }
 
     intersect(other) {
+        if (other instanceof Bezier) {
+            let Ax = -this.slope(),
+                Ay = 1,
+                C = this.y1 - this.slope() * this.x1;
+
+            let a = Ax * other.xCoeffs[0] + Ay * other.yCoeffs[0];
+            let b = Ax * other.xCoeffs[1] + Ay * other.yCoeffs[1];
+            let c = Ax * other.xCoeffs[2] + Ay * other.yCoeffs[2];
+            let d = Ax * other.xCoeffs[3] + Ay * other.yCoeffs[3] - C;
+
+
+            let roots = cubicRoots(a, b, c, d);
+
+            roots = roots.filter(function (x) {
+                return 0 <= x && x <= 1;
+            })
+
+            let answers = roots.map(function (e) {
+                let o = other.f(e);
+                o.n = other.normal(e);
+                o.r = other.reflective;
+                return o;
+            });
+            return answers;
+        }
+
         if (other instanceof Circle || other instanceof Arc) {
             // http://mathworld.wolfram.com/Circle-LineIntersection.html
 
@@ -427,7 +453,6 @@ class Space {
             class: "hollow " + style
         })
         let last = this.paths.length - 1
-        console.log(shapes);
         for (let i = 0; i < shapes.length; i++) {
             shapes[i].reflective = reflective
             this.geometry.push(shapes[i]);
@@ -482,16 +507,16 @@ class Space {
         this.svg_object.selectAll("circle").data(this.circles)
             .enter().append("circle")
             .attrs({
-                cx: function(d){
+                cx: function (d) {
                     return d.cx;
                 },
-                cy: function(d){
+                cy: function (d) {
                     return d.cy;
                 },
-                r: function(d){
+                r: function (d) {
                     return d.r;
                 },
-                class: function(d){
+                class: function (d) {
                     return d.style;
                 }
 
@@ -601,4 +626,113 @@ function dragged(d, w, h) {
 
 function dragended(d) {
     d3.select(this).classed("active", false);
+}
+
+class Bezier {
+    constructor(x1, y1, x2, y2, x3, y3, x4, y4) {
+        this.x1 = x1;
+        this.y1 = y1;
+
+        this.x2 = x2;
+        this.y2 = y2;
+
+        this.x3 = x3;
+        this.y3 = y3;
+
+        this.x4 = x4;
+        this.y4 = y4;
+
+        this.xCoeffs = [
+            (-this.x1 + 3 * this.x2 - 3 * this.x3 + this.x4),
+            (3 * this.x1 - 6 * this.x2 + 3 * this.x3),
+            (-3 * this.x1 + 3 * this.x2),
+            this.x1
+        ]
+
+        this.yCoeffs = [
+            (-this.y1 + 3 * this.y2 - 3 * this.y3 + this.y4),
+            (3 * this.y1 - 6 * this.y2 + 3 * this.y3),
+            (-3 * this.y1 + 3 * this.y2),
+            this.y1
+        ]
+    }
+
+    f(t) {
+        return {
+            x: this.xCoeffs[0] * t * t * t + this.xCoeffs[1] * t * t + this.xCoeffs[2] * t + this.xCoeffs[3],
+            y: this.yCoeffs[0] * t * t * t + this.yCoeffs[1] * t * t + this.yCoeffs[2] * t + this.yCoeffs[3]
+        }
+    }
+
+    draw() {
+        return `M ${this.x1} ${this.y1} C ${this.x2} ${this.y2} ${this.x3} ${this.y3} ${this.x4} ${this.y4}`
+    }
+
+    normal(t){
+        let dydt = this.yCoeffs[0] * 3 * t * t + this.yCoeffs[1] * 2 * t + this.yCoeffs[2],
+            dxdt = this.xCoeffs[0] * 3 * t * t + this.xCoeffs[1] * 2 * t + this.xCoeffs[2];
+
+        return Math.atan2(-dxdt, dydt);
+    }
+
+}
+
+function cubicRoots(a, b, c, d) {
+    if (a == 0) {
+        // Woops, now it's quadratic :)
+
+        let D = c * c - 4 * b * d;
+        if (D < 0) {
+            // No real solutions
+            return [];
+        } else if (D == 0) {
+            // One solution
+            return [
+                (-c + Math.sqrt(D)) / (2 * b)
+            ]
+        } else {
+            //Two solutions
+            return [
+                (-c + Math.sqrt(D)) / (2 * b),
+                (-c - Math.sqrt(D)) / (2 * b)
+            ]
+        }
+    } else {
+
+        // from https://www.particleincell.com/2013/cubic-line-intersection/
+        let A = b / a;
+        let B = c / a;
+        let C = d / a;
+
+        let Q, R, D, S, T, Im;
+
+        Q = (3 * B - A * A) / 9;
+        R = (9 * A * B - 27 * C - 2 * Math.pow(A, 3)) / 54;
+        D = Math.pow(Q, 3) + Math.pow(R, 2); // discriminant
+
+        let answers = [];
+
+        if (D >= 0) {
+            S = sign(R + Math.sqrt(D)) * Math.pow(Math.abs(R + Math.sqrt(D)), (1 / 3));
+            T = sign(R - Math.sqrt(D)) * Math.pow(Math.abs(R - Math.sqrt(D)), (1 / 3));
+
+            answers[0] = -A / 3 + (S + T); // real
+            answers[1] = -A / 3 - (S + T) / 2;
+            answers[2] = -A / 3 - (S + T) / 2;
+            Im = Math.abs(Math.sqrt(3) * (S - T / 2));
+
+            if (Im != 0) {
+                answers = [answers[0]]
+            }
+        } else {
+            let th = Math.acos(R / Math.sqrt(-Math.pow(Q, 3)));
+
+            answers[0] = 2 * Math.sqrt(-Q) * Math.cos(th / 3) - A / 3;
+            answers[1] = 2 * Math.sqrt(-Q) * Math.cos((th + 2 * Math.PI) / 3) - A / 3;
+            answers[2] = 2 * Math.sqrt(-Q) * Math.cos((th + 4 * Math.PI) / 3) - A / 3;
+            Im = 0.0;
+        }
+
+        return answers;
+    }
 }

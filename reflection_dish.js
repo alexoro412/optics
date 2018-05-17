@@ -19,8 +19,8 @@
 
     let space = new Space();
 
-    let dome = new Arc(w/2 - dome_radius, coords.h, w/2 + dome_radius, coords.h, w/2, coords.h + dome_radius);
-    
+    let dome = new Arc(w / 2 - dome_radius, coords.h, w / 2 + dome_radius, coords.h, w / 2, coords.h + dome_radius);
+
     // let dome_left = new Circle(w/2, coords.h, dome_radius, true);
     // dome_left.reflective = true;
     // dome_left.arc(w / 2 - dome_radius, coords.h, w / 2, coords.h + dome_radius, dome_radius, 0, 1);
@@ -46,8 +46,11 @@
         new Line(w, 0, w, coords.h, false),
     ], false, "arc")
 
+    space.add_thin(new Bezier(0, 0, 0, 100,
+            100, 100, 100, 0),true,"ray")
+
     space.install(svg);
 
-    let beam = new Beam(100, 100, 200, 200, 10, 20);
+    let beam = new Beam(100, 100, 200, 200, 1, 20);
     beam.install(svg, space);
 })();
