@@ -92,12 +92,12 @@
 
     let dome_left = new Circle();
     dome_left.reflective = true;
-     dome_left.arc(w / 2 - dome_radius, coords.h, w / 2, coords.h - dome_radius, dome_radius, 0, 0);
+    dome_left.arc(w / 2 - dome_radius, coords.h, w / 2, coords.h - dome_radius, dome_radius, 0, 1);
     // dome_left.arc(w / 2 + dome_radius, coords.h, w / 2, coords.h - dome_radius, dome_radius, 0, 0);
 
     let dome_right = new Circle();
     dome_right.reflective = true;
-    dome_right.arc(w / 2, coords.h - dome_radius, w / 2 + dome_radius, coords.h, dome_radius, 0, 1);
+    dome_right.arc(w / 2, coords.h - dome_radius, w / 2 + dome_radius, coords.h, dome_radius, 0, 0);
 
     let dome = new Circle();
     dome.reflective = true;
@@ -154,14 +154,14 @@
     mirror_string = "";
     for(let i = 0; i < space.length; i++){
         if(space[i].reflective)
-        mirror_string += space[i].draw()
+        mirror_string += space[i].draw(i == 0)
     }
 
     mirror_string += " z";
 
     let arc_test = svg.append("path")
         .attrs({
-            class: "hollow mirror",
+            class: "solid mirror",
             d: mirror_string
         })
 
