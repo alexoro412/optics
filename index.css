@@ -3,8 +3,12 @@ svg.sim {
 }
 
 .mirror {
-    stroke: black;
+    stroke: gray;
     stroke-width: 1;
+}
+
+.hollow {
+    fill: none;
 }
 
 .solid {

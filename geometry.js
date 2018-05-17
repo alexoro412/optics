@@ -27,7 +27,7 @@ function raycast(ray, geometry, bounce = 10) {
 
     let theta = ray.angle();
 
-    if(intersections.length == 0) {
+    if (intersections.length == 0) {
         console.log("HOW DOES THIS HAPPEN? THIS SHOULD NEVER EVER EVER HAPPEN");
     }
 
@@ -103,7 +103,11 @@ class Line {
         this.reflective = reflective;
     }
 
-    moveTo(x1,y1,x2,y2){
+    draw(){
+        return "M " + this.x1 + " " + this.y1 + " L " + this.x2 + " " + this.y2;
+    }
+
+    moveTo(x1, y1, x2, y2) {
         this.x1 = x1;
         this.x2 = x2;
         this.y1 = y1;
@@ -168,7 +172,8 @@ class Line {
 
                 let points = [];
 
-                if(other.theta1 < n1 && n1 < other.theta2){
+                // if (other.theta1 < n1 && n1 < other.theta2) {
+                    if(other.inAngles(n1)){
                     points.push({
                         x: x1,
                         y: y1,
@@ -177,7 +182,8 @@ class Line {
                     })
                 }
 
-                if(other.theta1 < n2 && n2 < other.theta2){
+                // if (other.theta1 < n2 && n2 < other.theta2) {
+                if(other.inAngles(n2)){
                     points.push({
                         x: x2,
                         y: y2,
@@ -213,17 +219,17 @@ class Line {
                         // let n = 0;
                         let x = other.x1;
                         let y = this.f(x, false);
-                        if(Math.min(other.y1, other.y2) < y && y < Math.max(other.y1, other.y2)){
+                        if (Math.min(other.y1, other.y2) < y && y < Math.max(other.y1, other.y2)) {
                             return [{
                                 x: x,
                                 y: y,
                                 n: other.normalAngle(),
                                 r: other.reflective
                             }]
-                        }else{
+                        } else {
                             return [];
                         }
-                        
+
                     }
                 } else {
                     if (isFinite(other.slope())) {
@@ -236,7 +242,7 @@ class Line {
                             n: other.normalAngle(),
                             r: other.reflective
                         }]
-                    }else{
+                    } else {
                         return [];
                     }
                 }
@@ -247,18 +253,97 @@ class Line {
 }
 
 class Circle {
+
     constructor(cx, cy, r, reflective) {
         this.cx = cx;
         this.cy = cy;
         this.r = r;
         this.reflective = reflective;
-        this.theta1 = - Math.PI;
-        this.theta2 = Math.PI
+        this.theta1 = -Math.PI;
+        this.theta2 = Math.PI;
+        this.large_arc = false;
     }
 
-    setAngles(theta1, theta2){
-        this.theta1 = Math.min(theta1, theta2);
-        this.theta2 = Math.max(theta1, theta2);
+    setAngles(theta1, theta2, large_arc) {
+        this.theta1 = theta1;
+        this.theta2 = theta2;
+        this.large_arc = large_arc;
+    }
+
+    minAngle(){
+        return Math.min(this.theta1, this.theta2);
+    }
+
+    maxAngle(){
+        return Math.max(this.theta1, this.theta2)
+    }
+
+    inAngles(angle){
+        // I DO NOT KNOW WHY THIS WORKS
+        // DO NOT ASK ME ABOUT THIS
+        // IT IS LATE AND I AM TIRED
+        // IT WORKS
+        if((this.large_arc && (Math.abs(this.theta2 - this.theta1) < Math.PI))
+            || (!this.large_arc && (Math.abs(this.theta2 - this.theta1) > Math.PI))){
+            return angle < this.minAngle() || this.maxAngle() < angle;
+        }else{
+            return this.minAngle() < angle && angle < this.maxAngle();
+        }
+    }
+
+
+    draw(){
+        // if(this.large_arc){
+             return "M " + (this.cx + Math.cos(this.theta1) * this.r) + " " + (this.cy + Math.sin(this.theta1) * this.r) +
+                 " A " + this.r + " " + this.r + " 0 " + (this.large_arc ? 1 : 0) + " " + (this.flip ? 1 : 0) +
+                 " " + (this.cx + this.r * Math.cos(this.theta2)) + " " + (this.cy + this.r * Math.sin(this.theta2));
+        // }else{
+        //     return "M " + (this.cx - Math.cos(this.theta1) * this.r) + " " + (this.cy - Math.sin(this.theta1) * this.r) +
+        //         " A " + this.r + " " + this.r + " 0 " + (this.large_arc ? 1 : 0) + " " + (this.large_arc ? 0 : 1) +
+        //         " " + (this.cx - this.r * Math.cos(this.theta2)) + " " + (this.cy - this.r * Math.sin(this.theta2));
+        // }
+        
+    }
+
+    arc(x1, y1, x2, y2, r, large_arc, flip) {
+
+        // flip = 1 => clockwise
+
+        this.r = r;
+        let q = distance(x1, y1, x2, y2),
+            xm = (x1 + x2) / 2,
+            ym = (y1 + y2) / 2;
+
+            console.log(q,xm,ym);
+
+        let deltax = Math.sqrt(r ** 2 - (q / 2) ** 2) * (y1 - y2) / q,
+            deltay = Math.sqrt(r ** 2 - (q / 2) ** 2) * (x2 - x1) / q;
+
+        console.log(r**2 - (q/2)**2);
+
+        this.flip = flip;
+        this.large_arc = large_arc;
+
+        if (flip == large_arc) {
+            this.cx = xm + deltax;
+            this.cy = ym + deltay;
+        } else {
+            this.cx = xm - deltax;
+            this.cy = ym - deltay;
+        }
+
+        // if(flip == large_arc){
+             this.setAngles(Math.atan2(y2 - this.cy, x2 - this.cx),
+                 Math.atan2(y1 - this.cy, x1 - this.cx),
+                 large_arc);
+        // }else{
+        //      this.setAngles(Math.atan2(this.cy - y2, this.cx - x2),
+        //          Math.atan2(this.cy - y1, this.cx - x1),
+        //          large_arc);
+        // }
+
+       
+
     }
 
     intersect(other) {
