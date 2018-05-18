@@ -16,13 +16,23 @@ svg.sim {
     fill: none;
 }
 
-.glass {
+.water {
     stroke: rgb(155, 192, 241);
     stroke-width: 1;
 }
 
-.solid.glass {
+.solid.water {
     fill: rgb(231, 242, 252);
+    fill-opacity: 0.4;
+}
+
+.glass{
+    stroke: rgb(216, 216, 216);
+    stroke-width: 1;
+}
+
+.solid.glass {
+    fill: rgb(237, 237, 238);
     fill-opacity: 0.4;
 }
 

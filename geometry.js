@@ -13,6 +13,10 @@ function make_sim(id, h, w) {
         })
 }
 
+function isOdd(x) {
+    return x % 2 == 1;
+}
+
 function sign(x) {
     if (x < 0) {
         return -1;
@@ -41,7 +45,12 @@ function close_enough(a, b, tolerance = 0.1) {
 
 const max_bounce = 10;
 
-function raycast(ray, geometry, bounce = max_bounce, ior = 1) {
+function raycast(ray, geometry, bounce = max_bounce, ior = 0) {
+
+    if (ior == 0) {
+        ior = get_ior(geometry, ray.x1, ray.y1);
+    }
+
     if (bounce == 0) return [];
 
     intersections = [];
@@ -72,6 +81,8 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 1) {
         })
     }
 
+    // 
+
     if (intersections.length > 0) {
         points.push(intersections[0]);
         if (intersections[0].opts.reflective) {
@@ -84,11 +95,11 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 1) {
 
             return points
                 // .concat([{x:reflected_ray.x1, y: reflected_ray.y1}, {x:reflected_ray.x2, y: reflected_ray.y2}])
-                .concat(raycast(reflected_ray, geometry, bounce - 1))
-        } else if(intersections[0].opts.refractive){
+                .concat(raycast(reflected_ray, geometry, bounce - 1, ior))
+        } else if (intersections[0].opts.refractive) {
             let phi;
             let next_ior;
-            if(ior == intersections[0].opts.ior){
+            if (ior == intersections[0].opts.ior) {
                 // Probably return to vacuum
                 phi = refract(ray.angle(), intersections[0].n, ior, 1);
                 next_ior = 1;
@@ -96,7 +107,7 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 1) {
                 phi = refract(ray.angle(), intersections[0].n, ior, intersections[0].opts.ior);
                 next_ior = intersections[0].opts.ior;
             }
-            if(isNaN(phi)){
+            if (isNaN(phi)) {
                 // TOTAL INTERAL REFLECTION !!!!!
                 phi = reflect(ray.angle(), intersections[0].n)
                 next_ior = ior;
@@ -119,8 +130,8 @@ function reflect(alpha, theta) {
     return 2 * theta - alpha + Math.PI;
 }
 
-function dot(x1,y1,x2,y2){
-    return x1*x2 + y1*y2;
+function dot(x1, y1, x2, y2) {
+    return x1 * x2 + y1 * y2;
 }
 
 function refract(alpha, theta, n1, n2) {
@@ -128,7 +139,7 @@ function refract(alpha, theta, n1, n2) {
 
     let d = dot(Math.cos(alpha), Math.sin(alpha), Math.cos(theta), Math.sin(theta))
 
-    if(d > 0){
+    if (d > 0) {
         // Woops, need to flip the normal vector 
         theta = theta + Math.PI
         //  theta = Math.atan2(Math.sin(theta + Math.PI), Math.cos(theta + Math.PI))
@@ -137,7 +148,7 @@ function refract(alpha, theta, n1, n2) {
     return Math.PI + theta - Math.asin(n1 / n2 * Math.sin((alpha - theta)));
 
 
-    
+
 }
 
 class Line {
@@ -490,6 +501,52 @@ function set_default_opts(opts) {
     return opts;
 }
 
+// fair warning
+// does not work with clipped/overlapped objects
+function get_ior(geometry, x, y) {
+    intersections = [];
+
+    // Cast a ray from a point off screen :D
+    let ray = new Line(-100, -100, x, y);
+
+    for (let g of geometry) {
+        intersections = intersections.concat(ray.intersect(g));
+    }
+
+    if (intersections.length == 0) {
+        console.log("THIS SHOULDN'T HAPPEN EITHER")
+    }
+
+    intersections = intersections.filter(function (intersection) {
+        return intersection.opts.refractive && intersection.x < x && intersection.y < y;
+    }).map(function (intersection) {
+        return intersection.opts.ior;
+    });
+
+    if (intersections.length == 0) {
+        return 1;
+    }
+
+    let iors = {};
+    for (let n of intersections) {
+        if (iors[n] === undefined) {
+            iors[n] = 1
+        } else {
+            iors[n] += 1
+        }
+    }
+
+    let ior = 1;
+
+    for (let n of Object.keys(iors)) {
+        if (isOdd(iors[n])) {
+            ior = +n
+        }
+    }
+
+    return ior;
+}
+
 class Space {
     constructor() {
         this.paths = []
@@ -501,7 +558,7 @@ class Space {
         this.listeners = [];
     }
 
-    setBounds(w,h){
+    setBounds(w, h) {
         this.w = w;
         this.h = h;
     }
@@ -520,6 +577,9 @@ class Space {
 
     add_thin(shape, opts) {
         opts = set_default_opts(opts);
+        if (opts.refractive) {
+            throw "Can't have refractive thins"
+        }
         shape.opts = opts;
         this.geometry.push(shape);
         this.paths.push({
@@ -530,6 +590,9 @@ class Space {
 
     add_thins(shapes, opts) {
         opts = set_default_opts(opts);
+        if (opts.refractive) {
+            throw "Can't have refractive thins"
+        }
         this.paths.push({
             path: "",
             class: opts.style
@@ -558,14 +621,14 @@ class Space {
         this.paths[this.paths.length - 1].path += " Z "
     }
 
-    add_circle(circle,opts) {
+    add_circle(circle, opts) {
         circle.opts = set_default_opts(opts);
         circle.style = opts.style;
         this.geometry.push(circle);
         this.circles.push(circle);
     }
 
-    add_rect(x,y,w,h,opts){
+    add_rect(x, y, w, h, opts) {
         this.add_solid([
             new Line(x, y, x + w, y),
             new Line(x + w, y, x + w, y + h),
