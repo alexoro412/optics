@@ -11,13 +11,15 @@
         h: 216
     }
 
-    let svg = d3.select("#reflection_parabola")
-        .append("svg")
-        .attrs({
-            class: "sim",
-            height: h,
-            width: w
-        })
+    // let svg = d3.select("#reflection_parabola")
+    //     .append("svg")
+    //     .attrs({
+    //         class: "sim",
+    //         height: h,
+    //         width: w
+    //     })
+
+    let svg = make_sim("#reflection_parabola", h, w);
 
     let space = new Space();
 
@@ -29,14 +31,12 @@
         new Line(300, coords.h, w, coords.h),
         new Line(w, coords.h, w, h),
         new Line(w,h,0,h),
-        new Line(0,h,0,coords.h)], true, "mirror");
+        new Line(0,h,0,coords.h)], {
+            reflective: true,
+            style: "solid mirror"
+        });
 
-    space.add_thins([
-        new Line(-w, -h, 2 * w, -h),
-        new Line(2*w, -h, 2*w, 2*h),
-        new Line(2*w, 2*h, -w, 2*h),
-        new Line(-w, 2*h, -w, -h)
-    ], false, "mirror")
+    space.add_borders();
 
     space.install(svg);
 

@@ -52,7 +52,7 @@
         .attr("y", coords.h)
         .attr("width", w)
         .attr("height", h - coords.h)
-        .attr("class", "solid");
+        .attr("class", "solid mirror");
 
     svg.append("line")
         .attr("id", "incident")

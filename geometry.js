@@ -1,9 +1,28 @@
+// NB: Positive Y is down in this world
+
+// Also, I know this file is called "geometry.js"
+// But it has non-geometry things as well
+
+function make_sim(id, h, w) {
+    return d3.select(id)
+        .append("svg")
+        .attrs({
+            class: "sim",
+            height: h,
+            width: w
+        })
+}
+
 function sign(x) {
     if (x < 0) {
         return -1;
     } else {
         return 1;
     }
+}
+
+function clamp(num, min, max) {
+    return Math.min(Math.max(num, min), max);
 }
 
 function distance(x1, y1, x2, y2) {
@@ -16,13 +35,13 @@ function closest(x, y) {
     }
 }
 
-const max_bounce = 10;
-
 function close_enough(a, b, tolerance = 0.1) {
     return Math.abs(a - b) < tolerance;
 }
 
-function raycast(ray, geometry, bounce = max_bounce) {
+const max_bounce = 10;
+
+function raycast(ray, geometry, bounce = max_bounce, ior = 1) {
     if (bounce == 0) return [];
 
     intersections = [];
@@ -43,7 +62,6 @@ function raycast(ray, geometry, bounce = max_bounce) {
         if (distance(ray.x1, ray.y1, point.x, point.y) < 0.1) return false;
 
         return ray.inRayDirection(point.x, point.y);
-
     })).sort(closest(ray.x1, ray.y1));
 
     let points = [];
@@ -56,8 +74,7 @@ function raycast(ray, geometry, bounce = max_bounce) {
 
     if (intersections.length > 0) {
         points.push(intersections[0]);
-        if (intersections[0].r) {
-
+        if (intersections[0].opts.reflective) {
 
             let phi = reflect(ray.angle(), intersections[0].n)
 
@@ -68,6 +85,26 @@ function raycast(ray, geometry, bounce = max_bounce) {
             return points
                 // .concat([{x:reflected_ray.x1, y: reflected_ray.y1}, {x:reflected_ray.x2, y: reflected_ray.y2}])
                 .concat(raycast(reflected_ray, geometry, bounce - 1))
+        } else if(intersections[0].opts.refractive){
+            let phi;
+            let next_ior;
+            if(ior == intersections[0].opts.ior){
+                // Probably return to vacuum
+                phi = refract(ray.angle(), intersections[0].n, ior, 1);
+                next_ior = 1;
+            } else {
+                phi = refract(ray.angle(), intersections[0].n, ior, intersections[0].opts.ior);
+                next_ior = intersections[0].opts.ior;
+            }
+            if(isNaN(phi)){
+                // TOTAL INTERAL REFLECTION !!!!!
+                phi = reflect(ray.angle(), intersections[0].n)
+                next_ior = ior;
+            }
+            let refracted_ray = new Line(intersections[0].x, intersections[0].y, 0, 0);
+            refracted_ray.polar(10, phi);
+
+            return points.concat(raycast(refracted_ray, geometry, bounce - 1, next_ior));
         } else {
             return points;
         }
@@ -80,6 +117,27 @@ function reflect(alpha, theta) {
     // theta is angle on normal
     // alpha is angle on incident
     return 2 * theta - alpha + Math.PI;
+}
+
+function dot(x1,y1,x2,y2){
+    return x1*x2 + y1*y2;
+}
+
+function refract(alpha, theta, n1, n2) {
+    // This bit of cleverness inspired by https://math.stackexchange.com/questions/701656/check-angle-between-two-lines-greater-than-90?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+
+    let d = dot(Math.cos(alpha), Math.sin(alpha), Math.cos(theta), Math.sin(theta))
+
+    if(d > 0){
+        // Woops, need to flip the normal vector 
+        theta = theta + Math.PI
+        //  theta = Math.atan2(Math.sin(theta + Math.PI), Math.cos(theta + Math.PI))
+    }
+
+    return Math.PI + theta - Math.asin(n1 / n2 * Math.sin((alpha - theta)));
+
+
+    
 }
 
 class Line {
@@ -117,23 +175,22 @@ class Line {
     }
 
     inRayDirection(x, y) {
-        return (this.x2 > this.x1 && x > this.x1) ||
-            (this.x2 < this.x1 && x < this.x1) ||
-            (close_enough(this.x2, this.x1, 0.01) &&
+        return (this.x2 > this.x1 && x > this.x1) || // if point is to the right
+            (this.x2 < this.x1 && x < this.x1) || // if point is to the left
+            (close_enough(this.x2, this.x1, 0.01) && // if ray vertical
                 (
-                    (this.y2 > this.y1 && y > this.y1) ||
-                    (this.y2 < this.y1 && y < this.y1)
+                    (this.y2 > this.y1 && y > this.y1) || // if point is below
+                    (this.y2 < this.y1 && y < this.y1) // if point is above
                 ))
     }
 
     f(x, type) {
-
-        if ((type == "line") ||
+        if ((type == "line") || // set type to line to use full line, not just segment
             (Math.min(this.x1, this.x2) < x && x < Math.max(this.x1, this.x2))) {
             if (isFinite(this.slope())) {
                 return this.slope() * (x - this.x1) + this.y1;
             } else {
-                return -401;
+                return undefined;
             }
         }
     }
@@ -143,11 +200,12 @@ class Line {
     }
 
     normalAngle(x) {
-        return -Math.atan2(this.x2 - this.x1, this.y2 - this.y1);
+        return Math.atan2(this.x1 - this.x2, this.y2 - this.y1);
     }
 
     intersect(other) {
         if (other instanceof Bezier) {
+            // https://www.particleincell.com/2013/cubic-line-intersection/
             let Ax = -this.slope(),
                 Ay = 1,
                 C = this.y1 - this.slope() * this.x1;
@@ -174,7 +232,7 @@ class Line {
             let answers = roots.map(function (e) {
                 let o = other.f(e);
                 o.n = other.normal(e);
-                o.r = other.reflective;
+                o.opts = other.opts;
                 return o;
             });
 
@@ -184,10 +242,10 @@ class Line {
 
             let dx = this.x2 - this.x1,
                 dy = this.y2 - this.y1,
-                dr = Math.sqrt(dx ** 2 + dy ** 2),
+                dr = Math.sqrt(dx * dx + dy * dy),
                 D = (this.x1 - other.cx) * (this.y2 - other.cy) -
                 (this.x2 - other.cx) * (this.y1 - other.cy),
-                delta = (other.r * dr) ** 2 - D ** 2;
+                delta = (other.r * other.r * dr * dr) - D ** 2;
 
             if (delta <= 0) {
                 // Return nothing if doesn't intersect, or is tangent
@@ -200,10 +258,6 @@ class Line {
                     x2 = (D * dy - sign(dy) * dx * Math.sqrt(delta)) / (dr ** 2) + other.cx,
                     y2 = (-D * dx - Math.abs(dy) * Math.sqrt(delta)) / (dr ** 2) + other.cy;
 
-                // Calculate normals
-                // let n1 = (y1 - other.cy) / (x1 - other.cx),
-                //     n2 = (y2 - other.cy) / (x1 - other.cx);
-
                 // Calculate normal angles
                 let n1 = Math.atan2(y1 - other.cy, x1 - other.cx),
                     n2 = Math.atan2(y2 - other.cy, x2 - other.cx);
@@ -214,26 +268,24 @@ class Line {
                     x: x1,
                     y: y1,
                     n: n1,
-                    r: other.reflective
+                    opts: other.opts
                 }
 
                 let p2 = {
                     x: x2,
                     y: y2,
                     n: n2,
-                    r: other.reflective
+                    opts: other.opts
                 }
 
                 if (other instanceof Circle) {
                     points.push(p1);
                     points.push(p2);
                 } else if (other instanceof Arc) {
-                    // if (other.theta1 < n1 && n1 < other.theta2) {
                     if (other.inAngles(n1)) {
                         points.push(p1)
                     }
 
-                    // if (other.theta1 < n2 && n2 < other.theta2) {
                     if (other.inAngles(n2)) {
                         points.push(p2)
                     }
@@ -253,17 +305,15 @@ class Line {
                         let x = (other.slope() * other.x1 - this.slope() * this.x1 + this.y1 - other.y1) / (other.slope() - this.slope());
                         let y = other.f(x);
                         if (y == undefined) return [];
-                        // let n = -1 / other.slope();
                         return [{
                             x: x,
                             y: y,
                             n: other.normalAngle(),
-                            r: other.reflective
+                            opts: other.opts
                         }]
                     } else {
                         // ray non vertical
                         // surface vertical 
-                        // let n = 0;
                         let x = other.x1;
                         let y = this.f(x, "line");
                         if (Math.min(other.y1, other.y2) < y && y < Math.max(other.y1, other.y2)) {
@@ -271,7 +321,7 @@ class Line {
                                 x: x,
                                 y: y,
                                 n: other.normalAngle(),
-                                r: other.reflective
+                                opts: other.opts
                             }]
                         } else {
                             return [];
@@ -280,7 +330,6 @@ class Line {
                     }
                 } else {
                     if (isFinite(other.slope())) {
-                        // let n = -1 / other.slope();
                         let x = this.x1;
                         let y = other.f(x);
                         if (y == undefined) {
@@ -290,7 +339,7 @@ class Line {
                                 x: x,
                                 y: y,
                                 n: other.normalAngle(),
-                                r: other.reflective
+                                opts: other.opts
                             }]
                         }
 
@@ -306,12 +355,11 @@ class Line {
 
 class Arc {
 
-    // I don't understand this
-    // I got it from:
-    // https://stackoverflow.com/questions/43825414/draw-an-svg-arc-using-d3-knowing-3-points-on-the-arc?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-
-
     constructor(x1, y1, x2, y2, x3, y3) {
+        // I don't understand this
+        // I got it from:
+        // https://stackoverflow.com/questions/43825414/draw-an-svg-arc-using-d3-knowing-3-points-on-the-arc?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+
         // a : (x1,y1) start
         // b : (x2,y2) end 
         // c : (x3,y3) via
@@ -401,7 +449,7 @@ class Circle {
     }
 
     draw(move) {
-        throw "Can not draw circles in paths"
+        throw "Can't draw circles in paths. Use space.add_circle()"
     }
 
     intersect(other) {
@@ -430,55 +478,100 @@ class Ray {
     }
 }
 
+function set_if_undefined(v, d) {
+    return (v === undefined) ? d : v;
+}
+
+function set_default_opts(opts) {
+    opts.reflective = set_if_undefined(opts.reflective, false);
+    opts.style = set_if_undefined(opts.style, "");
+    opts.ior = set_if_undefined(opts.ior, 0);
+    opts.refractive = set_if_undefined(opts.refractive, false)
+    return opts;
+}
+
 class Space {
     constructor() {
         this.paths = []
         this.geometry = []
         this.circles = []
+        this.installed = false;
+        this.w = 400;
+        this.h = 350;
+        this.listeners = [];
     }
 
-    add_thin(shape, reflective, style) {
-        shape.reflective = reflective;
+    setBounds(w,h){
+        this.w = w;
+        this.h = h;
+    }
+
+    add_borders() {
+        this.add_thins([
+            new Line(-this.w, -this.h, 2 * this.w, -this.h),
+            new Line(2 * this.w, -this.h, 2 * this.w, 2 * this.h),
+            new Line(2 * this.w, 2 * this.h, -this.w, 2 * this.h),
+            new Line(-this.w, 2 * this.h, -this.w, -this.h)
+        ], {
+            reflective: false,
+            style: ""
+        })
+    }
+
+    add_thin(shape, opts) {
+        opts = set_default_opts(opts);
+        shape.opts = opts;
         this.geometry.push(shape);
         this.paths.push({
             path: shape.draw(true),
-            class: "hollow " + style
+            class: opts.style
         })
     }
 
-    add_thins(shapes, reflective, style) {
+    add_thins(shapes, opts) {
+        opts = set_default_opts(opts);
         this.paths.push({
             path: "",
-            class: "hollow " + style
+            class: opts.style
         })
         let last = this.paths.length - 1
         for (let i = 0; i < shapes.length; i++) {
-            shapes[i].reflective = reflective
+            shapes[i].opts = opts;
             this.geometry.push(shapes[i]);
             this.paths[last].path += shapes[i].draw(true)
             // this.paths[last].path += " Z "
         }
     }
 
-    add_solid(shapes, reflective, style) {
+    add_solid(shapes, opts) {
+        opts = set_default_opts(opts);
         this.paths.push({
             path: "",
-            class: "solid " + style
+            class: opts.style
         })
 
         for (let i = 0; i < shapes.length; i++) {
-            shapes[i].reflective = reflective;
+            shapes[i].opts = opts;
             this.geometry.push(shapes[i]);
             this.paths[this.paths.length - 1].path += shapes[i].draw(i == 0)
         }
         this.paths[this.paths.length - 1].path += " Z "
     }
 
-    add_circle(circle, reflective = false, style = "") {
-        circle.reflective = reflective;
-        circle.style = style;
+    add_circle(circle,opts) {
+        circle.opts = set_default_opts(opts);
+        circle.style = opts.style;
         this.geometry.push(circle);
         this.circles.push(circle);
+    }
+
+    add_rect(x,y,w,h,opts){
+        this.add_solid([
+            new Line(x, y, x + w, y),
+            new Line(x + w, y, x + w, y + h),
+            new Line(x + w, y + h, x, y + h),
+            new Line(x, y + h, x, y)
+        ], opts)
     }
 
     get_geometry() {
@@ -490,7 +583,11 @@ class Space {
     }
 
     install(svg) {
-        this.svg_object = svg.append("g");
+        if (!this.installed) {
+            this.svg_object = svg.append("g");
+            this.installed = true;
+        }
+
 
         this.svg_object.selectAll("path").data(this.draw())
             .enter().append("path")
@@ -565,6 +662,7 @@ class Beam {
         this.angle = Math.atan2(this.data[1].y - this.data[0].y, this.data[1].x - this.data[0].x);
 
         for (let i = 0; i < this.num_rays; i++) {
+            // console.log("NOW RAYCASTING");
             this.rays[i] = new Ray(raycast(new Line(
                 this.data[0].x + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
                 this.data[0].y - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle),
@@ -636,7 +734,7 @@ class Beam {
                     cx: this.data[0].x,
                     cy: this.data[0].y,
                     ry: this.radius,
-                    rx: this.beam_width/2,
+                    rx: this.beam_width / 2,
                     class: "handle"
                 }).call(d3.drag().on("start", dragstarted)
                     .on("drag", function (d) {
@@ -660,8 +758,6 @@ function dragged(d, w, h) {
     d3.select(this)
         .attr("cx", d.x = clamp(d3.event.x, 0, w))
         .attr("cy", d.y = clamp(d3.event.y, 0, h));
-
-    // updateRays();
 }
 
 function dragended(d) {
@@ -717,11 +813,14 @@ class Bezier {
 
 }
 
+// This function solves cubics
+// That's right
+// It uses the cubic formula
+// You jealous?
 function cubicRoots(a, b, c, d) {
     if (close_enough(a, 0)) {
 
         // Woops, now it's quadratic :)
-
         let D = c * c - 4 * b * d;
         if (D < 0) {
             // No real solutions
@@ -763,7 +862,7 @@ function cubicRoots(a, b, c, d) {
             answers[2] = -A / 3 - (S + T) / 2;
             Im = Math.abs(Math.sqrt(3) * (S - T) / 2);
 
-            if (Im != 0) {
+            if (Im != 0) { // May need to change this part to use close_enough
                 answers = [answers[0]]
             }
         } else {

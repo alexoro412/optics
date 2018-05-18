@@ -38,16 +38,15 @@
         new Line(w, coords.h, w, h, true),
         new Line(w, h, 0, h, true),
         new Line(0, h, 0, coords.h, true)
-    ], true, "mirror")
+    ], {
+        reflective: true,
+        style: "solid mirror"
+    })
 
-    space.add_thins([
-        new Line(0, 0, 0, coords.h, false),
-        new Line(0, 0, w, 0, false),
-        new Line(w, 0, w, coords.h, false),
-    ], false, "mirror")
+    space.add_borders();
 
     space.install(svg);
 
-    let beam = new Beam(100, 100, 200, 200, 10, 20);
+    let beam = new Beam(100, 100, 200, 200, 30, 200, "down");
     beam.install(svg, space);
 })();

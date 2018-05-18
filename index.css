@@ -7,12 +7,22 @@ svg.sim {
     stroke-width: 1;
 }
 
+.solid.mirror{
+    fill: lightgray;
+    fill-opacity: 0.4;
+}
+
 .hollow {
     fill: none;
 }
 
-.solid {
-    fill: lightgray;
+.glass {
+    stroke: rgb(155, 192, 241);
+    stroke-width: 1;
+}
+
+.solid.glass {
+    fill: rgb(231, 242, 252);
     fill-opacity: 0.4;
 }
 
