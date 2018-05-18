@@ -518,7 +518,8 @@ function get_ior(geometry, x, y) {
     }
 
     intersections = intersections.filter(function (intersection) {
-        return intersection.opts.refractive && intersection.x < x && intersection.y < y;
+        if (distance(intersection.x, intersection.y, x, y) < 0.1) return false;
+        return intersection.opts.refractive && intersection.x <= x && intersection.y <= y;
     }).map(function (intersection) {
         return intersection.opts.ior;
     });
