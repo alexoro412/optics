@@ -44,13 +44,10 @@
         new Line(0, 0, 0, coords.h, false),
         new Line(0, 0, w, 0, false),
         new Line(w, 0, w, coords.h, false),
-    ], false, "arc")
-
-    space.add_thin(new Bezier(0, 0, 0, 100,
-            100, 100, 100, 0),true,"ray")
+    ], false, "mirror")
 
     space.install(svg);
 
-    let beam = new Beam(100, 100, 200, 200, 1, 20);
+    let beam = new Beam(100, 100, 200, 200, 10, 20);
     beam.install(svg, space);
 })();

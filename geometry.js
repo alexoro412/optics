@@ -18,6 +18,10 @@ function closest(x, y) {
 
 const max_bounce = 10;
 
+function close_enough(a, b, tolerance = 0.1) {
+    return Math.abs(a - b) < tolerance;
+}
+
 function raycast(ray, geometry, bounce = max_bounce) {
     if (bounce == 0) return [];
 
@@ -38,36 +42,8 @@ function raycast(ray, geometry, bounce = max_bounce) {
         // This prevents floating point errors
         if (distance(ray.x1, ray.y1, point.x, point.y) < 0.1) return false;
 
+        return ray.inRayDirection(point.x, point.y);
 
-        if (-Math.PI / 2 < theta && theta < Math.PI / 2) {
-            // Pointing to the right
-
-            // NB:
-            // Positive y is down in this world
-            // First quadrant is 0 to -90
-            // Fourth quadrant is 0 to 90
-
-            if (theta < 0) {
-                // Up and to the right
-                return point.x > ray.x1 && point.y < ray.y1;
-            } else {
-                // Down and to the right
-                return point.x > ray.x1 && point.y >= ray.y1;
-            }
-        } else if (theta < -Math.PI / 2 || theta > Math.PI / 2) {
-            // To the left
-            if (theta < 0) {
-                // Up and left
-                return point.x < ray.x1 && point.y < ray.y1;
-            } else {
-                // Down and left
-                return point.x < ray.x1 && point.y >= ray.y1;
-            }
-        } else if (theta == -Math.PI / 2) {
-            return point.x == ray.x1 && point.y < ray.y1;
-        } else if (theta == Math.PI / 2) {
-            return point.x == ray.x1 && point.y > ray.y1;
-        }
     })).sort(closest(ray.x1, ray.y1));
 
     let points = [];
@@ -84,8 +60,10 @@ function raycast(ray, geometry, bounce = max_bounce) {
 
 
             let phi = reflect(ray.angle(), intersections[0].n)
+
             let reflected_ray = new Line(intersections[0].x, intersections[0].y, 0, 0, false);
-            reflected_ray.polar(1, phi);
+            reflected_ray.polar(10, phi);
+
 
             return points
                 // .concat([{x:reflected_ray.x1, y: reflected_ray.y1}, {x:reflected_ray.x2, y: reflected_ray.y2}])
@@ -138,13 +116,26 @@ class Line {
         return (this.y1 - this.y2) / (this.x1 - this.x2);
     }
 
-    f(x, domain = true) {
-        if ((domain == false) || (Math.min(this.x1, this.x2) < x && x < Math.max(this.x1, this.x2))) {
-            return this.slope() * (x - this.x1) + this.y1;
-        } else {
-            return undefined;
-        }
+    inRayDirection(x, y) {
+        return (this.x2 > this.x1 && x > this.x1) ||
+            (this.x2 < this.x1 && x < this.x1) ||
+            (close_enough(this.x2, this.x1, 0.01) &&
+                (
+                    (this.y2 > this.y1 && y > this.y1) ||
+                    (this.y2 < this.y1 && y < this.y1)
+                ))
+    }
 
+    f(x, type) {
+
+        if ((type == "line") ||
+            (Math.min(this.x1, this.x2) < x && x < Math.max(this.x1, this.x2))) {
+            if (isFinite(this.slope())) {
+                return this.slope() * (x - this.x1) + this.y1;
+            } else {
+                return -401;
+            }
+        }
     }
 
     angle(x) {
@@ -161,11 +152,18 @@ class Line {
                 Ay = 1,
                 C = this.y1 - this.slope() * this.x1;
 
+
+
+            if (!isFinite(Ax)) {
+                Ax = -1;
+                Ay = 0;
+                C = -this.x1
+            }
+
             let a = Ax * other.xCoeffs[0] + Ay * other.yCoeffs[0];
             let b = Ax * other.xCoeffs[1] + Ay * other.yCoeffs[1];
             let c = Ax * other.xCoeffs[2] + Ay * other.yCoeffs[2];
             let d = Ax * other.xCoeffs[3] + Ay * other.yCoeffs[3] - C;
-
 
             let roots = cubicRoots(a, b, c, d);
 
@@ -179,10 +177,9 @@ class Line {
                 o.r = other.reflective;
                 return o;
             });
-            return answers;
-        }
 
-        if (other instanceof Circle || other instanceof Arc) {
+            return answers;
+        } else if (other instanceof Circle || other instanceof Arc) {
             // http://mathworld.wolfram.com/Circle-LineIntersection.html
 
             let dx = this.x2 - this.x1,
@@ -268,7 +265,7 @@ class Line {
                         // surface vertical 
                         // let n = 0;
                         let x = other.x1;
-                        let y = this.f(x, false);
+                        let y = this.f(x, "line");
                         if (Math.min(other.y1, other.y2) < y && y < Math.max(other.y1, other.y2)) {
                             return [{
                                 x: x,
@@ -286,12 +283,17 @@ class Line {
                         // let n = -1 / other.slope();
                         let x = this.x1;
                         let y = other.f(x);
-                        return [{
-                            x: x,
-                            y: y,
-                            n: other.normalAngle(),
-                            r: other.reflective
-                        }]
+                        if (y == undefined) {
+                            return [];
+                        } else {
+                            return [{
+                                x: x,
+                                y: y,
+                                n: other.normalAngle(),
+                                r: other.reflective
+                            }]
+                        }
+
                     } else {
                         return [];
                     }
@@ -361,8 +363,6 @@ class Arc {
             this.angle_flag = false;
         }
 
-        // console.log(this.angle1, this.angle2, this.angle3, this.angle_flag);
-
     }
 
     draw(move) {
@@ -383,7 +383,6 @@ class Arc {
     }
 
     inAngles(angle) {
-        // console.log("now trying", "1", this.minAngle(), "n", angle, "2", this.maxAngle(), this.angle_flag);
         if (this.angle_flag) {
             return angle < this.minAngle() || this.maxAngle() < angle;
         } else {
@@ -525,18 +524,33 @@ class Space {
 }
 
 class Beam {
-    constructor(x1, y1, x2, y2, num_rays, beam_width) {
+    constructor(x1, y1, x2, y2, num_rays, beam_width, orientation = "free") {
         this.ray_gap = beam_width / num_rays;
         this.num_rays = num_rays;
+        this.beam_width = beam_width;
         this.rays = [];
         this.radius = 10;
-        this.data = [{
-            x: x1,
-            y: y1
-        }, {
-            x: x2,
-            y: y2
-        }]
+
+        this.orientation = orientation;
+        if (orientation == "free") {
+            this.data = [{
+                x: x1,
+                y: y1
+            }, {
+                x: x2,
+                y: y2
+            }]
+        } else if (orientation == "down") {
+            this.data = [{
+                    x: x1,
+                    y: y1
+                },
+                {
+                    x: x1,
+                    y: y1 + 10
+                }
+            ]
+        }
 
         this.h = 350;
         this.w = 400;
@@ -551,8 +565,6 @@ class Beam {
         this.angle = Math.atan2(this.data[1].y - this.data[0].y, this.data[1].x - this.data[0].x);
 
         for (let i = 0; i < this.num_rays; i++) {
-            // incident_rays[i].moveTo(handles[0].x + (i - 2) * 5 * Math.sin(angle), handles[0].y - (i - 2) * 5 * Math.cos(angle), handles[1].x + (i - 2) * 5 * Math.sin(angle), handles[1].y - (i - 2) * 5 * Math.cos(angle));
-
             this.rays[i] = new Ray(raycast(new Line(
                 this.data[0].x + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
                 this.data[0].y - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle),
@@ -572,6 +584,13 @@ class Beam {
             })
     }
 
+    updateHandles() {
+        if (this.orientation == "down") {
+            this.data[1].x = this.data[0].x;
+            this.data[1].y = this.data[0].y + 10;
+        }
+    }
+
     install(svg, space) {
         this.space = space;
         this.svg_group = svg.append("g");
@@ -589,26 +608,47 @@ class Beam {
 
         let self = this;
 
-        this.svg_group.selectAll("circle")
-            .data(this.data)
-            .enter().append("circle")
-            .attrs({
-                cx: function (d) {
-                    return d.x;
-                },
-                cy: function (d) {
-                    return d.y;
-                },
-                r: this.radius,
-                class: "handle"
-            }).call(d3.drag()
-                .on("start", dragstarted)
-                .on("drag", function (d) {
-                    (dragged.bind(this))(d, self.w, self.h);
-                    self.updateRays();
-                    self.drawRays();
-                })
-                .on("end", dragended))
+        if (this.orientation == "free") {
+            this.svg_group.selectAll("circle")
+                .data(this.data)
+                .enter().append("circle")
+                .attrs({
+                    cx: function (d) {
+                        return d.x;
+                    },
+                    cy: function (d) {
+                        return d.y;
+                    },
+                    r: this.radius,
+                    class: "handle"
+                }).call(d3.drag()
+                    .on("start", dragstarted)
+                    .on("drag", function (d) {
+                        (dragged.bind(this))(d, self.w, self.h);
+                        self.updateRays();
+                        self.drawRays();
+                    })
+                    .on("end", dragended))
+        } else if (this.orientation == "down") {
+            this.svg_group.selectAll("ellipse")
+                .data([this.data[0]]).enter().append("ellipse")
+                .attrs({
+                    cx: this.data[0].x,
+                    cy: this.data[0].y,
+                    ry: this.radius,
+                    rx: this.beam_width/2,
+                    class: "handle"
+                }).call(d3.drag().on("start", dragstarted)
+                    .on("drag", function (d) {
+                        (dragged.bind(this))(d, self.w, self.h);
+                        self.updateHandles();
+                        self.updateRays();
+                        self.drawRays();
+                    })
+                    .on("end", dragended))
+        }
+
+
     }
 }
 
@@ -668,7 +708,7 @@ class Bezier {
         return `M ${this.x1} ${this.y1} C ${this.x2} ${this.y2} ${this.x3} ${this.y3} ${this.x4} ${this.y4}`
     }
 
-    normal(t){
+    normal(t) {
         let dydt = this.yCoeffs[0] * 3 * t * t + this.yCoeffs[1] * 2 * t + this.yCoeffs[2],
             dxdt = this.xCoeffs[0] * 3 * t * t + this.xCoeffs[1] * 2 * t + this.xCoeffs[2];
 
@@ -678,7 +718,8 @@ class Bezier {
 }
 
 function cubicRoots(a, b, c, d) {
-    if (a == 0) {
+    if (close_enough(a, 0)) {
+
         // Woops, now it's quadratic :)
 
         let D = c * c - 4 * b * d;
@@ -713,13 +754,14 @@ function cubicRoots(a, b, c, d) {
         let answers = [];
 
         if (D >= 0) {
+
             S = sign(R + Math.sqrt(D)) * Math.pow(Math.abs(R + Math.sqrt(D)), (1 / 3));
             T = sign(R - Math.sqrt(D)) * Math.pow(Math.abs(R - Math.sqrt(D)), (1 / 3));
 
             answers[0] = -A / 3 + (S + T); // real
             answers[1] = -A / 3 - (S + T) / 2;
             answers[2] = -A / 3 - (S + T) / 2;
-            Im = Math.abs(Math.sqrt(3) * (S - T / 2));
+            Im = Math.abs(Math.sqrt(3) * (S - T) / 2);
 
             if (Im != 0) {
                 answers = [answers[0]]
