@@ -68,7 +68,7 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0) {
     intersections = (intersections.filter(function (point) {
         // FIXME
         // This prevents floating point errors
-        if (distance(ray.x1, ray.y1, point.x, point.y) < 0.1) return false;
+        if (distance(ray.x1, ray.y1, point.x, point.y) < 0.001) return false;
 
         return ray.inRayDirection(point.x, point.y);
     })).sort(closest(ray.x1, ray.y1));
@@ -197,7 +197,7 @@ class Line {
 
     f(x, type) {
         if ((type == "line") || // set type to line to use full line, not just segment
-            (Math.min(this.x1, this.x2) < x && x < Math.max(this.x1, this.x2))) {
+            (Math.min(this.x1, this.x2) - 0.1 < x && x < Math.max(this.x1, this.x2) + 0.1)) {
             if (isFinite(this.slope())) {
                 return this.slope() * (x - this.x1) + this.y1;
             } else {
@@ -443,9 +443,9 @@ class Arc {
 
     inAngles(angle) {
         if (this.angle_flag) {
-            return angle < this.minAngle() || this.maxAngle() < angle;
+            return angle < this.minAngle() + 0.001 || this.maxAngle() - 0.001 < angle;
         } else {
-            return this.minAngle() < angle && angle < this.maxAngle();
+            return this.minAngle() - 0.001 < angle && angle < this.maxAngle() + 0.001;
         }
     }
 }
