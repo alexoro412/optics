@@ -70,22 +70,15 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
     intersections = (intersections.filter(function (point) {
         // FIXME
         // This prevents floating point errors
-        if (distance(ray.x1, ray.y1, point.x, point.y) < 0.001) return false;
+        if (distance(ray.x1, ray.y1, point.x, point.y) < 0.01) return false;
 
         return ray.inRayDirection(point.x, point.y);
     })).sort(closest(ray.x1, ray.y1));
 
     let lines = [];
-    // if (bounce == max_bounce) {
-    //     lines.push({
-    //         x: ray.x1,
-    //         y: ray.y1
-    //     })
-    // }
-
-    // 
 
     if (intersections.length > 0) {
+        
         lines.push({
             x1: ray.x1,
             y1: ray.y1,
@@ -93,7 +86,10 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
             y2: intersections[0].y,
             strength: strength
         });
-        if (intersections[0].opts.reflective) {
+        if (intersections.length > 1 && close_enough(0, distance(intersections[0].x, intersections[0].y, intersections[1].x, intersections[1].y))) {
+            // CORNER DETECTED
+            return lines;
+        }else if (intersections[0].opts.reflective) {
             // reflective
             let phi = reflect(ray.angle(), intersections[0].n)
 
@@ -301,8 +297,10 @@ class Line {
             let c = Ax * other.xCoeffs[2] + Ay * other.yCoeffs[2];
             let d = Ax * other.xCoeffs[3] + Ay * other.yCoeffs[3] - C;
 
-            let roots = cubicRoots(a, b, c, d);
 
+            // console.log("cubic ", a ,b ,c, d);
+            let roots = cubicRoots(a, b, c, d);
+            // console.log(roots);
             roots = roots.filter(function (x) {
                 return 0 <= x && x <= 1;
             })
@@ -804,7 +802,6 @@ class Beam {
         this.rays = [];
 
         for (let i = 0; i < this.num_rays; i++) {
-            // console.log("NOW RAYCASTING");
             this.rays = this.rays.concat(raycast(new Line(
                 this.data[0].x + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
                 this.data[0].y - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle),
@@ -1007,7 +1004,7 @@ class Bezier {
 // It uses the cubic formula
 // You jealous?
 function cubicRoots(a, b, c, d) {
-    if (close_enough(a, 0)) {
+    if (close_enough(a, 0, 0.1)) {
 
         // Woops, now it's quadratic :)
         let D = c * c - 4 * b * d;
