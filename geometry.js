@@ -111,13 +111,20 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
                 .concat(raycast(reflected_ray, geometry, bounce - 1, ior, strength * intersections[0].opts.reflectance))
         } else if (intersections[0].opts.refractive) {
             let phi;
+            let partial_strength;
+            let refraction;
             let next_ior;
             if (ior == intersections[0].opts.ior) {
                 // Probably return to vacuum
-                phi = refract(ray.angle(), intersections[0].n, ior, 1);
+                // TODO check for interfaces between two non-vacuum materials
+                refraction = refract(ray.angle(), intersections[0].n, ior, 1);
+                phi = refraction[0];
+                partial_strength = refraction[1];
                 next_ior = 1;
             } else {
-                phi = refract(ray.angle(), intersections[0].n, ior, intersections[0].opts.ior);
+                refraction = refract(ray.angle(), intersections[0].n, ior, intersections[0].opts.ior);
+                phi = refraction[0];
+                partial_strength = refraction[1];
                 next_ior = intersections[0].opts.ior;
             }
             let refracted_ray = new Line(intersections[0].x, intersections[0].y, 0, 0);
@@ -144,8 +151,8 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
                 // Why are these here, you may ask?
                 // Because if I just take these expressions, and put them in the function 
                 // IT BREAKS
-                let r_strength = strength * intersections[0].opts.reflectance;
-                let t_strength = strength * intersections[0].opts.transmission;
+                let r_strength = partial_strength * strength;
+                let t_strength = strength * (1 - partial_strength);
 
                 return lines
                     .concat(raycast(refracted_ray, geometry, bounce - 1, next_ior, t_strength))
@@ -180,8 +187,32 @@ function refract(alpha, theta, n1, n2) {
         theta = theta + Math.PI
         //  theta = Math.atan2(Math.sin(theta + Math.PI), Math.cos(theta + Math.PI))
     }
+    let gamma = Math.PI - (alpha - theta);
+    let beta = Math.asin(n1 / n2 * Math.sin(gamma));
+    let phi = Math.PI + theta - beta;
 
-    return Math.PI + theta - Math.asin(n1 / n2 * Math.sin((alpha - theta)));
+    if (isNaN(phi)) {
+        return [phi, 1]
+    }
+
+    let partial_strength = (1 / 2) * (
+        Math.pow((n1 * Math.cos(gamma) - n2 * Math.cos(beta)) / (n1 * Math.cos(gamma) + n2 * Math.cos(beta)), 2) +
+        Math.pow((n1 * Math.cos(beta) - n2 * Math.cos(gamma)) / (n1 * Math.cos(beta) + n2 * Math.cos(gamma)), 2))
+    if (partial_strength > 1) {
+        console.log("OH... So this shouldn't happen")
+        console.log(partial_strength);
+        console.log("gamma", gamma, Math.cos(gamma), Math.sin(gamma))
+        console.log("beta", beta, Math.cos(beta))
+
+        console.log(n1, n2, Math.cos(gamma), Math.cos(beta));
+
+        console.log((n1 * Math.cos(gamma) - n2 * Math.cos(beta)) / (n1 * Math.cos(gamma) + n2 * Math.cos(beta)));
+
+    }
+    // 
+
+
+    return [phi, partial_strength];
 
 
 
@@ -811,7 +842,7 @@ class Beam {
             },
             class: "ray",
             "stroke-opacity": function (d) {
-                return Math.floor(1000 * d.strength)/1000;
+                return Math.floor(1000 * d.strength) / 1000;
             }
         })
 
