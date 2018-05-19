@@ -44,10 +44,10 @@ svg.sim {
     stroke-linejoin: round;
 }
 
-.ray:hover {
+/* .ray:hover {
     stroke-width: 2;
     stroke: #c0392b;
-}
+} */
 
 .handle {
     fill: #bdc3c7;

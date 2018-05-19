@@ -54,5 +54,4 @@
 
     let beam = new Beam(41,17,178,143,10,20);
     beam.install(svg, space);
-
 })();

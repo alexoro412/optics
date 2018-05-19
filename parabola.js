@@ -33,7 +33,8 @@
         new Line(w,h,0,h),
         new Line(0,h,0,coords.h)], {
             reflective: true,
-            style: "solid mirror"
+            style: "solid mirror",
+            reflectance: 1.0
         });
 
     space.add_borders();

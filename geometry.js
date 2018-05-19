@@ -39,19 +39,21 @@ function closest(x, y) {
     }
 }
 
-function close_enough(a, b, tolerance = 0.1) {
+function close_enough(a, b, tolerance = 0.01) {
     return Math.abs(a - b) < tolerance;
 }
 
 const max_bounce = 10;
 
-function raycast(ray, geometry, bounce = max_bounce, ior = 0) {
+function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
+    // if(strength == 1){
+    //     console.log(ray.x1, ray.y1);
+    // }
+    if (bounce == 0 || strength < 0.01) return [];
 
     if (ior == 0) {
         ior = get_ior(geometry, ray.x1, ray.y1);
     }
-
-    if (bounce == 0) return [];
 
     intersections = [];
 
@@ -73,29 +75,40 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0) {
         return ray.inRayDirection(point.x, point.y);
     })).sort(closest(ray.x1, ray.y1));
 
-    let points = [];
-    if (bounce == max_bounce) {
-        points.push({
-            x: ray.x1,
-            y: ray.y1
-        })
-    }
+    let lines = [];
+    // if (bounce == max_bounce) {
+    //     lines.push({
+    //         x: ray.x1,
+    //         y: ray.y1
+    //     })
+    // }
 
     // 
 
     if (intersections.length > 0) {
-        points.push(intersections[0]);
+        lines.push({
+            x1: ray.x1,
+            y1: ray.y1,
+            x2: intersections[0].x,
+            y2: intersections[0].y,
+            strength: strength
+        });
         if (intersections[0].opts.reflective) {
-
+            // reflective
             let phi = reflect(ray.angle(), intersections[0].n)
 
             let reflected_ray = new Line(intersections[0].x, intersections[0].y, 0, 0, false);
             reflected_ray.polar(10, phi);
 
+            if (intersections[0].opts.transmission != 0) {
+                let transmitted_ray = new Line(intersections[0].x, intersections[0].y, 0, 0);
+                transmitted_ray.polar(10, ray.angle());
+                lines = lines.concat(raycast(transmitted_ray, geometry, bounce - 1, ior, strength * intersections[0].opts.transmission));
+            }
 
-            return points
+            return lines
                 // .concat([{x:reflected_ray.x1, y: reflected_ray.y1}, {x:reflected_ray.x2, y: reflected_ray.y2}])
-                .concat(raycast(reflected_ray, geometry, bounce - 1, ior))
+                .concat(raycast(reflected_ray, geometry, bounce - 1, ior, strength * intersections[0].opts.reflectance))
         } else if (intersections[0].opts.refractive) {
             let phi;
             let next_ior;
@@ -107,17 +120,40 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0) {
                 phi = refract(ray.angle(), intersections[0].n, ior, intersections[0].opts.ior);
                 next_ior = intersections[0].opts.ior;
             }
+            let refracted_ray = new Line(intersections[0].x, intersections[0].y, 0, 0);
+
             if (isNaN(phi)) {
                 // TOTAL INTERAL REFLECTION !!!!!
                 phi = reflect(ray.angle(), intersections[0].n)
                 next_ior = ior;
-            }
-            let refracted_ray = new Line(intersections[0].x, intersections[0].y, 0, 0);
-            refracted_ray.polar(10, phi);
 
-            return points.concat(raycast(refracted_ray, geometry, bounce - 1, next_ior));
+                refracted_ray.polar(10, phi);
+
+                return lines.concat(raycast(refracted_ray, geometry, bounce - 1, next_ior, strength));
+
+            } else {
+                // Refraction, and partial reflection
+                refracted_ray.polar(10, phi);
+                let reflected_ray = new Line(intersections[0].x, intersections[0].y, 0, 0);
+                reflected_ray.polar(10, reflect(ray.angle(), intersections[0].n));
+
+                // TODO
+                // Need to properly calculate percentage partial refraction
+
+
+                // Why are these here, you may ask?
+                // Because if I just take these expressions, and put them in the function 
+                // IT BREAKS
+                let r_strength = strength * intersections[0].opts.reflectance;
+                let t_strength = strength * intersections[0].opts.transmission;
+
+                return lines
+                    .concat(raycast(refracted_ray, geometry, bounce - 1, next_ior, t_strength))
+                    .concat(raycast(reflected_ray, geometry, bounce - 1, ior, r_strength));
+            }
+
         } else {
-            return points;
+            return lines;
         }
     } else {
         return [];
@@ -197,7 +233,7 @@ class Line {
 
     f(x, type) {
         if ((type == "line") || // set type to line to use full line, not just segment
-            (Math.min(this.x1, this.x2) - 0.1 < x && x < Math.max(this.x1, this.x2) + 0.1)) {
+            (Math.min(this.x1, this.x2) - 0.01 < x && x < Math.max(this.x1, this.x2) + 0.01)) {
             if (isFinite(this.slope())) {
                 return this.slope() * (x - this.x1) + this.y1;
             } else {
@@ -470,18 +506,20 @@ class Circle {
 
 class Ray {
 
-    // path is a list of points where the ray turns
+    // path is a list of lines
     constructor(path) {
-        this.path = "M " + path[0].x + " " + path[0].y + " L ";
-
-        for (let i = 1; i < path.length; i++) {
-            this.path += (path[i].x + " " + path[i].y + " ");
-            if (i == path.length - 1) {
-                this.path += ("M " + path[0].x + " " + path[0].y + " z")
-            } else {
-                this.path += ("L ")
-            }
-        }
+        this.path = path;
+        // this.path = "M " + path[0].x + " " + path[0].y + " L ";
+        // this.path = "";
+        // for (let i = 0; i < path.length; i++) {
+        //     this.path += `M ${path[i].x1} ${path[i].y1} L ${path[i].x2} ${path[i].y2}`
+        //     // this.path += (path[i].x + " " + path[i].y + " ");
+        //     // if (i == path.length - 1) {
+        //     //     this.path += ("M " + path[0].x + " " + path[0].y + " z")
+        //     // } else {
+        //     //     this.path += ("L ")
+        //     // }
+        // }
     }
 
     draw() {
@@ -497,7 +535,14 @@ function set_default_opts(opts) {
     opts.reflective = set_if_undefined(opts.reflective, false);
     opts.style = set_if_undefined(opts.style, "");
     opts.ior = set_if_undefined(opts.ior, 0);
-    opts.refractive = set_if_undefined(opts.refractive, false)
+    opts.refractive = set_if_undefined(opts.refractive, false);
+    if (opts.refractive) {
+        opts.reflectance = set_if_undefined(opts.reflectance, 0.1);
+        opts.transmission = set_if_undefined(opts.transmission, 0.9);
+    } else {
+        opts.reflectance = set_if_undefined(opts.reflectance, 1);
+        opts.transmission = set_if_undefined(opts.transmission, 0);
+    }
     return opts;
 }
 
@@ -518,7 +563,7 @@ function get_ior(geometry, x, y) {
     }
 
     intersections = intersections.filter(function (intersection) {
-        if (distance(intersection.x, intersection.y, x, y) < 0.1) return false;
+        if (distance(intersection.x, intersection.y, x, y) < 0.01) return false;
         return intersection.opts.refractive && intersection.x <= x && intersection.y <= y;
     }).map(function (intersection) {
         return intersection.opts.ior;
@@ -725,9 +770,11 @@ class Beam {
     updateRays() {
         this.angle = Math.atan2(this.data[1].y - this.data[0].y, this.data[1].x - this.data[0].x);
 
+        this.rays = [];
+
         for (let i = 0; i < this.num_rays; i++) {
             // console.log("NOW RAYCASTING");
-            this.rays[i] = new Ray(raycast(new Line(
+            this.rays = this.rays.concat(raycast(new Line(
                 this.data[0].x + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
                 this.data[0].y - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle),
                 this.data[1].x + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
@@ -738,12 +785,56 @@ class Beam {
     }
 
     drawRays() {
-        this.svg_group.selectAll("path").data(this.rays)
-            .attrs({
-                d: function (d) {
-                    return d.draw()
-                }
-            })
+        // this.svg_group.selectAll("path").data(this.rays)
+        //     .attrs({
+        //         d: function (d) {
+        //             return d.draw()
+        //         }
+        //     })
+        let lines = this.beam_group.selectAll("line").data(this.rays);
+
+        lines.exit().remove();
+
+        // lines.attr("x1", function(d){return d.x1;});
+        lines.attrs({
+            x1: function (d) {
+                return d.x1;
+            },
+            y1: function (d) {
+                return d.y1;
+            },
+            x2: function (d) {
+                return d.x2;
+            },
+            y2: function (d) {
+                return d.y2;
+            },
+            class: "ray",
+            "stroke-opacity": function (d) {
+                return Math.floor(1000 * d.strength)/1000;
+            }
+        })
+
+        lines.enter().append("line").attrs({
+            x1: function (d) {
+                return d.x1;
+            },
+            y1: function (d) {
+                return d.y1;
+            },
+            x2: function (d) {
+                return d.x2;
+            },
+            y2: function (d) {
+                return d.y2;
+            },
+            class: "ray",
+            "stroke-opacity": function (d) {
+                return Math.floor(1000 * d.strength) / 1000;
+            }
+        })
+
+        // lines.exit().remove();
     }
 
     updateHandles() {
@@ -755,23 +846,26 @@ class Beam {
 
     install(svg, space) {
         this.space = space;
-        this.svg_group = svg.append("g");
+        this.beam_group = svg.append("g");
+        this.handle_group = svg.append("g");
+
 
         this.updateRays();
 
-        this.svg_group.selectAll("path").data(this.rays)
-            .enter().append("path")
-            .attrs({
-                d: "",
-                class: "ray"
-            });
+        // this.svg_group.selectAll("path").data(this.rays)
+        //     .enter().append("path")
+        //     .attrs({
+        //         d: "",
+        //         class: "ray"
+        //     });
+
 
         this.drawRays();
 
         let self = this;
 
         if (this.orientation == "free") {
-            this.svg_group.selectAll("circle")
+            this.handle_group.selectAll("circle")
                 .data(this.data)
                 .enter().append("circle")
                 .attrs({
@@ -792,7 +886,7 @@ class Beam {
                     })
                     .on("end", dragended))
         } else if (this.orientation == "down") {
-            this.svg_group.selectAll("ellipse")
+            this.handle_group.selectAll("ellipse")
                 .data([this.data[0]]).enter().append("ellipse")
                 .attrs({
                     cx: this.data[0].x,
