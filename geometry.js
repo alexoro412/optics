@@ -3,16 +3,6 @@
 // Also, I know this file is called "geometry.js"
 // But it has non-geometry things as well
 
-function make_sim(id, h, w) {
-    return d3.select(id)
-        .append("svg")
-        .attrs({
-            class: "sim",
-            height: h,
-            width: w
-        })
-}
-
 function isOdd(x) {
     return x % 2 == 1;
 }
@@ -139,9 +129,6 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
                 refracted_ray.polar(10, phi);
                 let reflected_ray = new Line(intersections[0].x, intersections[0].y, 0, 0);
                 reflected_ray.polar(10, reflect(ray.angle(), intersections[0].n));
-
-                // TODO
-                // Need to properly calculate percentage partial refraction
 
 
                 // Why are these here, you may ask?
@@ -622,10 +609,20 @@ function get_ior(geometry, x, y) {
     return ior;
 }
 
+
+// FROM https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+function guidGenerator() {
+    var S4 = function () {
+        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    };
+    return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+}
+
 class Space {
     constructor() {
         this.paths = []
-        this.geometry = []
+        this.geometry = {}
+        this.geometry_list = [];
         this.circles = []
         this.installed = false;
         this.w = 400;
@@ -636,6 +633,19 @@ class Space {
     setBounds(w, h) {
         this.w = w;
         this.h = h;
+    }
+
+    update_geometry(){
+        this.geometry_list = []
+        for(let k of Object.keys(this.geometry)){
+            if(Array.isArray(this.geometry[k])){
+                for(let k2 in this.geometry[k]){
+                    this.geometry_list.push(this.geometry[k][k2])
+                }
+            }else{
+                this.geometry_list.push(this.geometry[k])
+            }
+        }
     }
 
     add_borders() {
@@ -656,11 +666,14 @@ class Space {
             throw "Can't have refractive thins"
         }
         shape.opts = opts;
-        this.geometry.push(shape);
+        let shape_id = guidGenerator();
+        this.geometry[shape_id] = shape;
         this.paths.push({
             path: shape.draw(true),
             class: opts.style
         })
+        this.update_geometry();
+        return shape_id;
     }
 
     add_thins(shapes, opts) {
@@ -673,12 +686,17 @@ class Space {
             class: opts.style
         })
         let last = this.paths.length - 1
+        let shape_id = guidGenerator();
+        this.geometry[shape_id] = [];
+
         for (let i = 0; i < shapes.length; i++) {
             shapes[i].opts = opts;
-            this.geometry.push(shapes[i]);
+            this.geometry[shape_id].push(shapes[i]);
             this.paths[last].path += shapes[i].draw(true)
             // this.paths[last].path += " Z "
         }
+        this.update_geometry();
+        return shape_id;
     }
 
     add_solid(shapes, opts) {
@@ -688,19 +706,25 @@ class Space {
             class: opts.style
         })
 
+        let shape_id = guidGenerator();
+        this.geometry[shape_id] = [];
+
         for (let i = 0; i < shapes.length; i++) {
             shapes[i].opts = opts;
-            this.geometry.push(shapes[i]);
+            this.geometry[shape_id].push(shapes[i]);
             this.paths[this.paths.length - 1].path += shapes[i].draw(i == 0)
         }
         this.paths[this.paths.length - 1].path += " Z "
+        this.update_geometry();
+        return shape_id;
     }
 
     add_circle(circle, opts) {
         circle.opts = set_default_opts(opts);
         circle.style = opts.style;
-        this.geometry.push(circle);
-        this.circles.push(circle);
+        let shape_id = guidGenerator();
+        this.geometry[shape_id] = circle;
+        this.circles[shape_id] = circle;
     }
 
     add_rect(x, y, w, h, opts) {
@@ -713,7 +737,7 @@ class Space {
     }
 
     get_geometry() {
-        return this.geometry;
+        return this.geometry_list;
     }
 
     draw() {
@@ -738,20 +762,25 @@ class Space {
                 }
             });
 
-        this.svg_object.selectAll("circle").data(this.circles)
+        let self = this;
+
+        this.svg_object.selectAll("circle").data(Object.keys(this.circles))
             .enter().append("circle")
             .attrs({
                 cx: function (d) {
-                    return d.cx;
+                    return self.circles[d].cx;
                 },
                 cy: function (d) {
-                    return d.cy;
+                    return self.circles[d].cy;
                 },
                 r: function (d) {
-                    return d.r;
+                    return self.circles[d].r;
                 },
                 class: function (d) {
-                    return d.style;
+                    return self.circles[d].style;
+                },
+                id: function(d){
+                    return d;
                 }
 
             })
@@ -1061,5 +1090,53 @@ function cubicRoots(a, b, c, d) {
         }
 
         return answers;
+    }
+}
+
+function make_sim(id, h, w) {
+    return d3.select(id)
+        .append("svg")
+        .attrs({
+            class: "sim",
+            height: h,
+            width: w
+        })
+}
+
+class Sim{
+    constructor(div_id, h = 350, w = 400){
+        this.svg = d3.select(div_id)
+            .append("svg")
+            .attrs({
+                class: "sim",
+                height: h,
+                width: w
+            })
+
+        this.space = new Space();
+
+        this.space.install(this.svg);
+
+        // TODO use this so beams can be removed
+        // this.beams = [];
+    }
+
+    update_svg(){
+        this.space.install(this.svg);
+    }
+
+    add_borders(){
+        this.space.add_borders();
+        this.space.install(this.svg)
+    }
+
+    add_solid(solid, opts){
+        this.space.add_solid(solid, opts);
+        this.update_svg();
+    }
+
+    add_beam(beam){
+        // this.beams.push(beam);
+        beam.install(this.svg, this.space);
     }
 }

@@ -11,19 +11,9 @@
         h: 216
     }
 
-    // let svg = d3.select("#reflection_parabola")
-    //     .append("svg")
-    //     .attrs({
-    //         class: "sim",
-    //         height: h,
-    //         width: w
-    //     })
+    let sim = new Sim("#reflection_parabola", h, w)
 
-    let svg = make_sim("#reflection_parabola", h, w);
-
-    let space = new Space();
-
-    space.add_solid([
+    let para_id = sim.add_solid([
         new Line(0,coords.h, 100, coords.h),
         new Bezier(100, 216,
         166.666, 362.666,
@@ -37,10 +27,9 @@
             reflectance: 1.0
         });
 
-    space.add_borders();
-
-    space.install(svg);
+    sim.add_borders();
 
     let beam = new Beam(48,106,0,0,10,100, "down");
-    beam.install(svg, space);
+    // beam.install(svg, space);
+    sim.add_beam(beam);
 })();
