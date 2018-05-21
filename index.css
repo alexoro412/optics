@@ -49,6 +49,11 @@ svg.sim {
     stroke: rgb(76, 76, 126) !important;
 }
 
+.bezier-line {
+    stroke: rgb(131, 161, 226);
+    stroke-linecap: round;
+}
+
 .thandle {
     fill-opacity: 0.4 !important;
 }

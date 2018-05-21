@@ -901,6 +901,88 @@ class Space {
     }
 }
 
+class PointLamp {
+    constructor(x,y,num_rays){
+        this.ray_gap = 2 * Math.PI / num_rays;
+        this.x = x;
+        this.y = y;
+        this.num_rays = num_rays;
+        this.radius = 10;
+    }
+
+    move(x,y){
+        this.x = x;
+        this.y = y;
+        this.updateRays();
+        this.drawRays();
+    }
+
+    raise_handles(){
+
+    }
+
+    updateRays(){
+        this.rays = [];
+        for(let i = 0; i < this.num_rays; i++){
+            this.rays = this.rays.concat(raycast(new Line(this.x, this.y, 
+                this.x + 10 * Math.cos(i * this.ray_gap), this.y + 10 * Math.sin(i * this.ray_gap)), 
+                this.space.get_geometry()))
+        }
+    }
+
+    drawRays(){
+        let lines = this.beam_group.selectAll("line").data(this.rays);
+
+        lines.exit().remove();
+
+        lines.attrs({
+            x1: function (d) {
+                return d.x1;
+            },
+            y1: function (d) {
+                return d.y1;
+            },
+            x2: function (d) {
+                return d.x2;
+            },
+            y2: function (d) {
+                return d.y2;
+            },
+            class: "ray",
+            "stroke-opacity": function (d) {
+                return +precisionRound(d.strength, 3);
+            }
+        })
+
+        lines.enter().append("line").attrs({
+            x1: function (d) {
+                return d.x1;
+            },
+            y1: function (d) {
+                return d.y1;
+            },
+            x2: function (d) {
+                return d.x2;
+            },
+            y2: function (d) {
+                return d.y2;
+            },
+            class: "ray",
+            "stroke-opacity": function (d) {
+                return +precisionRound(d.strength, 3);
+            }
+        })
+    }
+
+    install(svg, space){
+        this.space = space;
+        this.beam_group = svg.append("g");
+
+        this.updateRays();
+        this.drawRays();
+    }
+}
+
 class Beam {
     constructor(x1, y1, x2, y2, num_rays, beam_width, orientation = "free") {
         this.ray_gap = beam_width / num_rays;
@@ -1212,7 +1294,7 @@ function make_sim(id, h, w) {
 
 class Sim {
     constructor(div_id, h = 350, w = 400) {
-        this.beams = {};
+        this.lights = {};
 
         this.svg = d3.select(div_id)
             .append("svg")
@@ -1233,10 +1315,10 @@ class Sim {
         this.space.install(this.svg);
     }
 
-    update_beams() {
-        for (let k of Object.keys(this.beams)) {
-            this.beams[k].updateRays();
-            this.beams[k].drawRays();
+    update_lights() {
+        for (let k of Object.keys(this.lights)) {
+            this.lights[k].updateRays();
+            this.lights[k].drawRays();
         }
     }
 
@@ -1246,7 +1328,7 @@ class Sim {
 
     update() {
         this.update_svg();
-        this.update_beams();
+        this.update_lights();
         this.ui_group.raise();
     }
 
@@ -1287,12 +1369,12 @@ class Sim {
         return id;
     }
 
-    add_beam(beam) {
-        let beam_id = guidGenerator();
-        this.beams[beam_id] = beam;
-        beam.install(this.svg, this.space);
-        for (let b of Object.keys(this.beams)) {
-            this.beams[b].raise_handles();
+    add_light(light) {
+        let light_id = guidGenerator();
+        this.lights[light_id] = light;
+        light.install(this.svg, this.space);
+        for (let b of Object.keys(this.lights)) {
+            this.lights[b].raise_handles();
         }
     }
 

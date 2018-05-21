@@ -13,5 +13,5 @@
     })
 
     let beam = new Beam(116, 111, 200, 200, 10, 20);
-    sim.add_beam(beam);
+    sim.add_light(beam);
 })();

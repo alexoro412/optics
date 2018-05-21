@@ -24,7 +24,7 @@
     })
 
     let beam = new Beam(100, 100, 0, 0, 30, 200, Math.PI / 2);
-    sim.add_beam(beam);
+    sim.add_light(beam);
 
     let slider = new Slider({
         x: w / 2 + 10,
