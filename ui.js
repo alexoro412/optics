@@ -86,3 +86,45 @@ class Slider {
             .on("end", dragended))
     }
 }
+
+let default_point = {
+    x: 0,
+    y: 0,
+    radius: 10,
+    style: "handle",
+    min_x: 0,
+    min_y: 0,
+    max_x: 100,
+    max_y: 100,
+    callback: null,
+    num_decimals: 10
+}
+
+class Point {
+    constructor(opts){
+        merge(opts, default_point)
+        Object.assign(this, opts)
+    }
+
+    install(group, id){
+        let self = this;
+
+        group.append("circle").attrs({
+            cx: this.x,
+            cy: this.y,
+            r: this.radius,
+            class: this.style
+        }).call(d3.drag()
+            .on("start", dragstarted)
+            .on("drag", function(d){
+                self.x = +precisionRound(clamp(d3.event.x, self.min_x, self.max_x),self.num_decimals)
+                self.y = +precisionRound(clamp(d3.event.y, self.min_y, self.max_y),self.num_decimals)
+                d3.select(this)
+                    .attrs({
+                        cx: self.x,
+                        cy: self.y
+                    })
+                self.callback(self.x, self.y)
+            }).on("end", dragended))
+    }
+}

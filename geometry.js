@@ -63,7 +63,7 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
         // This prevents floating point errors
         if (distance(ray.x1, ray.y1, point.x, point.y) < 0.01) return false;
 
-        return ray.inRayDirection(point.x, point.y);
+        return ray.inRayDirection(point.x, point.y) && !point.opts.transparent;
     })).sort(closest(ray.x1, ray.y1));
 
     let lines = [];
@@ -531,6 +531,7 @@ function set_if_undefined(v, d) {
 
 function set_default_opts(opts) {
     opts.reflective = set_if_undefined(opts.reflective, false);
+    opts.transparent = set_if_undefined(opts.transparent, false);
     opts.style = set_if_undefined(opts.style, "");
     opts.ior = set_if_undefined(opts.ior, 0);
     opts.refractive = set_if_undefined(opts.refractive, false);
@@ -652,7 +653,8 @@ class Space {
                 }
             } else {
                 // not a group
-                if (this.geometry[k].shape == "thin") {
+                if (this.geometry[k].type == "thin") {
+                    this.paths[path_index].class += " hollow"
                     this.paths[path_index].path += this.geometry[k].shape.draw(true)
                 }
 
@@ -1269,6 +1271,18 @@ class Sim {
 
     add_solid(solid, opts, shape_id) {
         let id = this.space.add_solid(solid, opts, shape_id);
+        this.update();
+        return id;
+    }
+
+    add_thin(shape, opts, shape_id){
+        let id = this.space.add_thin(shape, opts, shape_id);
+        this.update();
+        return id;
+    }
+
+    add_thins(shapes, opts, shape_id){
+        let id = this.space.add_thins(shapes, opts, shape_id);
         this.update();
         return id;
     }
