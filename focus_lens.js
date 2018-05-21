@@ -2,9 +2,9 @@
     let w = 400,
         h = 350;
 
-    let lens_height = 80;
+    let lens_height = 120;
 
-    let lens_width = 20;
+    let lens_width = 40;
 
     let sim = new Sim("#focus_lens", h, w);
 

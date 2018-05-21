@@ -1,5 +1,7 @@
 svg.sim {
     border: 1px solid black;
+    touch-action: none;
+    -ms-touch-action: none;
 }
 
 .mirror {
