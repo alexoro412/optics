@@ -68,7 +68,7 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
     let lines = [];
 
     if (intersections.length > 0) {
-        
+
         lines.push({
             x1: ray.x1,
             y1: ray.y1,
@@ -79,7 +79,7 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
         if (intersections.length > 1 && close_enough(0, distance(intersections[0].x, intersections[0].y, intersections[1].x, intersections[1].y))) {
             // CORNER DETECTED
             return lines;
-        }else if (intersections[0].opts.reflective) {
+        } else if (intersections[0].opts.reflective) {
             // reflective
             let phi = reflect(ray.angle(), intersections[0].n)
 
@@ -202,12 +202,11 @@ function refract(alpha, theta, n1, n2) {
 }
 
 class Line {
-    constructor(x1, y1, x2, y2, reflective) {
+    constructor(x1, y1, x2, y2) {
         this.x1 = x1;
         this.x2 = x2;
         this.y1 = y1;
         this.y2 = y2;
-        this.reflective = reflective;
     }
 
     draw(move = true) {
@@ -627,7 +626,6 @@ class Space {
         this.installed = false;
         this.w = 400;
         this.h = 350;
-        this.listeners = [];
     }
 
     setBounds(w, h) {
@@ -635,21 +633,55 @@ class Space {
         this.h = h;
     }
 
-    update_geometry(){
+    update_geometry() {
         this.geometry_list = []
-        for(let k of Object.keys(this.geometry)){
-            if(Array.isArray(this.geometry[k])){
-                for(let k2 in this.geometry[k]){
-                    this.geometry_list.push(this.geometry[k][k2])
+        for (let k of Object.keys(this.geometry)) {
+            // if(Array.isArray(this.geometry[k])){
+            //     for(let k2 in this.geometry[k]){
+            //         this.geometry_list.push(this.geometry[k][k2])
+            //     }
+            // }else{
+            //     this.geometry_list.push(this.geometry[k])
+            // }
+            if (this.geometry[k].isGroup) {
+                for (let k2 in this.geometry[k].shapes) {
+                    this.geometry_list.push(this.geometry[k].shapes[k2])
                 }
-            }else{
-                this.geometry_list.push(this.geometry[k])
+            } else {
+                this.geometry_list.push(this.geometry[k].shape)
+            }
+        }
+    }
+
+    update_paths() {
+        this.paths = []
+        for (let k of Object.keys(this.geometry)) {
+            this.paths.push({
+                path: "",
+                class: this.geometry[k].opts.style
+            })
+            let path_index = this.paths.length - 1
+            if (this.geometry[k].isGroup) {
+                if (this.geometry[k].isSolid) {
+                    // solid group
+                    for (let i in this.geometry[k].shapes) {
+                        this.paths[path_index].path += this.geometry[k].shapes[i].draw(i == 0)
+                    }
+                    this.paths[path_index].path += " Z"
+                } else {
+                    //group of thins
+                    for (let i in this.geometry[k].shapes) {
+                        this.paths[path_index].path += this.geometry[k].shapes[i].draw(true);
+                    }
+                }
+            } else {
+                // not a group
             }
         }
     }
 
     add_borders() {
-        this.add_thins([
+        return this.add_thins([
             new Line(-this.w, -this.h, 2 * this.w, -this.h),
             new Line(2 * this.w, -this.h, 2 * this.w, 2 * this.h),
             new Line(2 * this.w, 2 * this.h, -this.w, 2 * this.h),
@@ -660,23 +692,49 @@ class Space {
         })
     }
 
-    add_thin(shape, opts) {
+    add_thin(shape, opts, shape_id) {
+        if (typeof shape_id === "undefined") {
+            // Adding new
+            shape_id = guidGenerator();
+        } else {
+            // Updating
+            opts = Object.assign(this.geometry[shape_id].opts, opts);
+            if (typeof shape === "undefined") {
+                shape = this.geometry[shape_id].shape
+            }
+        }
         opts = set_default_opts(opts);
         if (opts.refractive) {
             throw "Can't have refractive thins"
         }
         shape.opts = opts;
-        let shape_id = guidGenerator();
-        this.geometry[shape_id] = shape;
-        this.paths.push({
-            path: shape.draw(true),
-            class: opts.style
-        })
+        this.geometry[shape_id] = {
+            shape: shape,
+            id: shape_id,
+            opts: opts,
+            isGroup: false,
+            isSolid: false
+        }
+        // this.paths.push({
+        //     path: shape.draw(true),
+        //     class: opts.style
+        // })
         this.update_geometry();
+        this.update_paths();
         return shape_id;
     }
 
-    add_thins(shapes, opts) {
+    add_thins(shapes, opts, shape_id) {
+        if (typeof shape_id === "undefined") {
+            // Adding new
+            shape_id = guidGenerator();
+        } else {
+            // Updating
+            opts = Object.assign(this.geometry[shape_id].opts, opts);
+            if(shapes.length == 0){
+                shapes = this.geometry[shape_id].shapes
+            }
+        }
         opts = set_default_opts(opts);
         if (opts.refractive) {
             throw "Can't have refractive thins"
@@ -686,44 +744,86 @@ class Space {
             class: opts.style
         })
         let last = this.paths.length - 1
-        let shape_id = guidGenerator();
-        this.geometry[shape_id] = [];
+
+        this.geometry[shape_id] = {
+            isGroup: true,
+            isSolid: false,
+            shapes: [],
+            opts: opts,
+            id: shape_id
+        };
 
         for (let i = 0; i < shapes.length; i++) {
             shapes[i].opts = opts;
-            this.geometry[shape_id].push(shapes[i]);
-            this.paths[last].path += shapes[i].draw(true)
+            this.geometry[shape_id].shapes.push(shapes[i]);
+            // this.paths[last].path += shapes[i].draw(true)
             // this.paths[last].path += " Z "
         }
         this.update_geometry();
+        this.update_paths();
         return shape_id;
     }
 
-    add_solid(shapes, opts) {
-        opts = set_default_opts(opts);
-        this.paths.push({
-            path: "",
-            class: opts.style
-        })
+    add_solid(shapes, opts, shape_id) {
+        if (typeof shape_id === "undefined") {
+            // Adding new
+            shape_id = guidGenerator();
+        } else {
+            // Updating
+            opts = Object.assign(this.geometry[shape_id].opts, opts);
+            if (shapes.length == 0) {
+                shapes = this.geometry[shape_id].shapes
+            }
+        }
 
-        let shape_id = guidGenerator();
-        this.geometry[shape_id] = [];
+        opts = set_default_opts(opts);
+        // this.paths.push({
+        //     path: "",
+        //     class: opts.style
+        // })
+
+
+
+        this.geometry[shape_id] = {
+            isGroup: true,
+            shapes: [],
+            opts: opts,
+            id: shape_id,
+            isSolid: true
+        };
 
         for (let i = 0; i < shapes.length; i++) {
             shapes[i].opts = opts;
-            this.geometry[shape_id].push(shapes[i]);
-            this.paths[this.paths.length - 1].path += shapes[i].draw(i == 0)
+            this.geometry[shape_id].shapes.push(shapes[i]);
+            // this.paths[this.paths.length - 1].path += shapes[i].draw(i == 0)
         }
-        this.paths[this.paths.length - 1].path += " Z "
+        // this.paths[this.paths.length - 1].path += " Z "
         this.update_geometry();
+        this.update_paths();
+        console.log(this.geometry);
         return shape_id;
     }
 
-    add_circle(circle, opts) {
+    add_circle(circle, opts, shape_id) {
+        if (typeof shape_id === "undefined") {
+            // Adding new
+            shape_id = guidGenerator();
+        } else {
+            // Updating
+            opts = Object.assign(this.geometry[shape_id].opts, opts);
+            if (typeof circle === "undefined") {
+                shape = this.geometry[shape_id].shape
+            }
+        }
         circle.opts = set_default_opts(opts);
         circle.style = opts.style;
-        let shape_id = guidGenerator();
-        this.geometry[shape_id] = circle;
+        this.geometry[shape_id] = {
+            shape: circle,
+            id: shape_id,
+            opts: opts,
+            isGroup: false
+        }
+        this.update_geometry();
         this.circles[shape_id] = circle;
     }
 
@@ -751,8 +851,24 @@ class Space {
         }
 
 
-        this.svg_object.selectAll("path").data(this.draw())
-            .enter().append("path")
+        let paths = this.svg_object.selectAll("path")
+            .data(this.draw(), function (d) {
+                return d;
+            });
+
+
+        paths.exit().remove();
+
+        paths.attrs({
+            class: function (d) {
+                return d.class
+            },
+            d: function (d) {
+                return d.path;
+            }
+        })
+
+        paths.enter().append("path")
             .attrs({
                 class: function (d) {
                     return d.class
@@ -761,6 +877,8 @@ class Space {
                     return d.path;
                 }
             });
+
+
 
         let self = this;
 
@@ -779,7 +897,7 @@ class Space {
                 class: function (d) {
                     return self.circles[d].style;
                 },
-                id: function(d){
+                id: function (d) {
                     return d;
                 }
 
@@ -909,14 +1027,6 @@ class Beam {
 
         this.updateRays();
 
-        // this.svg_group.selectAll("path").data(this.rays)
-        //     .enter().append("path")
-        //     .attrs({
-        //         d: "",
-        //         class: "ray"
-        //     });
-
-
         this.drawRays();
 
         let self = this;
@@ -1015,8 +1125,12 @@ class Bezier {
         }
     }
 
-    draw() {
-        return `M ${this.x1} ${this.y1} C ${this.x2} ${this.y2} ${this.x3} ${this.y3} ${this.x4} ${this.y4}`
+    draw(move) {
+        if(move){
+            return `M ${this.x1} ${this.y1} C ${this.x2} ${this.y2} ${this.x3} ${this.y3} ${this.x4} ${this.y4}`
+        }else{
+            return `C ${this.x2} ${this.y2} ${this.x3} ${this.y3} ${this.x4} ${this.y4}`
+        }
     }
 
     normal(t) {
@@ -1103,8 +1217,10 @@ function make_sim(id, h, w) {
         })
 }
 
-class Sim{
-    constructor(div_id, h = 350, w = 400){
+class Sim {
+    constructor(div_id, h = 350, w = 400) {
+        this.beams = {};
+
         this.svg = d3.select(div_id)
             .append("svg")
             .attrs({
@@ -1115,28 +1231,46 @@ class Sim{
 
         this.space = new Space();
 
-        this.space.install(this.svg);
-
-        // TODO use this so beams can be removed
-        // this.beams = [];
-    }
-
-    update_svg(){
+        this.add_borders();
+        
         this.space.install(this.svg);
     }
 
-    add_borders(){
-        this.space.add_borders();
-        this.space.install(this.svg)
+    update_beams(){
+        for(let k of Object.keys(this.beams)){
+            this.beams[k].updateRays();
+            this.beams[k].drawRays();
+        }
     }
 
-    add_solid(solid, opts){
-        this.space.add_solid(solid, opts);
+    update_svg() {
+        this.space.install(this.svg);
+    }
+
+    update(){
         this.update_svg();
+        this.update_beams();
     }
 
-    add_beam(beam){
-        // this.beams.push(beam);
+    add_borders() {
+        this.border_id = this.space.add_borders();
+        this.update();
+    }
+
+    add_solid(solid, opts, shape_id) {
+        let id = this.space.add_solid(solid, opts, shape_id);
+        this.update();
+        return id;
+    }
+
+    add_beam(beam) {
+        let beam_id = guidGenerator();
+        this.beams[beam_id] = beam;
         beam.install(this.svg, this.space);
+    }
+
+    add_circle(circle, opts) {
+        this.space.add_circle(circle, opts);
+        this.update();
     }
 }

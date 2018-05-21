@@ -27,9 +27,22 @@
             reflectance: 1.0
         });
 
-    sim.add_borders();
+    console.log("para id", para_id);
+
+    sim.add_circle(new Circle(100,80,24), {
+        reflective: false,
+        style: "solid water"
+    })
+
+    setTimeout(function(){
+        sim.add_solid([], {
+            reflectance: 0.5
+        }, para_id);
+    }, 2000)
 
     let beam = new Beam(48,106,0,0,10,100, "down");
     // beam.install(svg, space);
     sim.add_beam(beam);
+
+    console.log(sim.space);
 })();
