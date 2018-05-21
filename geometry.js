@@ -61,7 +61,7 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
     intersections = (intersections.filter(function (point) {
         // FIXME
         // This prevents floating point errors
-        if (distance(ray.x1, ray.y1, point.x, point.y) <= 0.02) return false;
+        if (distance(ray.x1, ray.y1, point.x, point.y) <= 0.05) return false;
 
         return ray.inRayDirection(point.x, point.y) && !point.opts.transparent;
     })).sort(closest(ray.x1, ray.y1));
