@@ -1,17 +1,25 @@
+// From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round
+function precisionRound(number, precision) {
+    var factor = Math.pow(10, precision);
+    return Math.round(number * factor) / factor;
+}
+
 let default_slider = {
     x: 100,
     y: 100,
     length: 100,
-    orientation: "horizontal",
+    angle: 0,
     handle_style: "handle",
     style: "",
     callback: null,
     radius: 10,
     text_dx: 0,
     text_dy: 0,
+    text_value: "",
     min: 0,
     max: 100,
-    value: 0
+    value: 0,
+    num_decimals: 10
 }
 
 function merge(o, defaults){
@@ -27,7 +35,6 @@ class Slider {
         merge(opts, default_slider);
         Object.assign(this, opts);
         
-        this.horizontal = this.orientation === "horizontal"
         this.slider_value = map(this.value, this.min, this.max, 0, this.length)
     }
 
@@ -35,8 +42,8 @@ class Slider {
         group.append("line").attrs({
             x1: this.x,
             y1: this.y,
-            x2: this.horizontal ? this.x + this.length : this.x,
-            y2: this.horizontal ? this.y : this.y + this.length,
+            x2: this.x + this.length * Math.cos(this.angle),
+            y2: this.y + this.length * Math.sin(this.angle),
             class: this.style
         })
 
@@ -48,27 +55,29 @@ class Slider {
         }).text(this.callback(this.value))
 
         group.append("circle").attrs({
-            cx: this.x + (this.horizontal ? this.slider_value : 0),
-            cy: this.y + (this.horizontal ? 0 : this.slider_value),
+            cx: this.x + this.slider_value * Math.cos(this.angle),
+            cy: this.y + this.slider_value * Math.sin(this.angle),
             r: this.radius,
             class: this.handle_style
         }).call(d3.drag()
             .on("start", dragstarted)
             .on("drag", function(d){
-                if(self.horizontal){
-                    self.slider_value = clamp(d3.event.x, self.x, self.x + self.length) - self.x
+                // That's right, dot product
+                let a_x = d3.event.x - self.x,
+                    a_y = d3.event.y - self.y,
+                    e_x = Math.cos(self.angle),
+                    e_y = Math.sin(self.angle),
+                    dot = a_x * e_x + a_y * e_y;
 
-                    d3.select(this)
-                        .attr("cx", self.slider_value + self.x)
+                self.slider_value = clamp(dot, 0, self.length);
+                
+                d3.select(this)
+                    .attrs({
+                        cx: self.x + self.slider_value * Math.cos(self.angle), 
+                        cy: self.y + self.slider_value * Math.sin(self.angle)
+                    })
 
-                    
-                }else{
-                    self.slider_value = clamp(d3.event.y, self.y, self.y + self.length) - self.y
-
-                    d3.select(this)
-                        .attr("cy", self.slider_value + self.y)
-                }
-                self.value = map(self.slider_value, 0, self.length, self.min, self.max)
+                self.value = precisionRound(map(self.slider_value, 0, self.length, self.min, self.max), self.num_decimals);
 
                 self.text_value = self.callback(self.value);
 

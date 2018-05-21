@@ -23,14 +23,14 @@
         x: 150,
         y: 300,
         length: 120,
-        orientation: "horizontal",
+        angle: 0,
         style: "slider",
         handle_style: "slider-handle handle",
         value: 1.5,
+        num_decimals: 2,
         callback: function(value){
-            ior = value.toFixed(2);
-            sim.update_shape_opts(rect, {ior: ior})
-            return "IOR: " + ior;
+            sim.update_shape_opts(rect, {ior: value})
+            return "IOR: " + value;
         },
         text_dx: -73,
         text_dy: 3.5,

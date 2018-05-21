@@ -47,6 +47,10 @@ svg.sim {
     stroke: rgb(76, 76, 126) !important;
 }
 
+.thandle {
+    fill-opacity: 0.4 !important;
+}
+
 .ray {
     fill: none;
     stroke: #e74c3c;

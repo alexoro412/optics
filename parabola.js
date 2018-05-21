@@ -2,10 +2,7 @@
 
 (function(){
     let w = 400,
-        h = 350,
-        angle_radius = 15,
-        handle_radius = 10,
-        dome_radius = 120;
+        h = 350;
 
     let coords = {
         h: 216
@@ -43,7 +40,7 @@
     //     sim.update_shape_geometry(circle_id, new Circle(100,200,13));
     // }, 2000)
 
-    let beam = new Beam(48,106,0,0,10,100, "down");
+    let beam = new Beam(48,106,0,0,10,100, Math.PI/2);
     // beam.install(svg, space);
     sim.add_beam(beam);
 })();

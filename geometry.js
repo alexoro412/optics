@@ -80,7 +80,7 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
             y2: intersections[0].y,
             strength: strength
         });
-        if (intersections.length > 1 && close_enough(0, distance(intersections[0].x, intersections[0].y, intersections[1].x, intersections[1].y))) {
+        if (intersections.length > 1 && close_enough(0, distance(intersections[0].x, intersections[0].y, intersections[1].x, intersections[1].y),0.1)) {
             // CORNER DETECTED
             return lines;
         } else if (intersections[0].opts.reflective) {
@@ -950,14 +950,14 @@ class Beam {
                 x: x2,
                 y: y2
             }]
-        } else if (orientation == "down") {
+        } else if (typeof orientation == "number") {
             this.data = [{
                     x: x1,
                     y: y1
                 },
                 {
-                    x: x1,
-                    y: y1 + 10
+                    x: x1 + 10 * Math.cos(orientation),
+                    y: y1 + 10 * Math.sin(orientation)
                 }
             ]
         }
@@ -1045,9 +1045,11 @@ class Beam {
     }
 
     updateHandles() {
-        if (this.orientation == "down") {
-            this.data[1].x = this.data[0].x;
-            this.data[1].y = this.data[0].y + 10;
+        if (typeof this.orientation == "number") {
+            this.data[1].x = this.data[0].x + 10 * Math.cos(this.orientation);
+            this.data[1].y = this.data[0].y + 10 * Math.sin(this.orientation);
+            this.handle_group.select("ellipse")
+                .attr("transform", `rotate(${(this.orientation - Math.PI/2) * 180 / Math.PI} ${this.data[0].x} ${this.data[0].y})`);
         }
     }
 
@@ -1084,7 +1086,7 @@ class Beam {
                         self.drawRays();
                     })
                     .on("end", dragended))
-        } else if (this.orientation == "down") {
+        } else if (typeof this.orientation == "number") {
             this.handle_group.selectAll("ellipse")
                 .data([this.data[0]]).enter().append("ellipse")
                 .attrs({
@@ -1092,7 +1094,8 @@ class Beam {
                     cy: this.data[0].y,
                     ry: this.radius,
                     rx: this.beam_width / 2,
-                    class: "handle"
+                    class: "handle",
+                    transform: `rotate(${(this.orientation - Math.PI/2) * 180 / Math.PI} ${this.data[0].x} ${this.data[0].y})`
                 }).call(d3.drag().on("start", dragstarted)
                     .on("drag", function (d) {
                         (dragged.bind(this))(d, self.w, self.h);
