@@ -1,4 +1,7 @@
 (function () {
+    // TODO 
+    // Rewrite this one using the simulator
+
     let w = 400,
         h = 350,
         angle_radius = 35,
@@ -155,41 +158,19 @@
         d3.select(this).classed("active", false);
     }
 
-     svg.selectAll("circle")
-         .data([handle])
-         .enter().append("circle")
-         .attr("cx", function (d) {
-             return d.x;
-         })
-         .attr("cy", function (d) {
-             return d.y;
-         })
-         .attr("r", handle_radius)
-         .attr("class", "handle")
-         .call(d3.drag()
-             .on("start", dragstarted)
-             .on("drag", dragged)
-             .on("end", dragended));
+    svg.selectAll("circle")
+        .data([handle])
+        .enter().append("circle")
+        .attr("cx", function (d) {
+            return d.x;
+        })
+        .attr("cy", function (d) {
+            return d.y;
+        })
+        .attr("r", handle_radius)
+        .attr("class", "handle")
+        .call(d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended));
 })();
-
-// FOR PARABOLIC REFLECTOR
-
-// let mirror = [
-
-// ];
-
-// for(let i = -10; i <= 10; i++){
-//     mirror.push({
-//         y: i * 10 + h/2,
-//         x: w - 10 - 0.005 * (i*10) ** 2
-//     })
-// }
-
-
-// polyPath = mirror.reduce(function(acc, x){
-//     return acc += x.x + "," + x.y + " ";
-// }, "");
-
-// svg.append("polyline")
-//     .attr("class", "mirror")
-//     .attr("points", polyPath);

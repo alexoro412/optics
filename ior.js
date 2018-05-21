@@ -1,4 +1,4 @@
-(function(){
+(function () {
     let w = 400,
         h = 350,
         rect_width = 250,
@@ -8,16 +8,16 @@
 
     let ior = 1.00;
 
-    let rect = sim.add_rect((w-rect_width)/2,(h-rect_height)/2,rect_width,rect_height,{
+    let rect = sim.add_rect((w - rect_width) / 2, (h - rect_height) / 2, rect_width, rect_height, {
         style: "solid glass",
         refractive: true,
         ior: ior
     });
 
-    let beam = new Beam(41,17,145,115,10,20);
+    let beam = new Beam(41, 17, 145, 115, 10, 20);
     sim.add_beam(beam);
 
-    
+
 
     let slider = new Slider({
         x: 150,
@@ -28,8 +28,10 @@
         handle_style: "slider-handle handle",
         value: 1.5,
         num_decimals: 2,
-        callback: function(value){
-            sim.update_shape_opts(rect, {ior: value})
+        callback: function (value) {
+            sim.update_shape_opts(rect, {
+                ior: value
+            })
             return "IOR: " + value;
         },
         text_dx: -73,

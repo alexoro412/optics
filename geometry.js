@@ -19,7 +19,7 @@ function clamp(num, min, max) {
     return Math.min(Math.max(num, min), max);
 }
 
-function map(num, min1, max1, min2, max2){
+function map(num, min1, max1, min2, max2) {
     return (num - min1) / (max1 - min1) * (max2 - min2) + min2
 }
 
@@ -40,9 +40,6 @@ function close_enough(a, b, tolerance = 0.01) {
 const max_bounce = 10;
 
 function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
-    // if(strength == 1){
-    //     console.log(ray.x1, ray.y1);
-    // }
     if (bounce == 0 || strength < 0.01) return [];
 
     if (ior == 0) {
@@ -80,7 +77,7 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
             y2: intersections[0].y,
             strength: strength
         });
-        if (intersections.length > 1 && close_enough(0, distance(intersections[0].x, intersections[0].y, intersections[1].x, intersections[1].y),0.1)) {
+        if (intersections.length > 1 && close_enough(0, distance(intersections[0].x, intersections[0].y, intersections[1].x, intersections[1].y), 0.1)) {
             // CORNER DETECTED
             return lines;
         } else if (intersections[0].opts.reflective) {
@@ -97,7 +94,6 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
             }
 
             return lines
-                // .concat([{x:reflected_ray.x1, y: reflected_ray.y1}, {x:reflected_ray.x2, y: reflected_ray.y2}])
                 .concat(raycast(reflected_ray, geometry, bounce - 1, ior, strength * intersections[0].opts.reflectance))
         } else if (intersections[0].opts.refractive) {
             let phi;
@@ -165,7 +161,7 @@ function dot(x1, y1, x2, y2) {
 }
 
 function refract(alpha, theta, n1, n2) {
-    // This bit of cleverness inspired by https://math.stackexchange.com/questions/701656/check-angle-between-two-lines-greater-than-90?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+    // This bit of cleverness brought to you by https://math.stackexchange.com/questions/701656/check-angle-between-two-lines-greater-than-90?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
 
     let d = dot(Math.cos(alpha), Math.sin(alpha), Math.cos(theta), Math.sin(theta))
 
@@ -196,13 +192,8 @@ function refract(alpha, theta, n1, n2) {
         console.log((n1 * Math.cos(gamma) - n2 * Math.cos(beta)) / (n1 * Math.cos(gamma) + n2 * Math.cos(beta)));
 
     }
-    // 
-
 
     return [phi, partial_strength];
-
-
-
 }
 
 class Line {
@@ -527,17 +518,6 @@ class Ray {
     // path is a list of lines
     constructor(path) {
         this.path = path;
-        // this.path = "M " + path[0].x + " " + path[0].y + " L ";
-        // this.path = "";
-        // for (let i = 0; i < path.length; i++) {
-        //     this.path += `M ${path[i].x1} ${path[i].y1} L ${path[i].x2} ${path[i].y2}`
-        //     // this.path += (path[i].x + " " + path[i].y + " ");
-        //     // if (i == path.length - 1) {
-        //     //     this.path += ("M " + path[0].x + " " + path[0].y + " z")
-        //     // } else {
-        //     //     this.path += ("L ")
-        //     // }
-        // }
     }
 
     draw() {
@@ -565,7 +545,7 @@ function set_default_opts(opts) {
 }
 
 // fair warning
-// does not work with clipped/overlapped objects
+// probably won't with clipped/overlapped objects
 function get_ior(geometry, x, y) {
     intersections = [];
 
@@ -716,10 +696,6 @@ class Space {
             isSolid: false,
             type: "thin"
         }
-        // this.paths.push({
-        //     path: shape.draw(true),
-        //     class: opts.style
-        // })
         this.update_geometry();
         this.update_paths();
         return shape_id;
@@ -758,8 +734,6 @@ class Space {
         for (let i = 0; i < shapes.length; i++) {
             shapes[i].opts = opts;
             this.geometry[shape_id].shapes.push(shapes[i]);
-            // this.paths[last].path += shapes[i].draw(true)
-            // this.paths[last].path += " Z "
         }
         this.update_geometry();
         this.update_paths();
@@ -779,12 +753,6 @@ class Space {
         }
 
         opts = set_default_opts(opts);
-        // this.paths.push({
-        //     path: "",
-        //     class: opts.style
-        // })
-
-
 
         this.geometry[shape_id] = {
             isGroup: true,
@@ -798,9 +766,7 @@ class Space {
         for (let i = 0; i < shapes.length; i++) {
             shapes[i].opts = opts;
             this.geometry[shape_id].shapes.push(shapes[i]);
-            // this.paths[this.paths.length - 1].path += shapes[i].draw(i == 0)
         }
-        // this.paths[this.paths.length - 1].path += " Z "
         this.update_geometry();
         this.update_paths();
         return shape_id;
@@ -971,7 +937,7 @@ class Beam {
         this.h = h;
     }
 
-    raise_handles(){
+    raise_handles() {
         this.handle_group.raise();
     }
 
@@ -992,17 +958,10 @@ class Beam {
     }
 
     drawRays() {
-        // this.svg_group.selectAll("path").data(this.rays)
-        //     .attrs({
-        //         d: function (d) {
-        //             return d.draw()
-        //         }
-        //     })
         let lines = this.beam_group.selectAll("line").data(this.rays);
 
         lines.exit().remove();
 
-        // lines.attr("x1", function(d){return d.x1;});
         lines.attrs({
             x1: function (d) {
                 return d.x1;
@@ -1040,8 +999,6 @@ class Beam {
                 return Math.floor(1000 * d.strength) / 1000;
             }
         })
-
-        // lines.exit().remove();
     }
 
     updateHandles() {
@@ -1291,7 +1248,7 @@ class Sim {
         this.ui_group.raise();
     }
 
-    add_ui(ui){
+    add_ui(ui) {
         let ui_id = guidGenerator();
         let elem_group = this.ui_group.append("g").attr("id", ui_id)
         this.ui_elems[ui_id] = {
@@ -1300,7 +1257,7 @@ class Sim {
             svg_group: elem_group,
             elem: ui // TODO may be unecessary 
         };
-        
+
         ui.install(elem_group);
         this.ui_group.raise();
     }
@@ -1320,7 +1277,7 @@ class Sim {
         let beam_id = guidGenerator();
         this.beams[beam_id] = beam;
         beam.install(this.svg, this.space);
-        for(let b of Object.keys(this.beams)){
+        for (let b of Object.keys(this.beams)) {
             this.beams[b].raise_handles();
         }
     }

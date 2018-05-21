@@ -22,23 +22,23 @@ let default_slider = {
     num_decimals: 10
 }
 
-function merge(o, defaults){
-    for(let k of Object.keys(defaults)){
-        if(typeof o[k] === "undefined"){
+function merge(o, defaults) {
+    for (let k of Object.keys(defaults)) {
+        if (typeof o[k] === "undefined") {
             o[k] = defaults[k]
         }
     }
 }
 
 class Slider {
-    constructor(opts){
+    constructor(opts) {
         merge(opts, default_slider);
         Object.assign(this, opts);
-        
+
         this.slider_value = map(this.value, this.min, this.max, 0, this.length)
     }
 
-    install(group, id){
+    install(group, id) {
         group.append("line").attrs({
             x1: this.x,
             y1: this.y,
@@ -61,7 +61,7 @@ class Slider {
             class: this.handle_style
         }).call(d3.drag()
             .on("start", dragstarted)
-            .on("drag", function(d){
+            .on("drag", function (d) {
                 // That's right, dot product
                 let a_x = d3.event.x - self.x,
                     a_y = d3.event.y - self.y,
@@ -70,10 +70,10 @@ class Slider {
                     dot = a_x * e_x + a_y * e_y;
 
                 self.slider_value = clamp(dot, 0, self.length);
-                
+
                 d3.select(this)
                     .attrs({
-                        cx: self.x + self.slider_value * Math.cos(self.angle), 
+                        cx: self.x + self.slider_value * Math.cos(self.angle),
                         cy: self.y + self.slider_value * Math.sin(self.angle)
                     })
 

@@ -1,4 +1,4 @@
-(function(){
+(function () {
     let w = 400,
         h = 350;
 
@@ -6,52 +6,52 @@
 
     let lens_width = 20;
 
-    let sim = new Sim("#focus_lens",h,w);
+    let sim = new Sim("#focus_lens", h, w);
 
     let lens = sim.add_solid([
-        new Arc(w/2, h/2 - lens_height, w/2, h/2 + lens_height, w/2 - lens_width, h/2),
-        new Arc(w/2, h/2 + lens_height, w/2, h/2 - lens_height, w/2 + lens_width, h/2)
+        new Arc(w / 2, h / 2 - lens_height, w / 2, h / 2 + lens_height, w / 2 - lens_width, h / 2),
+        new Arc(w / 2, h / 2 + lens_height, w / 2, h / 2 - lens_height, w / 2 + lens_width, h / 2)
     ], {
         refractive: true,
         ior: 1.5,
         style: "solid glass"
     })
 
-    function update_lens(){
+    function update_lens() {
         sim.update_shape_geometry(lens, [
             new Arc(w / 2, h / 2 - lens_height, w / 2, h / 2 + lens_height, w / 2 - lens_width, h / 2),
             new Arc(w / 2, h / 2 + lens_height, w / 2, h / 2 - lens_height, w / 2 + lens_width, h / 2)
         ]);
     }
 
-    let beam = new Beam(10,h/2,40,h/2,10,80,0);
+    let beam = new Beam(10, h / 2, 40, h / 2, 10, 80, 0);
     sim.add_beam(beam);
 
     let height_slider = new Slider({
-        x: w/2,
-        y: h/2 - 10,
+        x: w / 2,
+        y: h / 2 - 10,
         length: lens_height - 10,
         min: 10,
         max: lens_height,
         value: lens_height,
-        angle: -Math.PI/2,
+        angle: -Math.PI / 2,
         handle_style: "thandle handle",
-        callback: function(value){
+        callback: function (value) {
             lens_height = value;
             update_lens();
         }
     })
 
     let width_slider = new Slider({
-        x: w/2 + 5,
-        y: h/2,
+        x: w / 2 + 5,
+        y: h / 2,
         length: lens_width - 5,
         min: 5,
         handle_style: "thandle handle",
         max: lens_width,
         value: lens_width,
         angle: 0,
-        callback: function(value){
+        callback: function (value) {
             lens_width = value;
             update_lens();
         }

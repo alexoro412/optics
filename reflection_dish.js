@@ -13,8 +13,6 @@
 
     let dish_id = sim.add_solid([
         new Line(0, coords.h, w / 2 - dome_radius, coords.h, true),
-        // dome_left,
-        // dome_right,
         dome,
         new Line(w / 2 + dome_radius, coords.h, w, coords.h, true),
         new Line(w, coords.h, w, h, true),
@@ -25,11 +23,11 @@
         style: "solid mirror"
     })
 
-    let beam = new Beam(100, 100, 0, 0, 30, 200, Math.PI/2);
+    let beam = new Beam(100, 100, 0, 0, 30, 200, Math.PI / 2);
     sim.add_beam(beam);
 
     let slider = new Slider({
-        x: w/2 + 10, 
+        x: w / 2 + 10,
         y: coords.h,
         length: dome_radius - 10,
         min: 10,
@@ -37,12 +35,10 @@
         angle: 0,
         num_decimals: 0,
         value: dome_radius,
-        callback: function(value){
+        callback: function (value) {
             dome_radius = value;
             sim.update_shape_geometry(dish_id, [
                 new Line(0, coords.h, w / 2 - dome_radius, coords.h, true),
-                // dome_left,
-                // dome_right,
                 new Arc(w / 2 - dome_radius, coords.h, w / 2 + dome_radius, coords.h, w / 2, coords.h + dome_radius),
                 new Line(w / 2 + dome_radius, coords.h, w, coords.h, true),
                 new Line(w, coords.h, w, h, true),
