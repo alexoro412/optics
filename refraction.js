@@ -47,4 +47,14 @@
 
     let beam = new Beam(41,17,178,143,10,20);
     sim.add_beam(beam);
+
+    
+
+    // let slider = new Slider(150,100,90,"horizontal", "water",function(slider_value){
+        
+    // });
+
+    // slider.text_offset = 35;
+
+    // sim.add_ui(slider);
 })();

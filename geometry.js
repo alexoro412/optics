@@ -19,6 +19,10 @@ function clamp(num, min, max) {
     return Math.min(Math.max(num, min), max);
 }
 
+function map(num, min1, max1, min2, max2){
+    return (num - min1) / (max1 - min1) * (max2 - min2) + min2
+}
+
 function distance(x1, y1, x2, y2) {
     return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
 }
@@ -967,6 +971,10 @@ class Beam {
         this.h = h;
     }
 
+    raise_handles(){
+        this.handle_group.raise();
+    }
+
     updateRays() {
         this.angle = Math.atan2(this.data[1].y - this.data[0].y, this.data[1].x - this.data[0].x);
 
@@ -1094,7 +1102,6 @@ class Beam {
                     })
                     .on("end", dragended))
         }
-
 
     }
 }
@@ -1253,6 +1260,10 @@ class Sim {
                 width: w
             })
 
+        this.ui_elems = {}
+
+        this.ui_group = this.svg.append("g");
+
         this.space = new Space();
 
         this.add_borders();
@@ -1274,6 +1285,21 @@ class Sim {
     update() {
         this.update_svg();
         this.update_beams();
+        this.ui_group.raise();
+    }
+
+    add_ui(ui){
+        let ui_id = guidGenerator();
+        let elem_group = this.ui_group.append("g").attr("id", ui_id)
+        this.ui_elems[ui_id] = {
+            type: ui.type,
+            id: ui_id,
+            svg_group: elem_group,
+            elem: ui // TODO may be unecessary 
+        };
+        
+        ui.install(elem_group);
+        this.ui_group.raise();
     }
 
     add_borders() {
@@ -1291,6 +1317,9 @@ class Sim {
         let beam_id = guidGenerator();
         this.beams[beam_id] = beam;
         beam.install(this.svg, this.space);
+        for(let b of Object.keys(this.beams)){
+            this.beams[b].raise_handles();
+        }
     }
 
     add_circle(circle, opts, shape_id) {

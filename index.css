@@ -36,6 +36,17 @@ svg.sim {
     fill-opacity: 0.4;
 }
 
+.slider {
+    stroke: rgb(76, 76, 126);
+    stroke-width: 3px;
+    stroke-linecap: round;
+}
+
+.slider-handle {
+    fill: rgb(131, 161, 226) !important;
+    stroke: rgb(76, 76, 126) !important;
+}
+
 .ray {
     fill: none;
     stroke: #e74c3c;
@@ -61,8 +72,7 @@ svg.sim {
 }
 
 .handle:hover {
-    stroke: black;
-    stroke-opacity: 1;
+
     stroke-width: 2px;
     transition: stroke-width 0.3s;
 }
