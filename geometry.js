@@ -503,11 +503,10 @@ class Arc {
 
 class Circle {
 
-    constructor(cx, cy, r, reflective) {
+    constructor(cx, cy, r) {
         this.cx = cx;
         this.cy = cy;
         this.r = r;
-        this.reflective = reflective;
     }
 
     draw(move) {
@@ -636,13 +635,6 @@ class Space {
     update_geometry() {
         this.geometry_list = []
         for (let k of Object.keys(this.geometry)) {
-            // if(Array.isArray(this.geometry[k])){
-            //     for(let k2 in this.geometry[k]){
-            //         this.geometry_list.push(this.geometry[k][k2])
-            //     }
-            // }else{
-            //     this.geometry_list.push(this.geometry[k])
-            // }
             if (this.geometry[k].isGroup) {
                 for (let k2 in this.geometry[k].shapes) {
                     this.geometry_list.push(this.geometry[k].shapes[k2])
@@ -676,6 +668,10 @@ class Space {
                 }
             } else {
                 // not a group
+                if (this.geometry[k].shape == "thin") {
+                    this.paths[path_index].path += this.geometry[k].shape.draw(true)
+                }
+
             }
         }
     }
@@ -713,7 +709,8 @@ class Space {
             id: shape_id,
             opts: opts,
             isGroup: false,
-            isSolid: false
+            isSolid: false,
+            type: "thin"
         }
         // this.paths.push({
         //     path: shape.draw(true),
@@ -731,7 +728,7 @@ class Space {
         } else {
             // Updating
             opts = Object.assign(this.geometry[shape_id].opts, opts);
-            if(shapes.length == 0){
+            if (typeof shapes === "undefined") {
                 shapes = this.geometry[shape_id].shapes
             }
         }
@@ -750,7 +747,8 @@ class Space {
             isSolid: false,
             shapes: [],
             opts: opts,
-            id: shape_id
+            id: shape_id,
+            type: "thins"
         };
 
         for (let i = 0; i < shapes.length; i++) {
@@ -771,7 +769,7 @@ class Space {
         } else {
             // Updating
             opts = Object.assign(this.geometry[shape_id].opts, opts);
-            if (shapes.length == 0) {
+            if (typeof shapes === "undefined") {
                 shapes = this.geometry[shape_id].shapes
             }
         }
@@ -789,7 +787,8 @@ class Space {
             shapes: [],
             opts: opts,
             id: shape_id,
-            isSolid: true
+            isSolid: true,
+            type: "solid"
         };
 
         for (let i = 0; i < shapes.length; i++) {
@@ -800,7 +799,6 @@ class Space {
         // this.paths[this.paths.length - 1].path += " Z "
         this.update_geometry();
         this.update_paths();
-        console.log(this.geometry);
         return shape_id;
     }
 
@@ -812,7 +810,7 @@ class Space {
             // Updating
             opts = Object.assign(this.geometry[shape_id].opts, opts);
             if (typeof circle === "undefined") {
-                shape = this.geometry[shape_id].shape
+                circle = this.geometry[shape_id].shape
             }
         }
         circle.opts = set_default_opts(opts);
@@ -821,14 +819,16 @@ class Space {
             shape: circle,
             id: shape_id,
             opts: opts,
-            isGroup: false
+            isGroup: false,
+            type: "circle"
         }
         this.update_geometry();
         this.circles[shape_id] = circle;
+        return shape_id;
     }
 
     add_rect(x, y, w, h, opts) {
-        this.add_solid([
+        return this.add_solid([
             new Line(x, y, x + w, y),
             new Line(x + w, y, x + w, y + h),
             new Line(x + w, y + h, x, y + h),
@@ -882,8 +882,33 @@ class Space {
 
         let self = this;
 
-        this.svg_object.selectAll("circle").data(Object.keys(this.circles))
-            .enter().append("circle")
+        let circles = this.svg_object.selectAll("circle")
+            .data(Object.keys(this.circles), function (d) {
+                return d;
+            });
+
+        circles.exit().remove();
+
+        circles.attrs({
+            cx: function (d) {
+                return self.circles[d].cx;
+            },
+            cy: function (d) {
+                return self.circles[d].cy;
+            },
+            r: function (d) {
+                return self.circles[d].r;
+            },
+            class: function (d) {
+                return self.circles[d].style;
+            },
+            id: function (d) {
+                return d;
+            }
+        })
+
+
+        circles.enter().append("circle")
             .attrs({
                 cx: function (d) {
                     return self.circles[d].cx;
@@ -900,7 +925,6 @@ class Space {
                 id: function (d) {
                     return d;
                 }
-
             })
     }
 }
@@ -1126,9 +1150,9 @@ class Bezier {
     }
 
     draw(move) {
-        if(move){
+        if (move) {
             return `M ${this.x1} ${this.y1} C ${this.x2} ${this.y2} ${this.x3} ${this.y3} ${this.x4} ${this.y4}`
-        }else{
+        } else {
             return `C ${this.x2} ${this.y2} ${this.x3} ${this.y3} ${this.x4} ${this.y4}`
         }
     }
@@ -1232,12 +1256,12 @@ class Sim {
         this.space = new Space();
 
         this.add_borders();
-        
+
         this.space.install(this.svg);
     }
 
-    update_beams(){
-        for(let k of Object.keys(this.beams)){
+    update_beams() {
+        for (let k of Object.keys(this.beams)) {
             this.beams[k].updateRays();
             this.beams[k].drawRays();
         }
@@ -1247,7 +1271,7 @@ class Sim {
         this.space.install(this.svg);
     }
 
-    update(){
+    update() {
         this.update_svg();
         this.update_beams();
     }
@@ -1269,8 +1293,56 @@ class Sim {
         beam.install(this.svg, this.space);
     }
 
-    add_circle(circle, opts) {
-        this.space.add_circle(circle, opts);
+    add_circle(circle, opts, shape_id) {
+        let id = this.space.add_circle(circle, opts, shape_id);
+        this.update();
+        return id;
+    }
+
+    add_rect(x, y, w, h, opts) {
+        let id = this.space.add_rect(x, y, w, h, opts);
+        this.update();
+        return id;
+    }
+
+    update_shape_opts(shape_id, opts) {
+        // this.space.
+        switch (this.space.geometry[shape_id].type) {
+            case "solid":
+                this.add_solid(undefined, opts, shape_id)
+                break;
+            case "circle":
+                this.add_circle(undefined, opts, shape_id)
+                break;
+            case "thin":
+                this.add_thin(undefined, opts, shape_id)
+                break;
+            case "thins":
+                this.add_thins(undefined, opts, shape_id)
+                break;
+            default:
+                break;
+        }
+        this.update();
+    }
+
+    update_shape_geometry(shape_id, geometry) {
+        switch (this.space.geometry[shape_id].type) {
+            case "solid":
+                this.add_solid(geometry, {}, shape_id)
+                break;
+            case "circle":
+                this.add_circle(geometry, {}, shape_id)
+                break;
+            case "thin":
+                this.add_thin(geometry, {}, shape_id)
+                break;
+            case "thins":
+                this.add_thins(geometry, {}, shape_id)
+                break;
+            default:
+                break;
+        }
         this.update();
     }
 }

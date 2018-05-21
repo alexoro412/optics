@@ -27,22 +27,23 @@
             reflectance: 1.0
         });
 
-    console.log("para id", para_id);
-
-    sim.add_circle(new Circle(100,80,24), {
+    let circle_id = sim.add_circle(new Circle(100,80,24), {
         reflective: false,
         style: "solid water"
     })
 
     setTimeout(function(){
-        sim.add_solid([], {
+        sim.update_shape_opts(para_id, {
             reflectance: 0.5
-        }, para_id);
+        })
+        sim.update_shape_opts(circle_id, {
+            reflective: true,
+            reflectance: 0.3
+        })
+        sim.update_shape_geometry(circle_id, new Circle(100,200,13));
     }, 2000)
 
     let beam = new Beam(48,106,0,0,10,100, "down");
     // beam.install(svg, space);
     sim.add_beam(beam);
-
-    console.log(sim.space);
 })();
