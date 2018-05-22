@@ -30,6 +30,16 @@ class Slider {
         this.slider_value = map(this.value, this.min, this.max, 0, this.length)
     }
 
+    set(value){
+
+        this.value = +precisionRound(value, this.num_decimals);
+        this.slider_value = map(value, this.min, this.max, 0, this.length);
+        this.circle.attrs({
+            cx: this.x + this.slider_value * Math.cos(this.angle),
+            cy: this.y + this.slider_value * Math.sin(this.angle)
+        })
+    }
+
     install(group, id) {
         group.append("line").attrs({
             x1: this.x,
@@ -46,7 +56,7 @@ class Slider {
             y: this.y + this.text_dy
         }).text(this.callback(this.value))
 
-        group.append("circle").attrs({
+        this.circle = group.append("circle").attrs({
             cx: this.x + this.slider_value * Math.cos(this.angle),
             cy: this.y + this.slider_value * Math.sin(this.angle),
             r: this.radius,
@@ -395,7 +405,8 @@ default_conelamp = {
     width: Math.PI / 4,
     radius: 10,
     fixed: false,
-    handle_gap: 30
+    handle_gap: 30,
+    max_bounce: 10
 }
 
 class ConeLamp {
@@ -451,7 +462,7 @@ class ConeLamp {
             this.rays.push(raycast(new Line(this.x, this.y,
                     this.x + 10 * Math.cos(this.angle + (i - this.num_rays / 2 + 0.5) * this.ray_gap),
                     this.y + 10 * Math.sin(this.angle + (i - this.num_rays / 2 + 0.5) * this.ray_gap)),
-                this.space.get_geometry(), max_bounce, 0, this.strength))
+                this.space.get_geometry(), this.max_bounce, 0, this.strength))
         }
     }
 

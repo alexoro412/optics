@@ -27,7 +27,7 @@
             handles[2].x, handles[2].y,
             handles[3].x, handles[3].y), {
             reflective: true,
-            style: "mirror",
+            style: "mirror bezier-heat thick",
             reflectance: 0.5
         })
 
@@ -40,10 +40,10 @@
     })
 
     sim.add_thins([
-        new Line(0, h - 50, w, h - 50),
-        new Line(w / 2, h - 50, w / 2, h)
+        new Line(0, h - 80, w, h - 80),
+        new Line(w / 2, h - 80, w / 2, h)
     ], {
-        style: "mirror"
+        style: "mirror thick"
     })
 
     function update_bezier(x, y) {
@@ -70,13 +70,88 @@
         sim.add_ui(handles[i])
     }
 
-    let lamp = new PointLamp({
-        x: 313,
-        y: 326,
-        num_rays: 40,
-        strength: 0.6,
-        ui: {}
-    });
+    percent_reflectance = 50;
+    percent_transmission = 10;
+
+    function update_opts(){
+        console.log(percent_reflectance/100, percent_transmission)
+        sim.update_shape_opts(bezier, {
+            reflectance: percent_reflectance / 100,
+            transmission: percent_transmission / 100
+        });
+        document.querySelector(".bezier-heat").style.stroke = 
+            `rgb(${map(100 - (percent_reflectance + percent_transmission), 0, 100, 128, 255)},128,128)`;
+        p_ref.text(`${percent_reflectance}%`);
+        p_tra.text(`${percent_transmission}%`);
+        p_abs.text(`${100 - (percent_reflectance + percent_transmission)}%`);
+    }
+
+    let r_slider = new Slider({
+        x: 220,
+        y: 330,
+        length: 150,
+        angle: 0,
+        style: "slider",
+        handle_style: "slider-handle handle",
+        value: percent_reflectance,
+        num_decimals: 0,
+        callback: function(value){
+            if(value + percent_transmission > 100){
+                percent_reflectance = value;
+                percent_transmission = 100 - value;
+                t_slider.set(percent_transmission);
+            }else{
+                percent_reflectance = value;
+            }
+            update_opts();
+        },
+        min: 0,
+        max: 100
+    })
+
+    let t_slider = new Slider({
+        x: 20,
+        y: 330,
+        length: 150,
+        angle: 0,
+        style: "slider",
+        handle_style: "slider-handle handle",
+        value: percent_transmission,
+        num_decimals: 0,
+        callback: function (value) {
+            if (value + percent_reflectance > 100) {
+                percent_transmission = value;
+                percent_reflectance = 100 - value;
+                r_slider.set(percent_reflectance);
+            } else {
+                percent_transmission = value;
+            }
+            update_opts();
+        },
+        min: 0,
+        max: 100
+    })
+
+    let p_ref = d3.select("#percent-reflectance");
+    let p_abs = d3.select("#percent-absorbance");
+    let p_tra = d3.select("#percent-transmission");
+
+    let titles = [
+        {x: 295, y: 300, text: "Reflectance"},
+        {x: 100, y: 300, text: "Transmission"}
+    ]
+    
+    sim.svg.append("g").selectAll("text")
+        .data(titles).enter().append("text").attrs({
+        x: function(d){return d.x;},
+        y: function(d){return d.y;},
+        "font-size": 16,
+        "text-anchor": "middle",
+        "background-color": "lightgray"
+    }).text(function(d){return d.text;});
+
+    sim.add_ui(r_slider);
+    sim.add_ui(t_slider);
 
     let beam = new Beam({
         x1: 22,
@@ -94,6 +169,6 @@
 
     // let beam = new Beam(22, 215, 106, 176, 10, 20);
     sim.add_light(beam);
-    sim.add_light(lamp);
+    // sim.add_light(lamp);
     // sim.add_ui(lamp_handle);
 })();

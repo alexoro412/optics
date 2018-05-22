@@ -95,14 +95,17 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
             let reflected_ray = new Line(intersections[0].x, intersections[0].y, 0, 0, false);
             reflected_ray.polar(10, phi);
 
+            let r_strength = strength * intersections[0].opts.reflectance;
+
             if (intersections[0].opts.transmission != 0) {
                 let transmitted_ray = new Line(intersections[0].x, intersections[0].y, 0, 0);
                 transmitted_ray.polar(10, ray.angle());
-                lines = lines.concat(raycast(transmitted_ray, geometry, bounce - 1, ior, strength * intersections[0].opts.transmission));
+                let t_strength = strength * intersections[0].opts.transmission;
+                lines = lines.concat(raycast(transmitted_ray, geometry, bounce - 1, ior, t_strength));
             }
 
             return lines
-                .concat(raycast(reflected_ray, geometry, bounce - 1, ior, strength * intersections[0].opts.reflectance))
+                .concat(raycast(reflected_ray, geometry, bounce - 1, ior, r_strength))
         } else if (intersections[0].opts.refractive) {
             let phi;
             let partial_strength;
@@ -688,6 +691,7 @@ class Space {
         } else {
             // Updating
             opts = Object.assign(this.geometry[shape_id].opts, opts);
+            // console.log(this.geometry[shape_id])
             if (typeof shape === "undefined") {
                 shape = this.geometry[shape_id].shape
             }

@@ -29,6 +29,11 @@ svg.sim.color {
 .mirror {
     stroke: gray;
     stroke-width: 1;
+    stroke-linecap: round;
+}
+
+.mirror.thick {
+    stroke-width: 1.5;
 }
 
 .solid.mirror {

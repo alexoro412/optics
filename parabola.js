@@ -29,7 +29,7 @@
     sim.add_thins([
         new Line(100,0,100,h),
         new Line(300,0,300,h),
-        new Line(300,h/2,w,h/2)
+        // new Line(300,h/2,w,h/2)
     ],{
         style: "mirror"
     })
@@ -58,13 +58,13 @@
 
     sim.add_light(cone);
 
-    let lamp = new PointLamp({
-        x: 350, y: 250,
-        num_rays: 40,
-        ui: {
-            style: "thandle handle"
-        }
-    })
+    // let lamp = new PointLamp({
+    //     x: 350, y: 250,
+    //     num_rays: 40,
+    //     ui: {
+    //         style: "thandle handle"
+    //     }
+    // })
 
-    sim.add_light(lamp);
+    // sim.add_light(lamp);
 })();
