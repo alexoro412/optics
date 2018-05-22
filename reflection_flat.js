@@ -97,10 +97,35 @@
         .attr("font-size", "10")
         .text("r");
 
+    let angle_text = svg.append("text")
+        .attrs({
+            x: coords.x3 - 40,
+            y: coords.h + 70,
+            "font-size": 30
+        }).text("θ")
+    
+    angle_text.append("tspan")
+        .attrs({
+            "baseline-shift": "sub",
+            "font-size": 20,
+            "font-family": "Courier"
+        }).text("i")
+    angle_text.append("tspan")
+        .text(" = ")
+
+    angle_text = angle_text.append("tspan").attrs({
+        "font-family": "Courier",
+        "text-anchor": "end",
+        x: 310
+    });
+    
+
     let angles = svg.append("path").attr("class", "arc");
 
     function updateAngles() {
         theta = Math.abs(Math.atan(coords.m));
+
+        angle_text.text(`${(90 - theta * 180 / Math.PI).toFixed(1)}°`)
 
         cost = Math.abs(Math.cos(theta));
         sint = Math.abs(Math.sin(theta));

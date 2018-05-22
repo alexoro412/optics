@@ -51,7 +51,8 @@
         width: 2*Math.PI/3,
         handle_gap: 30,
         ui: {
-            max_y: h - 30
+            max_y: h - 30,
+            style: "thandle handle"
         }
     })
 
@@ -60,7 +61,9 @@
     let lamp = new PointLamp({
         x: 350, y: 250,
         num_rays: 40,
-        ui: {}
+        ui: {
+            style: "thandle handle"
+        }
     })
 
     sim.add_light(lamp);

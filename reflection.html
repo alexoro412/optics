@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Optics</title>
+
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="normalize.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="skeleton.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="old.css" />
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="one-half column" style="margin-top: 10%">
+                <h3>Reflection</h3>
+                <p>When light hits a mirror, it reflects out at the same angle that it hit the mirror at. Try moving the light
+                    ray to see this --> </p>
+
+                <blockquote>
+                    <h5>Law of Reflection</h5>
+
+                    The angle with which light hits the mirror (θ
+                    <sub>i</sub>) is the same as the angle it reflects out at (θ
+                    <sub>r</sub>).
+
+                    <br/>
+                    <br/>
+                    <h6> θ<sub>i</sub> = θ<sub>r</sub>
+                    </h6>
+
+                </blockquote>
+            </div>
+            <div id="reflection_flat" class="one-half column" style="margin-top: 10%;"></div>
+        </div>
+        <div class="row">
+            <div class="one-half column">
+                <p>
+                    Light hitting a curved mirror can get a bit more complicated. 
+                    
+                </p>
+                <p>
+                    When the rays hit a concave part of the mirror, it focuses the light onto a point.
+                    The rays also flip which side of the beam they're on. This is why when you look into 
+                    a spoon, your reflection is flipped. Try hovering over the rays to see this.
+                </p>
+                <p>
+                    When the light hits a convex part of the mirror, it tends to spread out, and the rays don't flip. 
+                    This is why convex mirrors and more boring than concave mirrors.
+                </p>
+            </div>
+            <div id="reflection_dome" class="one-half column"></div>
+        </div>
+        <div class="row">
+            <div class="one-half column">
+                <p>
+                    Reflection on a half sphere
+                </p>
+            </div>
+            <div id="reflection_dish" class="one-half column"></div>
+        </div>
+        <div class="row">
+            <div class="one-half column">
+                <p>
+                    Reflection in a circle
+                </p>
+            </div>
+            <div id="reflection_circle" class="one-half column"></div>
+        </div>
+        <div class="row">
+            <div class="one-half column">
+                <p>
+                    Reflection on a parabola
+                </p>
+            </div>
+            <div id="reflection_parabola" class="one-half column"></div>
+        </div>
+        <div class="row">
+            <div class="one-half column">
+                <p>
+                    Bezier Curve Mirror
+                </p>
+            </div>
+            <div id="bezier" class="one-half column"></div>
+        </div>
+    </div>
+
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+    <script src="geometry.js"></script>
+    <script src="ui.js"></script>
+    <!-- <script src="reflection_flat.js"></script> -->
+    <script src="reflection_dome.js"></script>
+    <!-- <script src="reflection_dish.js"></script> -->
+    <!-- <script src="reflection_circle.js"></script> -->
+    <!-- <script src="parabola.js"></script> -->
+    <!-- <script src="refraction.js"></script> -->
+    <!-- <script src="ior.js"></script> -->
+    <!-- <script src="focus_lens.js"></script> -->
+    <!-- <script src="bezier.js"></script> -->
+</body>
+
+</html>

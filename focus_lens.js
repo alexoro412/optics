@@ -6,7 +6,7 @@
 
     let lens_height = 120;
 
-    let lens_width = 40;
+    let lens_width = 80;
 
     let sim = new Sim("#focus_lens", h, w);
 
@@ -53,7 +53,8 @@
         width: Math.PI/8,
         fixed: true,
         ui:{
-            max_y: h
+            max_y: h,
+            style: "thandle handle"
         }
     })
 
@@ -81,7 +82,7 @@
         min: 5,
         handle_style: "thandle handle",
         max: lens_width,
-        value: lens_width,
+        value: lens_width / 2,
         angle: 0,
         callback: function (value) {
             lens_width = value;

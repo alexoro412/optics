@@ -93,12 +93,12 @@ let default_point = {
 }
 
 class Point {
-    constructor(opts){
+    constructor(opts) {
         merge(opts, default_point)
         Object.assign(this, opts)
     }
 
-    install(group, id){
+    install(group, id) {
         let self = this;
 
         this.svg_object = group.append("circle").attrs({
@@ -108,9 +108,9 @@ class Point {
             class: this.style
         }).call(d3.drag()
             .on("start", dragstarted)
-            .on("drag", function(d){
-                self.x = +precisionRound(clamp(d3.event.x, self.min_x, self.max_x),self.num_decimals)
-                self.y = +precisionRound(clamp(d3.event.y, self.min_y, self.max_y),self.num_decimals)
+            .on("drag", function (d) {
+                self.x = +precisionRound(clamp(d3.event.x, self.min_x, self.max_x), self.num_decimals)
+                self.y = +precisionRound(clamp(d3.event.y, self.min_y, self.max_y), self.num_decimals)
                 d3.select(this)
                     .attrs({
                         cx: self.x,
@@ -120,7 +120,7 @@ class Point {
             }).on("end", dragended))
     }
 
-    move(x,y){
+    move(x, y) {
         this.x = x;
         this.y = y;
         this.svg_object.attrs({
@@ -146,42 +146,16 @@ class Beam {
         Object.assign(this, opts);
 
         this.ray_gap = this.width / this.num_rays;
-        // this.num_rays = num_rays;
-        // this.beam_width = beam_width;
         this.rays = [];
-        // this.radius = 10;
-        // this.strength = 0.4;
 
-        if (this.angle === undefined) {
-            // this.data = [{
-            //     x: x1,
-            //     y: y1
-            // }, {
-            //     x: x2,
-            //     y: y2
-            // }]
-        } else if (typeof this.angle == "number") {
-            this.x2 = this.x1 + 10 * Math.cos(this.angle);
-            this.y2 = this.y1 + 10 * Math.sin(this.angle);
-            // this.data = [{
-            //         x: x1,
-            //         y: y1
-            //     },
-            //     {
-            //         x: x1 + 10 * Math.cos(this.angle),
-            //         y: y1 + 10 * Math.sin(this.angle)
-            //     }
-            // ]
-        }
-
-        if(this.ui != undefined){
+        if (this.ui != undefined) {
             this.handle1 = new Point(opts.ui);
             this.handle1.x = this.x1;
             this.handle1.y = this.y1;
 
-            
 
-            if(typeof this.angle != "number"){
+
+            if (typeof this.angle != "number") {
                 this.handle2 = new Point(opts.ui);
                 this.handle2.x = this.x2;
                 this.handle2.y = this.y2;
@@ -201,8 +175,11 @@ class Beam {
                 }).bind(this);
 
                 this.handles = [this.handle1, this.handle2]
-            } else{
-                this.handle1.callback = (function(x,y){
+            } else {
+                this.x2 = this.x1 + 10 * Math.cos(this.angle);
+                this.y2 = this.y1 + 10 * Math.sin(this.angle);
+
+                this.handle1.callback = (function (x, y) {
                     this.x1 = x;
                     this.y1 = y;
                     this.x2 = x + 10 * Math.cos(this.angle);
@@ -217,18 +194,14 @@ class Beam {
         }
     }
 
-    // setBounds(w, h) {
-    //     this.w = w;
-    //     this.h = h;
-    // }
-
     updateRays() {
         this.angle = Math.atan2(this.y2 - this.y1, this.x2 - this.x1);
 
         this.rays = [];
 
         for (let i = 0; i < this.num_rays; i++) {
-            this.rays = this.rays.concat(raycast(new Line(
+            // this.rays = 
+            this.rays.push(raycast(new Line(
                 this.x1 + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
                 this.y1 - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle),
                 this.x2 + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
@@ -239,7 +212,21 @@ class Beam {
     }
 
     drawRays() {
-        let lines = this.beam_group.selectAll("line").data(this.rays);
+        let ray_groups = this.beam_group
+            .selectAll("g")
+            .data(this.rays);
+
+        ray_groups.exit().remove();
+
+        ray_groups.enter().append("g")
+            .attr("class", "single-ray")
+
+        let lines = ray_groups.selectAll("line")
+            .data(function (d) {
+                return d;
+            });
+
+        // console.log(lines);
 
         lines.exit().remove();
 
@@ -256,7 +243,6 @@ class Beam {
             y2: function (d) {
                 return d.y2;
             },
-            class: "ray",
             "stroke-opacity": function (d) {
                 return +precisionRound(d.strength, 3);
             }
@@ -280,68 +266,19 @@ class Beam {
                 return +precisionRound(d.strength, 3);
             }
         })
-    }
 
-    // updateHandles() {
-    //     if (typeof this.orientation == "number") {
-    //         this.data[1].x = this.data[0].x + 10 * Math.cos(this.orientation);
-    //         this.data[1].y = this.data[0].y + 10 * Math.sin(this.orientation);
-    //         this.handle_group.select("ellipse")
-    //             .attr("transform", `rotate(${(this.orientation - Math.PI/2) * 180 / Math.PI} ${this.data[0].x} ${this.data[0].y})`);
-    //     }
-    // }
+        // console.log(lines);
+
+    }
 
     install(svg, space) {
         this.space = space;
         this.beam_group = svg.append("g");
-        // this.handle_group = svg.append("g");
-
 
         this.updateRays();
 
         this.drawRays();
-
-
-        // if (this.orientation == "free") {
-        //     this.handle_group.selectAll("circle")
-        //         .data(this.data)
-        //         .enter().append("circle")
-        //         .attrs({
-        //             cx: function (d) {
-        //                 return d.x;
-        //             },
-        //             cy: function (d) {
-        //                 return d.y;
-        //             },
-        //             r: this.radius,
-        //             class: "handle"
-        //         }).call(d3.drag()
-        //             .on("start", dragstarted)
-        //             .on("drag", function (d) {
-        //                 (dragged.bind(this))(d, self.w, self.h);
-        //                 self.updateRays();
-        //                 self.drawRays();
-        //             })
-        //             .on("end", dragended))
-        // } else if (typeof this.orientation == "number") {
-        //     this.handle_group.selectAll("ellipse")
-        //         .data([this.data[0]]).enter().append("ellipse")
-        //         .attrs({
-        //             cx: this.data[0].x,
-        //             cy: this.data[0].y,
-        //             ry: this.radius,
-        //             rx: this.beam_width / 2,
-        //             class: "handle",
-        //             transform: `rotate(${(this.orientation - Math.PI/2) * 180 / Math.PI} ${this.data[0].x} ${this.data[0].y})`
-        //         }).call(d3.drag().on("start", dragstarted)
-        //             .on("drag", function (d) {
-        //                 (dragged.bind(this))(d, self.w, self.h);
-        //                 self.updateHandles();
-        //                 self.updateRays();
-        //                 self.drawRays();
-        //             })
-        //             .on("end", dragended))
-        // }
+        this.drawRays();
 
     }
 }
@@ -361,14 +298,14 @@ class PointLamp {
         Object.assign(this, opts);
         this.ray_gap = 2 * Math.PI / this.num_rays;
 
-        if(opts.ui != undefined){
+        if (opts.ui != undefined) {
             this.handle = new Point(opts.ui);
             this.handle.x = this.x;
             this.handle.y = this.y;
             this.handles = [this.handle]
             let self = this;
-            this.handle.callback = (function(x,y){
-                this.move(x,y);
+            this.handle.callback = (function (x, y) {
+                this.move(x, y);
             }).bind(this)
         }
     }
@@ -383,14 +320,27 @@ class PointLamp {
     updateRays() {
         this.rays = [];
         for (let i = 0; i < this.num_rays; i++) {
-            this.rays = this.rays.concat(raycast(new Line(this.x, this.y,
+            // this.rays = 
+            this.rays.push(raycast(new Line(this.x, this.y,
                     this.x + 10 * Math.cos(i * this.ray_gap), this.y + 10 * Math.sin(i * this.ray_gap)),
                 this.space.get_geometry(), max_bounce, 0, this.strength))
         }
     }
 
     drawRays() {
-        let lines = this.beam_group.selectAll("line").data(this.rays);
+        let ray_groups = this.beam_group
+            .selectAll("g")
+            .data(this.rays);
+
+        ray_groups.exit().remove();
+
+        ray_groups.enter().append("g")
+            .attr("class", "single-ray")
+
+        let lines = ray_groups.selectAll("line")
+            .data(function (d) {
+                return d;
+            });
 
         lines.exit().remove();
 
@@ -407,8 +357,6 @@ class PointLamp {
             y2: function (d) {
                 return d.y2;
             },
-            // class: "ray",
-            // style: `stroke:${this.color}`,
             "stroke-opacity": function (d) {
                 return +precisionRound(d.strength, 3);
             }
@@ -428,7 +376,6 @@ class PointLamp {
                 return d.y2;
             },
             class: "ray",
-            style: `stroke:${this.color}`,
             "stroke-opacity": function (d) {
                 return +precisionRound(d.strength, 3);
             }
@@ -441,6 +388,7 @@ class PointLamp {
 
         this.updateRays();
         this.drawRays();
+        this.drawRays();
     }
 }
 
@@ -450,42 +398,42 @@ default_conelamp = {
     strength: 0.5,
     angle: 0,
     num_rays: 20,
-    width: Math.PI/4,
+    width: Math.PI / 4,
     radius: 10,
     fixed: false,
     handle_gap: 30
 }
 
 class ConeLamp {
-    constructor(opts = {}){
+    constructor(opts = {}) {
         merge(opts, default_conelamp);
         Object.assign(this, opts);
 
         this.ray_gap = this.width / this.num_rays;
-        if(this.ui != undefined){
+        if (this.ui != undefined) {
             this.handle1 = new Point(opts.ui);
             this.handle1.x = this.x;
             this.handle1.y = this.y;
 
-            if(this.fixed){
+            if (this.fixed) {
                 this.handle1.callback = (function (x, y) {
                     this.move(x, y)
                 }).bind(this);
 
                 this.handles = [this.handle1]
-            }else{
+            } else {
                 this.handle2 = new Point(opts.ui);
                 this.handle2.x = this.x + this.handle_gap * Math.cos(this.angle);
                 this.handle2.y = this.y + this.handle_gap * Math.sin(this.angle);
 
-                this.handle1.callback = (function(x,y){
+                this.handle1.callback = (function (x, y) {
                     this.handle2.x = x + this.handle_gap * Math.cos(this.angle);
                     this.handle2.y = y + this.handle_gap * Math.sin(this.angle);
                     this.handle2.move(x + this.handle_gap * Math.cos(this.angle), y + this.handle_gap * Math.sin(this.angle))
-                    this.move(x,y);
+                    this.move(x, y);
                 }).bind(this);
 
-                this.handle2.callback = (function(x,y){
+                this.handle2.callback = (function (x, y) {
                     this.angle = Math.atan2(y - this.y, x - this.x)
                     this.handle2.move(this.x + this.handle_gap * Math.cos(this.angle), this.y + this.handle_gap * Math.sin(this.angle));
                     this.move(this.x, this.y);
@@ -496,25 +444,37 @@ class ConeLamp {
         }
     }
 
-    move(x,y){
+    move(x, y) {
         this.x = x;
         this.y = y;
         this.updateRays();
         this.drawRays();
     }
 
-    updateRays(){
+    updateRays() {
         this.rays = [];
-        for(let i = 0; i < this.num_rays; i++){
-            this.rays = this.rays.concat(raycast(new Line(this.x, this.y, 
-                this.x + 10 * Math.cos(this.angle + (i - this.num_rays/2 + 0.5) * this.ray_gap), 
-                this.y + 10 * Math.sin(this.angle + (i - this.num_rays/2 + 0.5) * this.ray_gap)), 
+        for (let i = 0; i < this.num_rays; i++) {
+            this.rays.push(raycast(new Line(this.x, this.y,
+                    this.x + 10 * Math.cos(this.angle + (i - this.num_rays / 2 + 0.5) * this.ray_gap),
+                    this.y + 10 * Math.sin(this.angle + (i - this.num_rays / 2 + 0.5) * this.ray_gap)),
                 this.space.get_geometry(), max_bounce, 0, this.strength))
         }
     }
 
-    drawRays(){
-        let lines = this.beam_group.selectAll("line").data(this.rays);
+    drawRays() {
+        let ray_groups = this.beam_group
+            .selectAll("g")
+            .data(this.rays);
+
+        ray_groups.exit().remove();
+
+        ray_groups.enter().append("g")
+            .attr("class", "single-ray")
+
+        let lines = ray_groups.selectAll("line")
+            .data(function (d) {
+                return d;
+            });
 
         lines.exit().remove();
 
@@ -554,13 +514,55 @@ class ConeLamp {
                 return +precisionRound(d.strength, 3);
             }
         })
+
+        // let lines = this.beam_group.selectAll("line").data(this.rays);
+
+        // lines.exit().remove();
+
+        // lines.attrs({
+        //     x1: function (d) {
+        //         return d.x1;
+        //     },
+        //     y1: function (d) {
+        //         return d.y1;
+        //     },
+        //     x2: function (d) {
+        //         return d.x2;
+        //     },
+        //     y2: function (d) {
+        //         return d.y2;
+        //     },
+        //     "stroke-opacity": function (d) {
+        //         return +precisionRound(d.strength, 3);
+        //     }
+        // })
+
+        // lines.enter().append("line").attrs({
+        //     x1: function (d) {
+        //         return d.x1;
+        //     },
+        //     y1: function (d) {
+        //         return d.y1;
+        //     },
+        //     x2: function (d) {
+        //         return d.x2;
+        //     },
+        //     y2: function (d) {
+        //         return d.y2;
+        //     },
+        //     class: "ray",
+        //     "stroke-opacity": function (d) {
+        //         return +precisionRound(d.strength, 3);
+        //     }
+        // })
     }
 
-    install(svg, space){
+    install(svg, space) {
         this.space = space;
         this.beam_group = svg.append("g");
 
         this.updateRays();
+        this.drawRays();
         this.drawRays();
     }
 }
