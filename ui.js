@@ -200,7 +200,6 @@ class Beam {
         this.rays = [];
 
         for (let i = 0; i < this.num_rays; i++) {
-            // this.rays = 
             this.rays.push(raycast(new Line(
                 this.x1 + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
                 this.y1 - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle),
@@ -225,8 +224,6 @@ class Beam {
             .data(function (d) {
                 return d;
             });
-
-        // console.log(lines);
 
         lines.exit().remove();
 
@@ -266,8 +263,6 @@ class Beam {
                 return +precisionRound(d.strength, 3);
             }
         })
-
-        // console.log(lines);
 
     }
 
@@ -320,7 +315,6 @@ class PointLamp {
     updateRays() {
         this.rays = [];
         for (let i = 0; i < this.num_rays; i++) {
-            // this.rays = 
             this.rays.push(raycast(new Line(this.x, this.y,
                     this.x + 10 * Math.cos(i * this.ray_gap), this.y + 10 * Math.sin(i * this.ray_gap)),
                 this.space.get_geometry(), max_bounce, 0, this.strength))
@@ -514,47 +508,6 @@ class ConeLamp {
                 return +precisionRound(d.strength, 3);
             }
         })
-
-        // let lines = this.beam_group.selectAll("line").data(this.rays);
-
-        // lines.exit().remove();
-
-        // lines.attrs({
-        //     x1: function (d) {
-        //         return d.x1;
-        //     },
-        //     y1: function (d) {
-        //         return d.y1;
-        //     },
-        //     x2: function (d) {
-        //         return d.x2;
-        //     },
-        //     y2: function (d) {
-        //         return d.y2;
-        //     },
-        //     "stroke-opacity": function (d) {
-        //         return +precisionRound(d.strength, 3);
-        //     }
-        // })
-
-        // lines.enter().append("line").attrs({
-        //     x1: function (d) {
-        //         return d.x1;
-        //     },
-        //     y1: function (d) {
-        //         return d.y1;
-        //     },
-        //     x2: function (d) {
-        //         return d.x2;
-        //     },
-        //     y2: function (d) {
-        //         return d.y2;
-        //     },
-        //     class: "ray",
-        //     "stroke-opacity": function (d) {
-        //         return +precisionRound(d.strength, 3);
-        //     }
-        // })
     }
 
     install(svg, space) {
