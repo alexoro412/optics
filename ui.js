@@ -137,7 +137,7 @@ default_beam = {
     y2: 100,
     num_rays: 10,
     width: 20,
-    strength: 0.4
+    strength: 0.5
 }
 
 class Beam {
@@ -348,7 +348,7 @@ class Beam {
 
 let default_lamp = {
     color: "",
-    strength: 0.8,
+    strength: 0.5,
     x: 100,
     y: 100,
     num_rays: 20,
@@ -447,7 +447,7 @@ class PointLamp {
 default_conelamp = {
     x: 100,
     y: 100,
-    strength: 0.6,
+    strength: 0.5,
     angle: 0,
     num_rays: 20,
     width: Math.PI/4,
@@ -463,7 +463,6 @@ class ConeLamp {
 
         this.ray_gap = this.width / this.num_rays;
         if(this.ui != undefined){
-            console.log(opts.ui);
             this.handle1 = new Point(opts.ui);
             this.handle1.x = this.x;
             this.handle1.y = this.y;

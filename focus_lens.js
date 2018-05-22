@@ -1,7 +1,8 @@
 (function () {
     let w = 400,
-        h = 350,
-        x_shift = 80;
+        h = 400,
+        x_shift = 80,
+        y_shift = 40;
 
     let lens_height = 120;
 
@@ -9,9 +10,16 @@
 
     let sim = new Sim("#focus_lens", h, w);
 
+    sim.add_thins([
+        new Line(0,h-80,w,h-80),
+        new Line(w/2,h-80,w/2,h)
+    ],{
+        style: "mirror"
+    })
+
     let lens = sim.add_solid([
-        new Arc(w / 2 - x_shift, h / 2 - lens_height, w / 2 - x_shift, h / 2 + lens_height, w / 2 - lens_width - x_shift, h / 2),
-        new Arc(w / 2 - x_shift, h / 2 + lens_height, w / 2 - x_shift, h / 2 - lens_height, w / 2 + lens_width - x_shift, h / 2)
+        new Arc(w / 2 - x_shift, h / 2 - lens_height - y_shift, w / 2 - x_shift, h / 2 + lens_height - y_shift, w / 2 - lens_width - x_shift, h / 2 - y_shift),
+        new Arc(w / 2 - x_shift, h / 2 + lens_height - y_shift, w / 2 - x_shift, h / 2 - lens_height - y_shift, w / 2 + lens_width - x_shift, h / 2 - y_shift)
     ], {
         refractive: true,
         ior: 1.5,
@@ -20,28 +28,40 @@
 
     function update_lens() {
         sim.update_shape_geometry(lens, [
-            new Arc(w / 2 - x_shift, h / 2 - lens_height, w / 2 - x_shift, h / 2 + lens_height, w / 2 - lens_width - x_shift, h / 2),
-            new Arc(w / 2 - x_shift, h / 2 + lens_height, w / 2 - x_shift, h / 2 - lens_height, w / 2 + lens_width - x_shift, h / 2)
+            new Arc(w / 2 - x_shift, h / 2 - lens_height - y_shift, w / 2 - x_shift, h / 2 + lens_height - y_shift, w / 2 - lens_width - x_shift, h / 2 - y_shift),
+                new Arc(w / 2 - x_shift, h / 2 + lens_height - y_shift, w / 2 - x_shift, h / 2 - lens_height - y_shift, w / 2 + lens_width - x_shift, h / 2 - y_shift)
         ]);
     }
 
     // let beam = new Beam(10, h / 2, 40, h / 2, 10, 80, 0);
     let beam = new Beam({
         x1: 10,
-        y1: h / 2,
-        x2: 20,
-        y2: h / 2,
+        y1: h / 2 - y_shift,
         num_rays: 10,
-        width: 80,
+        width: 70,
         angle: 0,
-        ui: {}
+        ui: {
+            max_y: h
+        }
     })
-    beam.strength = 0.4;
     sim.add_light(beam);
+
+    let cone = new ConeLamp({
+        x: 350,
+        y: 360,
+        angle: Math.PI,
+        width: Math.PI/8,
+        fixed: true,
+        ui:{
+            max_y: h
+        }
+    })
+
+    sim.add_light(cone);
 
     let height_slider = new Slider({
         x: w / 2 - x_shift,
-        y: h / 2 - 10,
+        y: h / 2 - 10 - y_shift,
         length: lens_height - 10,
         min: 10,
         max: lens_height,
@@ -56,7 +76,7 @@
 
     let width_slider = new Slider({
         x: w / 2 + 5 - x_shift,
-        y: h / 2,
+        y: h / 2 - y_shift,
         length: lens_width - 5,
         min: 5,
         handle_style: "thandle handle",
@@ -71,7 +91,7 @@
 
     let ior_slider = new Slider({
         x: 150,
-        y: 320,
+        y: 300,
         length: 145,
         angle: 0,
         style: "slider",
