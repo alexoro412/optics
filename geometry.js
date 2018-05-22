@@ -449,7 +449,7 @@ class Arc {
         this.laf = +(Math.PI / 2 > angle);
         this.saf = +((x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1) < 0);
 
-        if (this.saf) {
+        if (!this.saf && this.laf) {
             this.cx = xm + deltax;
             this.cy = ym + deltay;
         } else {
@@ -468,6 +468,7 @@ class Arc {
             this.angle_flag = false;
         }
 
+        console.log(this);
     }
 
     draw(move) {

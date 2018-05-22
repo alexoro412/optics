@@ -14,6 +14,7 @@
     ], {
         refractive: true,
         ior: 1.5,
+        // reflective: true, 
         style: "solid glass"
     })
 
