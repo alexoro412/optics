@@ -1,6 +1,7 @@
 (function () {
     let w = 400,
-        h = 350;
+        h = 350,
+        x_shift = 80;
 
     let lens_height = 120;
 
@@ -9,8 +10,8 @@
     let sim = new Sim("#focus_lens", h, w);
 
     let lens = sim.add_solid([
-        new Arc(w / 2, h / 2 - lens_height, w / 2, h / 2 + lens_height, w / 2 - lens_width, h / 2),
-        new Arc(w / 2, h / 2 + lens_height, w / 2, h / 2 - lens_height, w / 2 + lens_width, h / 2)
+        new Arc(w / 2 - x_shift, h / 2 - lens_height, w / 2 - x_shift, h / 2 + lens_height, w / 2 - lens_width - x_shift, h / 2),
+        new Arc(w / 2 - x_shift, h / 2 + lens_height, w / 2 - x_shift, h / 2 - lens_height, w / 2 + lens_width - x_shift, h / 2)
     ], {
         refractive: true,
         ior: 1.5,
@@ -20,16 +21,17 @@
 
     function update_lens() {
         sim.update_shape_geometry(lens, [
-            new Arc(w / 2, h / 2 - lens_height, w / 2, h / 2 + lens_height, w / 2 - lens_width, h / 2),
-            new Arc(w / 2, h / 2 + lens_height, w / 2, h / 2 - lens_height, w / 2 + lens_width, h / 2)
+            new Arc(w / 2 - x_shift, h / 2 - lens_height, w / 2 - x_shift, h / 2 + lens_height, w / 2 - lens_width - x_shift, h / 2),
+            new Arc(w / 2 - x_shift, h / 2 + lens_height, w / 2 - x_shift, h / 2 - lens_height, w / 2 + lens_width - x_shift, h / 2)
         ]);
     }
 
     let beam = new Beam(10, h / 2, 40, h / 2, 10, 80, 0);
+    beam.strength = 0.4;
     sim.add_light(beam);
 
     let height_slider = new Slider({
-        x: w / 2,
+        x: w / 2 - x_shift,
         y: h / 2 - 10,
         length: lens_height - 10,
         min: 10,
@@ -44,7 +46,7 @@
     })
 
     let width_slider = new Slider({
-        x: w / 2 + 5,
+        x: w / 2 + 5 - x_shift,
         y: h / 2,
         length: lens_width - 5,
         min: 5,
@@ -60,8 +62,8 @@
 
     let ior_slider = new Slider({
         x: 150,
-        y: 300,
-        length: 120,
+        y: 320,
+        length: 145,
         angle: 0,
         style: "slider",
         handle_style: "slider-handle handle",

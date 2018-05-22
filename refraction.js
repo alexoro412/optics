@@ -44,5 +44,6 @@
     })
 
     let beam = new Beam(41, 17, 178, 143, 10, 20);
+    beam.strength = 0.8;
     sim.add_light(beam);
 })();

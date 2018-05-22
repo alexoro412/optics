@@ -449,7 +449,7 @@ class Arc {
         this.laf = +(Math.PI / 2 > angle);
         this.saf = +((x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1) < 0);
 
-        if (!this.saf && this.laf) {
+        if (this.saf != this.laf) {
             this.cx = xm + deltax;
             this.cy = ym + deltay;
         } else {
@@ -467,8 +467,6 @@ class Arc {
         if (!this.inAngles(this.angle3)) {
             this.angle_flag = false;
         }
-
-        console.log(this);
     }
 
     draw(move) {
@@ -909,6 +907,7 @@ class PointLamp {
         this.y = y;
         this.num_rays = num_rays;
         this.radius = 10;
+        this.strength = 0.8;
     }
 
     move(x,y){
@@ -927,7 +926,7 @@ class PointLamp {
         for(let i = 0; i < this.num_rays; i++){
             this.rays = this.rays.concat(raycast(new Line(this.x, this.y, 
                 this.x + 10 * Math.cos(i * this.ray_gap), this.y + 10 * Math.sin(i * this.ray_gap)), 
-                this.space.get_geometry()))
+                this.space.get_geometry(),max_bounce,0,this.strength))
         }
     }
 
@@ -949,7 +948,7 @@ class PointLamp {
             y2: function (d) {
                 return d.y2;
             },
-            class: "ray",
+            class: "blue ray",
             "stroke-opacity": function (d) {
                 return +precisionRound(d.strength, 3);
             }
@@ -968,7 +967,7 @@ class PointLamp {
             y2: function (d) {
                 return d.y2;
             },
-            class: "ray",
+            class: "blue ray",
             "stroke-opacity": function (d) {
                 return +precisionRound(d.strength, 3);
             }
@@ -991,6 +990,7 @@ class Beam {
         this.beam_width = beam_width;
         this.rays = [];
         this.radius = 10;
+        this.strength = 0.4;
 
         this.orientation = orientation;
         if (orientation == "free") {
@@ -1037,7 +1037,7 @@ class Beam {
                 this.data[0].y - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle),
                 this.data[1].x + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
                 this.data[1].y - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle)
-            ), this.space.get_geometry()));
+            ), this.space.get_geometry(), max_bounce, 0, this.strength));
         }
 
     }
@@ -1309,6 +1309,9 @@ class Sim {
 
         this.ui_group = this.svg.append("g");
 
+        this.ray_group = this.svg.append("g");
+        this.ray_group.attr("class", "ray-group");
+
         this.space = new Space();
 
         this.add_borders();
@@ -1330,6 +1333,7 @@ class Sim {
     update() {
         this.update_svg();
         this.update_lights();
+        this.ray_group.raise();
         this.ui_group.raise();
     }
 
@@ -1373,7 +1377,7 @@ class Sim {
     add_light(light) {
         let light_id = guidGenerator();
         this.lights[light_id] = light;
-        light.install(this.svg, this.space);
+        light.install(this.ray_group, this.space);
         for (let b of Object.keys(this.lights)) {
             this.lights[b].raise_handles();
         }

@@ -2,26 +2,16 @@ svg.sim {
     border: 1px solid black;
     touch-action: none;
     -ms-touch-action: none;
-    background-color: rgb(31, 30, 30);
-    /* background-color: black; */
-}
-
-html {
-    background-color: #5e6166;
-}
-
-text {
-    fill: white;
 }
 
 .mirror {
-    stroke: rgb(177, 177, 177);
+    stroke: gray;
     stroke-width: 1;
 }
 
 .solid.mirror {
-    fill: rgb(131, 131, 131);
-    stroke: none !important;
+    fill: lightgray;
+    fill-opacity: 0.4;
 }
 
 .hollow {
@@ -29,42 +19,39 @@ text {
 }
 
 .water {
-    /* stroke: rgb(70, 99, 136); */
+    stroke: rgb(155, 192, 241);
     stroke-width: 1;
 }
 
 .solid.water {
-    fill: rgb(31, 144, 250);
-    fill-opacity: 0.2;
+    fill: rgb(231, 242, 252);
+    fill-opacity: 0.4;
 }
 
 .glass {
-    /* stroke: rgb(216, 216, 216); */
+    stroke: rgb(216, 216, 216);
     stroke-width: 1;
 }
 
 .solid.glass {
-    fill: rgb(255, 255, 255);
-    fill-opacity: 0.3;
+    fill: rgb(237, 237, 238);
+    fill-opacity: 0.4;
 }
 
 .slider {
-    stroke: lightsteelblue;
+    stroke: rgb(76, 76, 126);
     stroke-width: 3px;
     stroke-linecap: round;
 }
 
 .slider-handle {
-    /* fill: rgb(131, 161, 226) !important; */
-    /* stroke: rgb(76, 76, 126) !important; */
-    stroke: lightsteelblue !important;
+    fill: rgb(131, 161, 226) !important;
+    stroke: rgb(76, 76, 126) !important;
 }
 
 .bezier-line {
-    stroke: lightsteelblue;
+    stroke: rgb(131, 161, 226);
     stroke-linecap: round;
-    stroke-width: 1.5;
-    stroke-opacity: 0.7;
 }
 
 .thandle {
@@ -72,21 +59,15 @@ text {
 }
 
 .blue {
-    stroke: lightblue !important;
+    stroke: rgb(77, 178, 236) !important;
 }
 
 .ray {
     fill: none;
-    /* stroke: #e74c3c; */
-    stroke: #ec5050;
+    stroke: #e74c3c;
     stroke-width: 1;
     stroke-linecap: round;
     stroke-linejoin: round;
-    mix-blend-mode: lighten;
-}
-
-.ray-group {
-    /* mix-blend-mode: darken; */
 }
 
 /* .ray:hover {
@@ -95,10 +76,8 @@ text {
 } */
 
 .handle {
-    /* fill: rgb(26,26,26); */
-    fill: rgb(58, 58, 58);
-    /* fill-opacity: 0.5; */
-    stroke: lightsteelblue;
+    fill: #bdc3c7;
+    stroke: black;
     stroke-opacity: 1;
     stroke-width: 1px;
     transition: stroke-width 0.3s;
@@ -109,7 +88,8 @@ text {
     transition: stroke-width 0.3s;
 }
 
-.handle.active {
+.handle:active {
+    /* fill-opacity: 1; */
     stroke-width: 2px;
     transition: stroke-width 0.3s;
 }

@@ -27,7 +27,8 @@
             handles[2].x, handles[2].y,
             handles[3].x, handles[3].y), {
             reflective: true,
-            style: "mirror"
+            style: "mirror",
+            reflectance: 0.5
         })
 
     let lines = sim.add_thins([
@@ -64,12 +65,14 @@
             num_decimals: 2,
             callback: update_bezier,
             radius: 7,
-            style: "thandle slider-handle handle"
+            style: "slider-handle handle"
         })
         sim.add_ui(handles[i])
     }
 
     let lamp = new PointLamp(313, 326, 40);
+
+    lamp.strength = 0.5;
 
     let lamp_handle = new Point({
         x: lamp.x,
