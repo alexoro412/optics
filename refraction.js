@@ -43,7 +43,16 @@
         style: "solid water"
     })
 
-    let beam = new Beam(41, 17, 178, 143, 10, 20);
-    beam.strength = 0.8;
+    let beam = new Beam({
+        x1: 41,
+        y1: 17,
+        x2: 178,
+        y2: 143,
+        num_rays: 10,
+        width: 20,
+        strength: 0.8,
+        ui: {}
+    })
+
     sim.add_light(beam);
 })();

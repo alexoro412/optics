@@ -15,7 +15,6 @@
     ], {
         refractive: true,
         ior: 1.5,
-        // reflective: true, 
         style: "solid glass"
     })
 
@@ -26,7 +25,17 @@
         ]);
     }
 
-    let beam = new Beam(10, h / 2, 40, h / 2, 10, 80, 0);
+    // let beam = new Beam(10, h / 2, 40, h / 2, 10, 80, 0);
+    let beam = new Beam({
+        x1: 10,
+        y1: h / 2,
+        x2: 20,
+        y2: h / 2,
+        num_rays: 10,
+        width: 80,
+        angle: 0,
+        ui: {}
+    })
     beam.strength = 0.4;
     sim.add_light(beam);
 

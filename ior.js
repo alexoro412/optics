@@ -14,7 +14,15 @@
         ior: ior
     });
 
-    let beam = new Beam(41, 17, 145, 115, 10, 20);
+    // let beam = new Beam(41, 17, 145, 115, 10, 20);
+    let beam = new Beam({
+        x1: 41, y1: 17,
+        x2: 145, y2: 115,
+        num_rays: 10,
+        width: 20,
+        strength: 0.8,
+        ui: {}
+    })
     sim.add_light(beam);
 
 

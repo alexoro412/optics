@@ -23,6 +23,14 @@
         reflectance: 1.0
     });
 
-    let beam = new Beam(48, 106, 0, 0, 10, 100, Math.PI / 2);
+    // let beam = new Beam(48, 106, 0, 0, 10, 100, Math.PI / 2);
+    let beam = new Beam({
+        x1: 48,
+        y1: 106,
+        num_rays: 20,
+        width: 100,
+        angle: Math.PI / 2,
+        ui: {}
+    })
     sim.add_light(beam);
 })();

@@ -63,7 +63,8 @@
         .attr("y1", coords.y1)
         .attr("x2", coords.x3)
         .attr("y2", coords.h)
-        .attr("class", "ray");
+        .attr("class", "ray")
+        .attr("style", "mix-blend-mode: normal;")
 
     svg.append("line")
         .attr("id", "reflection")
@@ -71,7 +72,8 @@
         .attr("y1", coords.h)
         .attr("x2", coords.x4)
         .attr("y2", coords.y4)
-        .attr("class", "ray");
+        .attr("class", "ray")
+        .attr("style", "mix-blend-mode: normal;")
 
     svg.append("text")
         .attr("id", "thetai")

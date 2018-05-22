@@ -41,7 +41,7 @@
 
     sim.add_thins([
         new Line(0, h - 50, w, h - 50),
-        new Line(w/2, h-50, w/2, h)
+        new Line(w / 2, h - 50, w / 2, h)
     ], {
         style: "mirror"
     })
@@ -70,23 +70,30 @@
         sim.add_ui(handles[i])
     }
 
-    let lamp = new PointLamp(313, 326, 40);
+    let lamp = new PointLamp({
+        x: 313,
+        y: 326,
+        num_rays: 40,
+        strength: 0.6,
+        ui: {}
+    });
 
-    lamp.strength = 0.5;
-
-    let lamp_handle = new Point({
-        x: lamp.x,
-        y: lamp.y,
-        max_x: w,
-        max_y: h,
-        num_decimals: 2,
-        callback: function (x, y) {
-            lamp.move(x, y);
+    let beam = new Beam({
+        x1: 22,
+        y1: 215,
+        x2: 106,
+        y2: 176,
+        num_rays: 10,
+        width: 20,
+        ui: {
+            max_x: w,
+            max_y: h,
+            num_decimals: 2
         }
     })
 
-    let beam = new Beam(22, 215, 106, 176, 10, 20);
+    // let beam = new Beam(22, 215, 106, 176, 10, 20);
     sim.add_light(beam);
     sim.add_light(lamp);
-    sim.add_ui(lamp_handle);
+    // sim.add_ui(lamp_handle);
 })();

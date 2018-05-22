@@ -23,7 +23,14 @@
         style: "solid mirror"
     })
 
-    let beam = new Beam(100, 100, 0, 0, 30, 200, Math.PI / 2);
+    let beam = new Beam({
+        x1: 100,
+        y1: 100,
+        num_rays: 30,
+        width: 200,
+        angle: Math.PI / 2,
+        ui: {}
+    })
     sim.add_light(beam);
 
     let slider = new Slider({

@@ -12,6 +12,15 @@
         style: "solid mirror"
     })
 
-    let beam = new Beam(116, 111, 200, 200, 10, 20);
+    // let beam = new Beam(116, 111, 200, 200, 10, 20);
+    let beam = new Beam({
+        x1: 116,
+        y1: 111,
+        x2: 200,
+        y2: 200,
+        num_rays: 10,
+        width: 20,
+        ui: {}
+    })
     sim.add_light(beam);
 })();

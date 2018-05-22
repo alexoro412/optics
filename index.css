@@ -82,12 +82,8 @@ text {
     stroke-width: 1;
     stroke-linecap: round;
     stroke-linejoin: round;
-    mix-blend-mode: lighten;
 }
 
-.ray-group {
-    /* mix-blend-mode: darken; */
-}
 
 /* .ray:hover {
     stroke-width: 2;

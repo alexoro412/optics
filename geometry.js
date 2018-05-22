@@ -37,6 +37,14 @@ function close_enough(a, b, tolerance = 0.01) {
     return Math.abs(a - b) < tolerance;
 }
 
+function merge(o, defaults) {
+    for (let k of Object.keys(defaults)) {
+        if (typeof o[k] === "undefined") {
+            o[k] = defaults[k]
+        }
+    }
+}
+
 const max_bounce = 10;
 
 function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
@@ -900,257 +908,6 @@ class Space {
     }
 }
 
-class PointLamp {
-    constructor(x,y,num_rays){
-        this.ray_gap = 2 * Math.PI / num_rays;
-        this.x = x;
-        this.y = y;
-        this.num_rays = num_rays;
-        this.radius = 10;
-        this.strength = 0.8;
-    }
-
-    move(x,y){
-        this.x = x;
-        this.y = y;
-        this.updateRays();
-        this.drawRays();
-    }
-
-    raise_handles(){
-
-    }
-
-    updateRays(){
-        this.rays = [];
-        for(let i = 0; i < this.num_rays; i++){
-            this.rays = this.rays.concat(raycast(new Line(this.x, this.y, 
-                this.x + 10 * Math.cos(i * this.ray_gap), this.y + 10 * Math.sin(i * this.ray_gap)), 
-                this.space.get_geometry(),max_bounce,0,this.strength))
-        }
-    }
-
-    drawRays(){
-        let lines = this.beam_group.selectAll("line").data(this.rays);
-
-        lines.exit().remove();
-
-        lines.attrs({
-            x1: function (d) {
-                return d.x1;
-            },
-            y1: function (d) {
-                return d.y1;
-            },
-            x2: function (d) {
-                return d.x2;
-            },
-            y2: function (d) {
-                return d.y2;
-            },
-            class: "blue ray",
-            "stroke-opacity": function (d) {
-                return +precisionRound(d.strength, 3);
-            }
-        })
-
-        lines.enter().append("line").attrs({
-            x1: function (d) {
-                return d.x1;
-            },
-            y1: function (d) {
-                return d.y1;
-            },
-            x2: function (d) {
-                return d.x2;
-            },
-            y2: function (d) {
-                return d.y2;
-            },
-            class: "blue ray",
-            "stroke-opacity": function (d) {
-                return +precisionRound(d.strength, 3);
-            }
-        })
-    }
-
-    install(svg, space){
-        this.space = space;
-        this.beam_group = svg.append("g");
-
-        this.updateRays();
-        this.drawRays();
-    }
-}
-
-class Beam {
-    constructor(x1, y1, x2, y2, num_rays, beam_width, orientation = "free") {
-        this.ray_gap = beam_width / num_rays;
-        this.num_rays = num_rays;
-        this.beam_width = beam_width;
-        this.rays = [];
-        this.radius = 10;
-        this.strength = 0.4;
-
-        this.orientation = orientation;
-        if (orientation == "free") {
-            this.data = [{
-                x: x1,
-                y: y1
-            }, {
-                x: x2,
-                y: y2
-            }]
-        } else if (typeof orientation == "number") {
-            this.data = [{
-                    x: x1,
-                    y: y1
-                },
-                {
-                    x: x1 + 10 * Math.cos(orientation),
-                    y: y1 + 10 * Math.sin(orientation)
-                }
-            ]
-        }
-
-        this.h = 350;
-        this.w = 400;
-    }
-
-    setBounds(w, h) {
-        this.w = w;
-        this.h = h;
-    }
-
-    raise_handles() {
-        this.handle_group.raise();
-    }
-
-    updateRays() {
-        this.angle = Math.atan2(this.data[1].y - this.data[0].y, this.data[1].x - this.data[0].x);
-
-        this.rays = [];
-
-        for (let i = 0; i < this.num_rays; i++) {
-            this.rays = this.rays.concat(raycast(new Line(
-                this.data[0].x + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
-                this.data[0].y - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle),
-                this.data[1].x + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
-                this.data[1].y - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle)
-            ), this.space.get_geometry(), max_bounce, 0, this.strength));
-        }
-
-    }
-
-    drawRays() {
-        let lines = this.beam_group.selectAll("line").data(this.rays);
-
-        lines.exit().remove();
-
-        lines.attrs({
-            x1: function (d) {
-                return d.x1;
-            },
-            y1: function (d) {
-                return d.y1;
-            },
-            x2: function (d) {
-                return d.x2;
-            },
-            y2: function (d) {
-                return d.y2;
-            },
-            class: "ray",
-            "stroke-opacity": function (d) {
-                return Math.floor(1000 * d.strength) / 1000;
-            }
-        })
-
-        lines.enter().append("line").attrs({
-            x1: function (d) {
-                return d.x1;
-            },
-            y1: function (d) {
-                return d.y1;
-            },
-            x2: function (d) {
-                return d.x2;
-            },
-            y2: function (d) {
-                return d.y2;
-            },
-            class: "ray",
-            "stroke-opacity": function (d) {
-                return Math.floor(1000 * d.strength) / 1000;
-            }
-        })
-    }
-
-    updateHandles() {
-        if (typeof this.orientation == "number") {
-            this.data[1].x = this.data[0].x + 10 * Math.cos(this.orientation);
-            this.data[1].y = this.data[0].y + 10 * Math.sin(this.orientation);
-            this.handle_group.select("ellipse")
-                .attr("transform", `rotate(${(this.orientation - Math.PI/2) * 180 / Math.PI} ${this.data[0].x} ${this.data[0].y})`);
-        }
-    }
-
-    install(svg, space) {
-        this.space = space;
-        this.beam_group = svg.append("g");
-        this.handle_group = svg.append("g");
-
-
-        this.updateRays();
-
-        this.drawRays();
-
-        let self = this;
-
-        if (this.orientation == "free") {
-            this.handle_group.selectAll("circle")
-                .data(this.data)
-                .enter().append("circle")
-                .attrs({
-                    cx: function (d) {
-                        return d.x;
-                    },
-                    cy: function (d) {
-                        return d.y;
-                    },
-                    r: this.radius,
-                    class: "handle"
-                }).call(d3.drag()
-                    .on("start", dragstarted)
-                    .on("drag", function (d) {
-                        (dragged.bind(this))(d, self.w, self.h);
-                        self.updateRays();
-                        self.drawRays();
-                    })
-                    .on("end", dragended))
-        } else if (typeof this.orientation == "number") {
-            this.handle_group.selectAll("ellipse")
-                .data([this.data[0]]).enter().append("ellipse")
-                .attrs({
-                    cx: this.data[0].x,
-                    cy: this.data[0].y,
-                    ry: this.radius,
-                    rx: this.beam_width / 2,
-                    class: "handle",
-                    transform: `rotate(${(this.orientation - Math.PI/2) * 180 / Math.PI} ${this.data[0].x} ${this.data[0].y})`
-                }).call(d3.drag().on("start", dragstarted)
-                    .on("drag", function (d) {
-                        (dragged.bind(this))(d, self.w, self.h);
-                        self.updateHandles();
-                        self.updateRays();
-                        self.drawRays();
-                    })
-                    .on("end", dragended))
-        }
-
-    }
-}
-
 function dragstarted(d) {
     d3.select(this).raise().classed("active", true);
 }
@@ -1349,6 +1106,7 @@ class Sim {
 
         ui.install(elem_group);
         this.ui_group.raise();
+        return ui_id;
     }
 
     add_borders() {
@@ -1378,6 +1136,11 @@ class Sim {
         let light_id = guidGenerator();
         this.lights[light_id] = light;
         light.install(this.ray_group, this.space);
+        if(light.ui != undefined){
+            for(let h of light.handles){
+                this.add_ui(h);
+            }
+        }
         for (let b of Object.keys(this.lights)) {
             this.lights[b].raise_handles();
         }
