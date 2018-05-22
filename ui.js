@@ -101,7 +101,7 @@ class Point {
     install(group, id){
         let self = this;
 
-        group.append("circle").attrs({
+        this.svg_object = group.append("circle").attrs({
             cx: this.x,
             cy: this.y,
             r: this.radius,
@@ -118,6 +118,15 @@ class Point {
                     })
                 self.callback(self.x, self.y)
             }).on("end", dragended))
+    }
+
+    move(x,y){
+        this.x = x;
+        this.y = y;
+        this.svg_object.attrs({
+            cx: this.x,
+            cy: this.y
+        })
     }
 }
 
@@ -212,10 +221,6 @@ class Beam {
     //     this.w = w;
     //     this.h = h;
     // }
-
-    raise_handles() {
-        // this.handle_group.raise();
-    }
 
     updateRays() {
         this.angle = Math.atan2(this.y2 - this.y1, this.x2 - this.x1);
@@ -375,10 +380,6 @@ class PointLamp {
         this.drawRays();
     }
 
-    raise_handles() {
-
-    }
-
     updateRays() {
         this.rays = [];
         for (let i = 0; i < this.num_rays; i++) {
@@ -435,6 +436,128 @@ class PointLamp {
     }
 
     install(svg, space) {
+        this.space = space;
+        this.beam_group = svg.append("g");
+
+        this.updateRays();
+        this.drawRays();
+    }
+}
+
+default_conelamp = {
+    x: 100,
+    y: 100,
+    strength: 0.6,
+    angle: 0,
+    num_rays: 20,
+    width: Math.PI/4,
+    radius: 10,
+    fixed: false,
+    handle_gap: 30
+}
+
+class ConeLamp {
+    constructor(opts = {}){
+        merge(opts, default_conelamp);
+        Object.assign(this, opts);
+
+        this.ray_gap = this.width / this.num_rays;
+        if(this.ui != undefined){
+            console.log(opts.ui);
+            this.handle1 = new Point(opts.ui);
+            this.handle1.x = this.x;
+            this.handle1.y = this.y;
+
+            if(this.fixed){
+                this.handle1.callback = (function (x, y) {
+                    this.move(x, y)
+                }).bind(this);
+
+                this.handles = [this.handle1]
+            }else{
+                this.handle2 = new Point(opts.ui);
+                this.handle2.x = this.x + this.handle_gap * Math.cos(this.angle);
+                this.handle2.y = this.y + this.handle_gap * Math.sin(this.angle);
+
+                this.handle1.callback = (function(x,y){
+                    this.handle2.x = x + this.handle_gap * Math.cos(this.angle);
+                    this.handle2.y = y + this.handle_gap * Math.sin(this.angle);
+                    this.handle2.move(x + this.handle_gap * Math.cos(this.angle), y + this.handle_gap * Math.sin(this.angle))
+                    this.move(x,y);
+                }).bind(this);
+
+                this.handle2.callback = (function(x,y){
+                    this.angle = Math.atan2(y - this.y, x - this.x)
+                    this.handle2.move(this.x + this.handle_gap * Math.cos(this.angle), this.y + this.handle_gap * Math.sin(this.angle));
+                    this.move(this.x, this.y);
+                }).bind(this)
+
+                this.handles = [this.handle1, this.handle2]
+            }
+        }
+    }
+
+    move(x,y){
+        this.x = x;
+        this.y = y;
+        this.updateRays();
+        this.drawRays();
+    }
+
+    updateRays(){
+        this.rays = [];
+        for(let i = 0; i < this.num_rays; i++){
+            this.rays = this.rays.concat(raycast(new Line(this.x, this.y, 
+                this.x + 10 * Math.cos(this.angle + (i - this.num_rays/2 + 0.5) * this.ray_gap), 
+                this.y + 10 * Math.sin(this.angle + (i - this.num_rays/2 + 0.5) * this.ray_gap)), 
+                this.space.get_geometry(), max_bounce, 0, this.strength))
+        }
+    }
+
+    drawRays(){
+        let lines = this.beam_group.selectAll("line").data(this.rays);
+
+        lines.exit().remove();
+
+        lines.attrs({
+            x1: function (d) {
+                return d.x1;
+            },
+            y1: function (d) {
+                return d.y1;
+            },
+            x2: function (d) {
+                return d.x2;
+            },
+            y2: function (d) {
+                return d.y2;
+            },
+            "stroke-opacity": function (d) {
+                return +precisionRound(d.strength, 3);
+            }
+        })
+
+        lines.enter().append("line").attrs({
+            x1: function (d) {
+                return d.x1;
+            },
+            y1: function (d) {
+                return d.y1;
+            },
+            x2: function (d) {
+                return d.x2;
+            },
+            y2: function (d) {
+                return d.y2;
+            },
+            class: "ray",
+            "stroke-opacity": function (d) {
+                return +precisionRound(d.strength, 3);
+            }
+        })
+    }
+
+    install(svg, space){
         this.space = space;
         this.beam_group = svg.append("g");
 

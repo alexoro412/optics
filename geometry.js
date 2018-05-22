@@ -1141,9 +1141,9 @@ class Sim {
                 this.add_ui(h);
             }
         }
-        for (let b of Object.keys(this.lights)) {
-            this.lights[b].raise_handles();
-        }
+        // for (let b of Object.keys(this.lights)) {
+        //     this.lights[b].raise_handles();
+        // }
     }
 
     add_circle(circle, opts, shape_id) {
