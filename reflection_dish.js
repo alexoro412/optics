@@ -24,10 +24,10 @@
     })
 
     let beam = new Beam({
-        x1: 100,
+        x1: 30,
         y1: 100,
-        num_rays: 30,
-        width: 200,
+        num_rays: 20,
+        width: 80,
         angle: Math.PI / 2,
         ui: {}
     })

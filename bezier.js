@@ -53,7 +53,9 @@
         sim.update_shape_geometry(lines, [
             new Line(handles[0].x, handles[0].y, handles[1].x, handles[1].y),
             new Line(handles[2].x, handles[2].y, handles[3].x, handles[3].y)
-        ])
+        ]);
+        document.querySelector(".bezier-heat").style.stroke =
+            `rgb(${map(100 - (percent_reflectance + percent_transmission), 0, 100, 128, 255)},128,128)`;
     }
 
     for (let i = 0; i < 4; i++) {

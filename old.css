@@ -15,7 +15,8 @@ p:first-child {
 
 .single-ray:hover > .ray{
     stroke-width: 2;
-    stroke-opacity: 1 !important;
+    stroke: red;
+    /* stroke-opacity: 1 !important; */
 }
 
 p:not(:first-child) {
