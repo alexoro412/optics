@@ -51,10 +51,13 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
     if (bounce == 0 || strength < 0.01) return [];
 
     if (ior == 0) {
+        // console.log("getting ior")
         ior = get_ior(geometry, ray.x1, ray.y1);
     }
 
     intersections = [];
+
+    // console.log(geometry);
 
     for (let g of geometry) {
         intersections = intersections.concat(ray.intersect(g));
@@ -241,13 +244,24 @@ class Line {
     }
 
     inRayDirection(x, y) {
-        return (this.x2 > this.x1 && x > this.x1) || // if point is to the right
-            (this.x2 < this.x1 && x < this.x1) || // if point is to the left
-            (close_enough(this.x2, this.x1, 0.01) && // if ray vertical
-                (
-                    (this.y2 > this.y1 && y > this.y1) || // if point is below
-                    (this.y2 < this.y1 && y < this.y1) // if point is above
-                ))
+        // Dot product saves the day yet again
+        let x1 = x - this.x1,
+            y1 = y - this.y1,
+            x2 = this.x2 - this.x1,
+            y2 = this.y2 - this.y1,
+            dot = x1 * x2 + y1 * y2,
+            M1 = Math.sqrt(x1*x1 + y1*y1),
+            M2 = Math.sqrt(x2 * x2 + y2*y2),
+            cos = dot / (M1 * M2);
+        return close_enough(cos, 1, 0.1);
+        // return close_enough(Math.atan2(y - this.y1, x - this.x1), Math.atan2(this.y1 - this.y1))
+        // return (this.x2 > this.x1 && x > this.x1) || // if point is to the right
+        //     (this.x2 < this.x1 && x < this.x1) || // if point is to the left
+        //     (close_enough(this.x2, this.x1, 0.0000000001) && // if ray vertical
+        //         (
+        //             (this.y2 > this.y1 && y > this.y1) || // if point is below
+        //             (this.y2 < this.y1 && y < this.y1) // if point is above
+        //         ))
     }
 
     f(x, type) {
@@ -282,6 +296,7 @@ class Line {
                 Ax = -1;
                 Ay = 0;
                 C = -this.x1
+                // console.log('problem?')
             }
 
             let a = Ax * other.xCoeffs[0] + Ay * other.yCoeffs[0];
@@ -984,8 +999,12 @@ class Bezier {
 // It uses the cubic formula
 // You jealous?
 function cubicRoots(a, b, c, d) {
-    if (close_enough(a, 0, 0.1)) {
-
+    // console.log("cubic", a,b,c,d);
+    if (close_enough(a, 0, 0.01)) {
+        if(close_enough(b,0,0.01)){
+            // Woops, it's a line!
+            return [-d/c]
+        }
         // Woops, now it's quadratic :)
         let D = c * c - 4 * b * d;
         if (D < 0) {

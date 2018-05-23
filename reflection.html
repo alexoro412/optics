@@ -9,6 +9,7 @@
 
     <link rel="stylesheet" type="text/css" media="screen" href="normalize.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="skeleton.css" />
+    <!-- <link rel="stylesheet" type="text/css" media="screen" href="balloon.css" /> -->
     <link rel="stylesheet" type="text/css" media="screen" href="old.css" />
 </head>
 
@@ -94,20 +95,26 @@
             <div class="one-half column">
                 <h3>The Parabola</h3>
                 <p>
-                    The parabola is another choice for focusing light. It focuses light far better than the circle. In fact, it can be mathematically
+                    The parabola is another choice for focusing light, and as you will see, it focuses light far better than the circle. <!--In fact, it can be mathematically
                     proven that every light ray coming down vertically onto a parabola will all be reflected towards the
-                    same point, the parabola's focal point.
+ same point, the parabola's focal point.--> 
+<!-- <sup class="footnote" data-balloon="Here's a great video that proves that, if you want" data-balloon-length="medium" data-balloon-pos="up">
+    <a href="https://www.youtube.com/watch?v=owVwjr6pTqc">[1]</a>
+</sup> -->
                 </p>
                 <p>
-                    See how the parabola focuses light by trying out the vertical beam (left).
+                    You can see how the parabola focuses light by trying out the vertical beam (left). The light rays will all focus
+                    onto the parabolas focal point. You can change how far away that point is with the slider below. 
                 </p>
                 <p>
-                    Then, try the cone lamp (right) and position it at the focal point. If you get it close enough, the lamp's rays should all
-                    be reflected to form a vertical beam.
+ Then, try the cone lamp (right) and position it at the focal point. If you get it close enough, the lamp's rays should all
+be reflected to form a vertical beam.
                 </p>
                 <p>
-                    You can take that beam, and focus it back down with another parabola. You can try that below. I've limited the number of
-                    times each light ray can get reflected, just so things don't get to messy.
+                    <!-- You can take that beam, and focus it back down with another parabola. You can try that below. I've limited the number of
+                    times each light ray can get reflected, just so things don't get to messy. -->
+                    Below, you can try using this property to focus light from one parabola onto another. 
+ I've limited the number of times each light ray can get reflected, just so things don't get to messy.
                 </p>
             </div>
             <div id="reflection_parabola" class="one-half column"></div>
@@ -119,15 +126,14 @@
             <div class="one-half column">
                 <h3>Satellite Dishes</h3>
                 <p>
-                    The simulation above shows how satellite dishes work. Satellite dishes are 3D parabolas, which are called parabaloids. They're
-                    typically flatter that what you see above.
+                    The simulation above shows how satellite dishes work. Satellite dishes are 3D parabolas, which are called parabaloids.
                 </p>
                 <p>
-                    That piece at the end of the rod is the transceiver. It can emit and detect radio waves, which is lower frequency light that
+                    That piece at the end of the rod is the transceiver. It can emit and detect radio waves, which are a kind of light that
                     we humans can't see naturally.
                 </p>
                 <p>
-                    The transceiver positioned at the parabola's focal point. When the two dishes are pointed at each other, any light from one
+                    The transceiver positioned at the parabola's focal point. When two dishes are pointed at each other, any light from one
                     of them will be focused into a beam that hits the other dish, where it gets focused onto the receiver.
                 </p>
             </div>
@@ -139,7 +145,10 @@
             <div class="one-half column">
                 <h3>Circles!</h3>
                 <p>
-                    Now, try playing around with light rays inside a circular mirror. It makes pretty patterns.
+                    Now you can try playing around with light rays inside a circular mirror. It makes pretty patterns.
+                </p>
+                <p>
+                    In reality, the rays would keep bouncing, but to keep your computer happy, these ones can only bounce 10 times.
                 </p>
             </div>
             <div id="reflection_circle" class="one-half column"></div>
@@ -156,9 +165,6 @@
     <script src="reflection_circle.js"></script>
     <script src="parabola.js"></script>
     <script src="parabola2.js"></script>
-    <!-- <script src="refraction.js"></script> -->
-    <!-- <script src="ior.js"></script> -->
-    <!-- <script src="focus_lens.js"></script> -->
     <script src="bezier.js"></script>
 </body>
 

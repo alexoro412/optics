@@ -12,6 +12,17 @@
         style: "solid mirror"
     })
 
+    let border_width = 150;
+
+    sim.add_thins([
+        new Line(0,border_width,border_width,0),
+        new Line(w-border_width, 0, w, border_width),
+        new Line(0,h-border_width,border_width,h),
+        new Line(w-border_width,h,w,h-border_width)
+    ], {
+        style: "mirror"
+    })
+
     // let beam = new Beam(116, 111, 200, 200, 10, 20);
     let beam = new Beam({
         x1: 116,
@@ -23,4 +34,22 @@
         ui: {}
     })
     sim.add_light(beam);
+
+    let lamp = new PointLamp({
+        x: 40, y:80,
+        num_rays: 30,
+        ui: {}
+    })
+    sim.add_light(lamp);
+
+    let cone = new ConeLamp({
+        x: 380, y: 340,
+        num_rays: 20,
+        angle: -3*Math.PI/4,
+        width: Math.PI/4,
+        handle_gap: 60,
+        ui: {
+        }
+    })
+    sim.add_light(cone);
 })();

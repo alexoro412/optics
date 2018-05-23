@@ -23,6 +23,14 @@ p:not(:first-child) {
     text-indent: 3em;
 }
 
+sup {
+    text-indent: 0;
+}
+
+sup::after{
+    height: 20px;
+}
+
 svg.sim.color {
     background-color:rgb(0,0,0);
 }

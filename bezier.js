@@ -76,7 +76,6 @@
     percent_transmission = 10;
 
     function update_opts(){
-        console.log(percent_reflectance/100, percent_transmission)
         sim.update_shape_opts(bezier, {
             reflectance: percent_reflectance / 100,
             transmission: percent_transmission / 100
