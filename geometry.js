@@ -351,7 +351,7 @@ class Line {
             let roots = cubicRoots(a, b, c, d);
             // console.log(roots);
             roots = roots.filter(function (x) {
-                return 0 <= x && x <= 1;
+                return -0.0001 <= x && x <= 1.0001;
             })
 
             let answers = roots.map(function (e) {
@@ -730,17 +730,22 @@ class Space {
     }
 
     add_borders() {
-        return this.add_thins([
-            // new Line(-this.w, -this.h, 2 * this.w, -this.h),
-            // new Line(2 * this.w, -this.h, 2 * this.w, 2 * this.h),
-            // new Line(2 * this.w, 2 * this.h, -this.w, 2 * this.h),
-            // new Line(-this.w, 2 * this.h, -this.w, -this.h)
+        this.add_thins([
+            new Line(-this.w, -this.h, 2 * this.w, -this.h),
+            new Line(2 * this.w, -this.h, 2 * this.w, 2 * this.h),
+            new Line(2 * this.w, 2 * this.h, -this.w, 2 * this.h),
+            new Line(-this.w, 2 * this.h, -this.w, -this.h)
+        ], {
+            reflective: false,
+            style: "border"
+        })
+        this.add_thins([
             new Line(0, 0, this.w, 0),
             new Line(this.w, 0, this.w, this.h),
             new Line(this.w, this.h, 0, this.h),
             new Line(0, this.h, 0, 0)
         ], {
-            reflective: false,
+            transparent: true,
             style: "border"
         })
     }
@@ -1164,6 +1169,26 @@ class Parabola {
             this.x[2], this.y[2],
             this.x[3], this.y[3]
         )
+    }
+}
+
+class Ellipse {
+    constructor(x, y, w, h) {
+        // from https://stackoverflow.com/questions/14169234/the-relation-of-the-bezier-curve-and-ellipse?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+        let kappa = 0.5522848,
+            ox = (w / 2) * kappa, // control point offset horizontal
+            oy = (h / 2) * kappa, // control point offset vertical
+            xe = x + w, // x-end
+            ye = y + h, // y-end
+            xm = x + w / 2, // x-middle
+            ym = y + h / 2; // y-middle
+
+        this.shapes = [
+            new Bezier(x, ym, x, ym - oy, xm - ox, y, xm, y),
+            new Bezier(xm, y, xm + ox, y, xe, ym - oy, xe, ym),
+            new Bezier(xe, ym, xe, ym + oy, xm + ox, ye, xm, ye),
+            new Bezier(xm, ye, xm - ox, ye, x, ym + oy, x, ym)
+        ]
     }
 }
 

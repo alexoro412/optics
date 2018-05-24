@@ -37,9 +37,7 @@
                     <blockquote class="notification">
                         <h6 class="has-text-centered subtitle">Law of Reflection</h6>
 
-                        The angle with which light hits the mirror (θ
-                        <sub>i</sub>) is the same as the angle it reflects out at (θ
-                        <sub>r</sub>).
+                        The angle with which light hits the mirror (θ<sub>i</sub>) is the same as the angle it reflects out at (θ<sub>r</sub>).
 
                         <br/>
                         <br/>
@@ -91,11 +89,16 @@
                 <div class="explanation column">
                     <h3 class="title">Focusing Light</h3>
                     <p>
-                        Since curved mirrors focus light, you could use a half circle to focus a beam onto a point.
+                        Focusing light is very useful. It can help to 
+                        amplify a weak signal, heat water in a 
+                        solar collector, and light things on fire.
+                    </p>
+                    <p>
+                        Since curved mirrors focus light, you can use a half circle to focus a beam onto a point.
                     </p>
                     <p>
                         But, as you can see to the right, not all of the light is focused. Most rays just bounce out of the circle entirely. The
-                        rays that do hit the focus don't focus into a point, but rather into a heart like shape (cardioid).
+                        rays that do hit the focus don't focus into a point, but rather into a upside down heart like shape (cardioid).
                         This is more visible when the radius of the circle is smaller.
                     </p>
                     <p>
@@ -129,8 +132,7 @@
                     <p>
                         <!-- You can take that beam, and focus it back down with another parabola. You can try that below. I've limited the number of
                     times each light ray can get reflected, just so things don't get to messy. -->
-                        Below, you can try using this property to focus light from one parabola onto another. I've limited the number of times each
-                        light ray can get reflected, just so things don't get to messy.
+                        Below, you can try using this property to focus light from one parabola onto another.
                     </p>
                 </div>
                 <div id="reflection_parabola" class="column sim-container"></div>
@@ -140,22 +142,55 @@
                 <div class="explanation column">
                     <h3 class="title">Satellite Dishes</h3>
                     <p>
-                        The simulation above shows how satellite dishes work. Satellite dishes are 3D parabolas, which are called parabaloids.
+                        This simulation shows how satellite dishes work.
                     </p>
                     <p>
-                        Every satellite dish has a rod that sticks out from it. At the end of the rod is the transceiver. It can emit and detect
+                        Satellite dishes are 3D parabolas, which are called parabaloids.
+                        Every satellite dish has a rod that sticks out from it. 
+                        At the end of the rod is the transceiver. It can emit and detect
                         radio waves, which are a kind of light that we humans can't see naturally.
                     </p>
                     <p>
                         The rod is used to position the transceiver at the parabola's focal point, so it can easily pick up all incoming light. When
-                        two dishes are pointed at each other, any light from one of them will be focused into a beam that
+                        two dishes are pointed at each other, any light from one of them will be focused into a beam, which then
                         hits the other dish, where it gets focused onto the other's receiver.
+                    </p>
+                    <p>
+                        (These rays are limited to only 
+                        reflect twice, just so things don't get to messy.)
                     </p>
                 </div>
                 <div class="column sim-container" id="beaming_parabola"></div>
                 <!-- <div class="one-half column">
                 <img src="dish.jpg">
             </div> -->
+            </div>
+            <div class="columns">
+                <div class="explanation column">
+                    <h3 class="title">The Ellipse</h3>
+                    <p>
+                        An ellipse, or oval, has two focal points. When a light is placed 
+                        at one focal point, all of it's light is focused onto the other focal point.
+                    </p>
+                    <p>
+                        A lot of phenomena related to reflecting light also work for sound. 
+                        For example, if you stand in the focal point of an elliptical room, 
+                        and whisper, you're whisper will be focused onto the other focal point. 
+                        Someone at that point will therefore be able to hear you whispering from across the room. 
+                    </p>
+                    <p>
+                        Similarly, the parabola can also focus sound. This kind of device is
+                        called a parabolic microphone, and it can let you hear sounds that 
+                        are very far away.
+                    </p>
+                    <p>
+                        (These rays are limited to only 
+                        reflect once, just so things don't get to messy.)
+                    </p>
+                </div>
+                <div class="column sim-container" id="ellipse">
+
+                </div>
             </div>
             <div class="columns">
                 <div class="explanation column">
@@ -187,6 +222,7 @@
     <script src="parabola.js"></script>
     <script src="parabola2.js"></script>
     <script src="bezier.js"></script>
+    <script src="ellipse.js"></script>
 </body>
 
 </html>

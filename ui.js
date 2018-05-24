@@ -301,7 +301,8 @@ let default_lamp = {
     y: 100,
     num_rays: 20,
     radius: 10,
-    ray_style: "ray"
+    ray_style: "ray",
+    max_bounce: 10
 }
 
 class PointLamp {
@@ -334,7 +335,7 @@ class PointLamp {
         for (let i = 0; i < this.num_rays; i++) {
             this.rays.push(raycast(new Line(this.x, this.y,
                     this.x + 10 * Math.cos(i * this.ray_gap), this.y + 10 * Math.sin(i * this.ray_gap)),
-                this.space.get_geometry(), max_bounce, 0, this.strength))
+                this.space.get_geometry(), this.max_bounce, 0, this.strength))
         }
     }
 

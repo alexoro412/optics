@@ -43,7 +43,7 @@
         new Line(0, h - 80, w, h - 80),
         new Line(w / 2, h - 80, w / 2, h)
     ], {
-        style: "mirror thick"
+        style: "mirror"
     })
 
     function update_bezier(x, y) {
