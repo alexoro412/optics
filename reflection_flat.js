@@ -39,8 +39,9 @@
     let svg = d3.select("#reflection_flat")
         .append("svg")
         .attr("class", "sim")
-        .attr("width", w)
-        .attr("height", h);
+        .attr("viewBox", "0 0 400 350")
+        // .attr("width", w)
+        // .attr("height", h);
 
 
     let mirror = svg.append("line")

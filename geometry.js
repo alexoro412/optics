@@ -1131,9 +1131,9 @@ class Sim {
             .append("svg")
             .attrs({
                 class: "sim",
-                height: h,
+                // height: h,
                 viewBox: `0 0 ${w} ${h}`,
-                width: w,
+                // width: w,
                 
             })
 

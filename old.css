@@ -1,8 +1,15 @@
 svg.sim {
     /* border: 1px solid black; */
+    width: 70%;
     touch-action: none;
     -ms-touch-action: none;
     background-color:rgb(255, 255, 255);
+}
+
+@media (max-width: 550px){
+    svg.sim {
+        width: 100%;
+    }
 }
 
 .border {
