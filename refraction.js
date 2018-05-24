@@ -32,6 +32,16 @@
     })
 
     sim.add_solid([
+        new Line(prism_x, prism_y, prism_x + prism_width, prism_y),
+        new Line(prism_x + prism_width, prism_y, prism_x + prism_width, prism_y - prism_width),
+        new Line(prism_x + prism_width, prism_y - prism_width, prism_x, prism_y)
+    ], {
+        refractive: true,
+        ior: 4,
+        style: "darkglass"
+    })
+
+    sim.add_solid([
         new Bezier(100 + 10, 216,
             166.666 + 10, 362.666,
             233.333 + 10, 362.666,
@@ -51,7 +61,8 @@
         num_rays: 10,
         width: 20,
         strength: 0.8,
-        ui: {}
+        ui: {},
+        max_bounce: 2
     })
 
     sim.add_light(beam);

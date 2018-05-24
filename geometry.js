@@ -48,11 +48,12 @@ function merge(o, defaults) {
 const max_bounce = 10;
 
 function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
-    if (bounce == 0 || strength < 0.01) return [];
+    if (bounce == 0 || strength < 0.05) return [];
 
     if (ior == 0) {
         // console.log("getting ior")
         ior = get_ior(geometry, ray.x1, ray.y1);
+        // console.log("ior:", ior);
     }
 
     intersections = [];
@@ -88,7 +89,8 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
             y2: intersections[0].y,
             strength: strength
         });
-        if (intersections.length > 1 && close_enough(0, distance(intersections[0].x, intersections[0].y, intersections[1].x, intersections[1].y), 0.1)) {
+        // console.log(intersections);
+        if (intersections.length > 1 && !(intersections[0].opts.refractive && intersections[1].opts.refractive) && close_enough(0, distance(intersections[0].x, intersections[0].y, intersections[1].x, intersections[1].y), 0.1)) {
             // CORNER DETECTED
             return lines;
         } else if (intersections[0].opts.reflective) {
@@ -117,16 +119,56 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
             if (ior == intersections[0].opts.ior) {
                 // Probably return to vacuum
                 // TODO check for interfaces between two non-vacuum materials
-                refraction = refract(ray.angle(), intersections[0].n, ior, 1);
-                phi = refraction[0];
-                partial_strength = refraction[1];
-                next_ior = 1;
+                if (intersections.length > 1 && close_enough(0, distance(intersections[0].x, intersections[0].y, intersections[1].x, intersections[1].y))) {
+                    // Interface between two materials, leaving refractive
+                    // console.log("ran", intersections[0].opts.ior, intersections[1].opts.ior);
+                    if (intersections[1].opts.reflective) {
+                        // reflective surface on refractive one
+                        phi = reflect(ray.angle(), intersections[1].n)
+                        let reflected_ray = new Line(intersections[1].x, intersections[1].y, 0, 0, false);
+                        reflected_ray.polar(10, phi);
+
+                        let r_strength = strength * intersections[1].opts.reflectance;
+
+                        if (intersections[1].opts.transmission != 0) {
+                            let transmitted_ray = new Line(intersections[1].x, intersections[1].y, 0, 0);
+                            transmitted_ray.polar(10, ray.angle());
+                            let t_strength = strength * intersections[1].opts.transmission;
+                            lines = lines.concat(raycast(transmitted_ray, geometry, bounce - 1, ior, t_strength));
+                        }
+
+                        return lines
+                            .concat(raycast(reflected_ray, geometry, bounce - 1, ior, r_strength))
+
+                    } else {
+                        // two refractive materials
+                        // console.log("red", ior, intersections[0].opts.ior, intersections[1].opts.ior)
+                        if (intersections[0].opts.ior == ior) {
+                            refraction = refract(ray.angle(), intersections[1].n, ior, intersections[1].opts.ior);
+                        } else {
+                            // woops, flipped
+                            refraction = refract(ray.angle(), intersections[1].n, ior, intersections[0].opts.ior);
+                        }
+
+                        phi = refraction[0];
+                        partial_strength = refraction[1];
+                        next_ior = intersections[1].opts.ior;
+                    }
+                } else {
+                    // return to vacuum
+                    refraction = refract(ray.angle(), intersections[0].n, ior, 1);
+                    phi = refraction[0];
+                    partial_strength = refraction[1];
+                    next_ior = 1;
+                }
+
             } else {
                 refraction = refract(ray.angle(), intersections[0].n, ior, intersections[0].opts.ior);
                 phi = refraction[0];
                 partial_strength = refraction[1];
                 next_ior = intersections[0].opts.ior;
             }
+
             let refracted_ray = new Line(intersections[0].x, intersections[0].y, 0, 0);
 
             if (isNaN(phi)) {
@@ -194,7 +236,9 @@ function refract(alpha, theta, n1, n2) {
 
     let partial_strength = (1 / 2) * (
         Math.pow((n1 * Math.cos(gamma) - n2 * Math.cos(beta)) / (n1 * Math.cos(gamma) + n2 * Math.cos(beta)), 2) +
-        Math.pow((n1 * Math.cos(beta) - n2 * Math.cos(gamma)) / (n1 * Math.cos(beta) + n2 * Math.cos(gamma)), 2))
+        Math.pow((n1 * Math.cos(beta) - n2 * Math.cos(gamma)) / (n1 * Math.cos(beta) + n2 * Math.cos(gamma)), 2));
+
+
     if (partial_strength > 1) {
         console.log("OH... So this shouldn't happen")
         console.log(partial_strength);
@@ -250,8 +294,8 @@ class Line {
             x2 = this.x2 - this.x1,
             y2 = this.y2 - this.y1,
             dot = x1 * x2 + y1 * y2,
-            M1 = Math.sqrt(x1*x1 + y1*y1),
-            M2 = Math.sqrt(x2 * x2 + y2*y2),
+            M1 = Math.sqrt(x1 * x1 + y1 * y1),
+            M2 = Math.sqrt(x2 * x2 + y2 * y2),
             cos = dot / (M1 * M2);
         return close_enough(cos, 1, 0.1);
         // return close_enough(Math.atan2(y - this.y1, x - this.x1), Math.atan2(this.y1 - this.y1))
@@ -693,10 +737,10 @@ class Space {
             // new Line(2 * this.w, -this.h, 2 * this.w, 2 * this.h),
             // new Line(2 * this.w, 2 * this.h, -this.w, 2 * this.h),
             // new Line(-this.w, 2 * this.h, -this.w, -this.h)
-            new Line(0,0,this.w,0),
-            new Line(this.w,0,this.w,this.h),
-            new Line(this.w,this.h,0,this.h),
-            new Line(0,this.h,0,0)
+            new Line(0, 0, this.w, 0),
+            new Line(this.w, 0, this.w, this.h),
+            new Line(this.w, this.h, 0, this.h),
+            new Line(0, this.h, 0, 0)
         ], {
             reflective: false,
             style: "border"
@@ -1005,9 +1049,9 @@ class Bezier {
 function cubicRoots(a, b, c, d) {
     // console.log("cubic", a,b,c,d);
     if (close_enough(a, 0, 0.01)) {
-        if(close_enough(b,0,0.01)){
+        if (close_enough(b, 0, 0.01)) {
             // Woops, it's a line!
-            return [-d/c]
+            return [-d / c]
         }
         // Woops, now it's quadratic :)
         let D = c * c - 4 * b * d;
@@ -1078,7 +1122,7 @@ function make_sim(id, h, w) {
 }
 
 class Parabola {
-    constructor(h,k,a,w){
+    constructor(h, k, a, w) {
         this.x = [];
         this.y = [];
         this.a = a;
@@ -1089,7 +1133,7 @@ class Parabola {
         this.recalc();
     }
 
-    recalc(){
+    recalc() {
         this.x[0] = this.h - this.w;
         this.y[0] = this.f(this.x[0]);
 
@@ -1104,15 +1148,15 @@ class Parabola {
         this.y[2] = this.y[1];
     }
 
-    f(x){
-        return this.a * (x-this.h)*(x-this.h) + this.k;
+    f(x) {
+        return this.a * (x - this.h) * (x - this.h) + this.k;
     }
 
-    g(x){
+    g(x) {
         return 2 * this.a * (this.x[0] - this.h) * (x - this.x[0]) + this.y[0]
     }
 
-    shape(){
+    shape() {
         // console.log(this.x, this.y);
         return new Bezier(
             this.x[0], this.y[0],
@@ -1134,7 +1178,7 @@ class Sim {
                 // height: h,
                 viewBox: `0 0 ${w} ${h}`,
                 // width: w,
-                
+
             })
 
         this.ui_elems = {}
@@ -1196,13 +1240,13 @@ class Sim {
         return id;
     }
 
-    add_thin(shape, opts, shape_id){
+    add_thin(shape, opts, shape_id) {
         let id = this.space.add_thin(shape, opts, shape_id);
         this.update();
         return id;
     }
 
-    add_thins(shapes, opts, shape_id){
+    add_thins(shapes, opts, shape_id) {
         let id = this.space.add_thins(shapes, opts, shape_id);
         this.update();
         return id;
@@ -1212,8 +1256,8 @@ class Sim {
         let light_id = guidGenerator();
         this.lights[light_id] = light;
         light.install(this.ray_group, this.space);
-        if(light.ui != undefined){
-            for(let h of light.handles){
+        if (light.ui != undefined) {
+            for (let h of light.handles) {
                 this.add_ui(h);
             }
         }
