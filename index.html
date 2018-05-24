@@ -5,48 +5,50 @@
     <meta charset="utf-8" />
     <title>Optics</title>
 
-    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
-
-    <link rel="stylesheet" type="text/css" media="screen" href="normalize.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="skeleton.css" />
-    <!-- <link rel="stylesheet" type="text/css" media="screen" href="balloon.css" /> -->
+    <link rel="stylesheet" type="text/css" href="node_modules/bulma/css/bulma.min.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="old.css" />
 </head>
 
 <body>
     <div class="container">
-<!-- Navbar based on http://css-snippets.com/simple-horizontal-navigation/ -->
-        <header>
-            <div class="nav">
-                <ul>
-                    <li><a href="#">Optics</a></li>
-                    <li><a href="reflection.html">Reflection</a></li>
-                    <li><a href="refraction.html">Refraction</a></li>
-                </ul>
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <h3 class="title">Optics</h3>
             </div>
-        </header>
-        <div class="row">
-            <div class="one-half column">
-                <h3>Optics!</h3>
-                <p>
-                    Optics is the physics of light. 
-                    It describes, alongside other phenomena,
-                     how light can be reflected by mirrors, and bent (refracted) by materials like
-                    glass or water.
-                </p>
-                <p>
-                    This site tries to explain some of the various aspect of optics, and each explanation is accompanied by a simulation. All
-                    of the simulations are interactive. Try playing with the one to the right, which has a laser beam, glass,
-                    and water.
-                </p>
-                <p>
-                    After that, you can move on to
-                    <a href="reflection.html">reflection,</a>
-                    or skip straight ahead to a different topic in the navbar above.
-                </p>
+            <div class="navbar-menu is-active">
+                <div class="navbar-start">
+                    <a class="navbar-item" href="index.html">Home</a>
+                    <a class="navbar-item" href="reflection.html">Reflection</a>
+                    <a class="navbar-item" href="refraction.html">Refraction</a>
+                </div>
+
             </div>
-            <div id="refraction_test" class="one-half column"></div>
-        </div>
+        </nav>
+        <section class="section">
+            <div class="container">
+                <div class="columns">
+                    <div class="column explanation">
+                        <!-- <h3 class="title">Optics!</h3> -->
+                        <p>
+                            Optics is the physics of light. It describes, alongside other phenomena, how light can be reflected by mirrors, and bent
+                            (refracted) by materials like glass or water.
+                        </p>
+                        <p>
+                            This site tries to explain some of the various aspect of optics, and each explanation is accompanied by a simulation. All
+                            of the simulations are interactive. Try playing with the one to the right, which has a laser
+                            beam, glass, and water.
+                        </p>
+                        <p>
+                            After that, you can move on to
+                            <a href="reflection.html">reflection,</a>
+                            or skip straight ahead to a different topic in the navbar above.
+                        </p>
+                    </div>
+                    <div id="refraction_test" class="column sim-container"></div>
+                </div>
+            </div>
+        </section>
+
     </div>
 
     <script src="https://d3js.org/d3.v5.min.js"></script>

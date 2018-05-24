@@ -5,173 +5,180 @@
     <meta charset="utf-8" />
     <title>Optics</title>
 
-    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
-
-    <link rel="stylesheet" type="text/css" media="screen" href="normalize.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="skeleton.css" />
-    <!-- <link rel="stylesheet" type="text/css" media="screen" href="balloon.css" /> -->
+    <link rel="stylesheet" type="text/css" href="node_modules/bulma/css/bulma.min.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="old.css" />
 </head>
 
 <body>
     <div class="container">
-        <div class="row navbar">
-            <!-- <div class="column one"></div> -->
-            <div class="columns two">
-                <h2>Optics</h2>
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <h3 class="title">Optics</h3>
             </div>
-            <div class="columns two">
-                <h5 class="navbar">
-                    <a class="navbar" href="reflection.html">Reflection</a>
-                </h5>
-            </div>
-            <div class="columns two">
-                <h5 class="navbar">
-                    <a class="navbar" href="refraction.html">Refraction</a>
-                </h5>
-            </div>
-        </div>
-        <div class="row">
-            <div class="one-half column">
-                <h3>Reflection</h3>
-                <p>When light hits a mirror, it reflects out at the same angle that it hit the mirror at. This angle is measured
-                    off of the normal vector, which is perpendicular to the surface of the mirror. Try moving the light ray
-                    to the right to see reflection in action. </p>
+            <div class="navbar-menu is-active">
+                <div class="navbar-start">
+                    <a class="navbar-item" href="index.html">Home</a>
+                    <a class="navbar-item" href="reflection.html">Reflection</a>
+                    <a class="navbar-item" href="refraction.html">Refraction</a>
+                </div>
 
-                <blockquote>
-                    <h5>Law of Reflection</h5>
-
-                    The angle with which light hits the mirror (θ<sub>i</sub>) is the same as the angle it reflects out at (θ<sub>r</sub>).
-
-                    <br/>
-                    <br/>
-                    <h6> θ<sub>i</sub> = θ<sub>r</sub>
-                    </h6>
-
-                </blockquote>
             </div>
-            <div id="reflection_flat" class="one-half column"></div>
-        </div>
-        <div class="row">
-            <div class="one-half column">
-                <h3>Curved mirrors</h3>
-                <p>
-                    Light hitting a curved mirror can get a bit more complicated.
+        </nav>
+        <section class="section">
+            <div class="columns">
+                <div class="explanation column">
+                    <h3 class="title">Reflection</h3>
+                    <p>When light hits a mirror, it reflects out at the same angle that it hit the mirror at. This angle is
+                        measured off of the normal vector, which is perpendicular to the surface of the mirror. Try moving
+                        the light ray to the right to see reflection in action. </p>
+                        <br/>
+                    <blockquote class="notification">
+                        <h6 class="has-text-centered subtitle">Law of Reflection</h6>
 
-                </p>
-                <p>
-                    When the rays hit a concave part of the mirror, it focuses the light onto a point. The rays also flip which side of the beam
-                    they're on. This is why when you look into a spoon, your reflection is flipped. Try hovering over the
-                    rays to see this.
-                </p>
-                <p>
-                    When the light hits a convex part of the mirror, it tends to spread out, and the rays don't flip. This is why convex mirrors
-                    and more boring than concave mirrors.
-                </p>
+                        The angle with which light hits the mirror 
+                        (θ<sub>i</sub>) is the same as the angle it reflects out at 
+                        (θ<sub>r</sub>).
+
+                        <br/>
+                        <br/>
+                        <h6 class="subtitle has-text-centered"> θ<sub>i</sub> = θ<sub>r</sub>
+                        </h6>
+
+                    </blockquote>
+                </div>
+                <div id="reflection_flat" class="column sim-container"></div>
             </div>
-            <div id="reflection_dome" class="one-half column"></div>
-        </div>
-        <div class="row">
-            <div class="one-half column">
-                <h3> More curved mirrors </h3>
-                <p>
-                    Here's another curved mirror to play with. This one's been modified to not be perfectly reflective.
-                </p>
-                <p>
-                    Instead, it only reflects
-                    <b id="percent-reflectance">50%</b> of the light that hits it. It lets another
-                    <b id="percent-transmission">10%</b> through, and the absorbs the other
-                    <b id="percent-absorbance">40%</b>. The absorbed light gets turned into heat, which can melt mirrors.
-                </p>
-                <p>
-                    Real mirrors tend to have reflectances within 80% - 99%.
-                </p>
+            <div class="columns">
+                <div class="explanation column">
+                    <h3 class="title">Curved mirrors</h3>
+                    <p>
+                        Light hitting a curved mirror can get a bit more complicated.
+
+                    </p>
+                    <p>
+                        When the rays hit a concave part of the mirror, it focuses the light onto a point. The rays also flip which side of the beam
+                        they're on. This is why when you look into a spoon, your reflection is flipped. Try hovering over
+                        the rays to see this.
+                    </p>
+                    <p>
+                        When the light hits a convex part of the mirror, it tends to spread out, and the rays don't flip. This is why convex mirrors
+                        and more boring than concave mirrors.
+                    </p>
+                </div>
+                <div id="reflection_dome" class="column sim-container"></div>
             </div>
-            <div id="bezier" class="one-half column"></div>
-        </div>
-        <div class="row">
-            <div class="one-half column">
-                <h3>Focusing Light</h3>
-                <p>
-                    Since curved mirrors focus light, you could use a half circle to focus a beam onto a point.
-                </p>
-                <p>
-                    But, as you can see to the right, not all of the light is focused. Most rays just bounce out of the circle entirely. The
-                    rays that do hit the focus don't focus into a point, but rather into a heart like shape (cardioid). This
-                    is more visible when the radius of the circle is smaller.
-                </p>
-                <p>
-                    The fact that a circle doesn't perfectly focus light is called
-                    <b>spherical aberration</b>. It can be minimized by only using the bottom part of the circle.
-                </p>
+            <div class="columns">
+                <div class="explanation column">
+                    <h3 class="title"> More curved mirrors </h3>
+                    <p>
+                        Here's another curved mirror to play with. This one's been modified to not be perfectly reflective.
+                    </p>
+                    <p>
+                        Instead, it only reflects
+                        <b id="percent-reflectance">50%</b> of the light that hits it. It lets another
+                        <b id="percent-transmission">10%</b> through, and the absorbs the other
+                        <b id="percent-absorbance">40%</b>. The absorbed light gets turned into heat, which can melt mirrors.
+                    </p>
+                    <p>
+                        Real mirrors tend to have reflectances within 80% - 99%.
+                    </p>
+                </div>
+                <div id="bezier" class="column sim-container"></div>
             </div>
-            <div id="reflection_dish" class="one-half column"></div>
-        </div>
-        <div class="row">
-            <div class="one-half column">
-                <h3>The Parabola</h3>
-                <p>
-                    The parabola is another choice for focusing light, and as you will see, it focuses light far better than the circle.
-                    <!--In fact, it can be mathematically
+
+            <div class="columns">
+                <div class="explanation column">
+                    <h3 class="title">Focusing Light</h3>
+                    <p>
+                        Since curved mirrors focus light, you could use a half circle to focus a beam onto a point.
+                    </p>
+                    <p>
+                        But, as you can see to the right, not all of the light is focused. Most rays just bounce out of the circle entirely. The
+                        rays that do hit the focus don't focus into a point, but rather into a heart like shape (cardioid).
+                        This is more visible when the radius of the circle is smaller.
+                    </p>
+                    <p>
+                        The fact that a circle doesn't perfectly focus light is called
+                        <b>spherical aberration</b>. It can be minimized by only using the bottom part of the circle.
+                    </p>
+                </div>
+                <div id="reflection_dish" class="column sim-container"></div>
+            </div>
+
+            <div class="columns">
+                <div class="explanation column">
+                    <h3 class="title">The Parabola</h3>
+                    <p>
+                        The parabola is another choice for focusing light, and as you will see, it focuses light far better than the circle.
+                        <!--In fact, it can be mathematically
                     proven that every light ray coming down vertically onto a parabola will all be reflected towards the
  same point, the parabola's focal point.-->
-                    <!-- <sup class="footnote" data-balloon="Here's a great video that proves that, if you want" data-balloon-length="medium" data-balloon-pos="up">
+                        <!-- <sup class="footnote" data-balloon="Here's a great video that proves that, if you want" data-balloon-length="medium" data-balloon-pos="up">
     <a href="https://www.youtube.com/watch?v=owVwjr6pTqc">[1]</a>
 </sup> -->
-                </p>
-                <p>
-                    You can see how the parabola focuses light by trying out the vertical beam (left). The light rays will all focus onto the
-                    parabolas focal point. You can change how far away that point is with the slider below.
-                </p>
-                <p>
-                    Then, try the cone lamp (right) and position it at the focal point. If you get it close enough, the lamp's rays should all
-                    be reflected to form a vertical beam.
-                </p>
-                <p>
-                    <!-- You can take that beam, and focus it back down with another parabola. You can try that below. I've limited the number of
+                    </p>
+                    <p>
+                        You can see how the parabola focuses light by trying out the vertical beam (left). The light rays will all focus onto the
+                        parabolas focal point. You can change how far away that point is with the slider below.
+                    </p>
+                    <p>
+                        Then, try the cone lamp (right) and position it at the focal point. If you get it close enough, the lamp's rays should all
+                        be reflected to form a vertical beam.
+                    </p>
+                    <p>
+                        <!-- You can take that beam, and focus it back down with another parabola. You can try that below. I've limited the number of
                     times each light ray can get reflected, just so things don't get to messy. -->
-                    Below, you can try using this property to focus light from one parabola onto another. I've limited the number of times each
-                    light ray can get reflected, just so things don't get to messy.
-                </p>
+                        Below, you can try using this property to focus light from one parabola onto another. I've limited the number of times each
+                        light ray can get reflected, just so things don't get to messy.
+                    </p>
+                </div>
+                <div id="reflection_parabola" class="column sim-container"></div>
             </div>
-            <div id="reflection_parabola" class="one-half column"></div>
-        </div>
-        <div class="row">
-            
-            <div class="one-half column">
-                <h3>Satellite Dishes</h3>
-                <p>
-                    The simulation above shows how satellite dishes work. Satellite dishes are 3D parabolas, which are called parabaloids.
-                </p>
-                <p>
-                    Every satellite dish has a rod that sticks out from it. 
-                    At the end of the rod is the transceiver. 
-                    It can emit and detect radio waves, which are a kind of light that we
-                    humans can't see naturally.
-                </p>
-                <p>
-                    The rod is used to position the transceiver at the parabola's focal point, so it can easily pick up all incoming light. 
-                    When two dishes are pointed at each other, any light from one of
-                    them will be focused into a beam that hits the other dish, where it gets focused onto the other's receiver.
-                </p>
-            </div>
-            <div class="one-half column" id="beaming_parabola"></div>    
-            <!-- <div class="one-half column">
+            <div class="columns">
+
+                <div class="explanation column">
+                    <h3 class="title">Satellite Dishes</h3>
+                    <p>
+                        The simulation above shows how satellite dishes work. Satellite dishes are 3D parabolas, which are called parabaloids.
+                    </p>
+                    <p>
+                        Every satellite dish has a rod that sticks out from it. At the end of the rod is the transceiver. It can emit and detect
+                        radio waves, which are a kind of light that we humans can't see naturally.
+                    </p>
+                    <p>
+                        The rod is used to position the transceiver at the parabola's focal point, so it can easily pick up all incoming light. When
+                        two dishes are pointed at each other, any light from one of them will be focused into a beam that
+                        hits the other dish, where it gets focused onto the other's receiver.
+                    </p>
+                </div>
+                <div class="column sim-container" id="beaming_parabola"></div>
+                <!-- <div class="one-half column">
                 <img src="dish.jpg">
             </div> -->
-        </div>
-        <div class="row">
-            <div class="one-half column">
-                <h3>Circles!</h3>
-                <p>
-                    Now you can try playing around with light rays inside a circular mirror. It makes pretty patterns.
-                </p>
-                <p>
-                    In reality, the rays would keep bouncing, but to keep your computer happy, these ones can only bounce 10 times.
-                </p>
             </div>
-            <div id="reflection_circle" class="one-half column"></div>
-        </div>
+            <div class="columns">
+                <div class="explanation column">
+                    <h3 class="title">Circles!</h3>
+                    <p>
+                        Now you can try playing around with light rays inside a circular mirror. It makes pretty patterns.
+                    </p>
+                    <p>
+                        In reality, the rays would keep bouncing, but to keep your computer happy, these ones can only bounce 10 times.
+                    </p>
+                    <p>
+                        Once you're done, you can move onto <a href="refraction.html">refraction!</a>
+                    </p>
+                </div>
+                <div id="reflection_circle" class="column sim-container"></div>
+            </div>
+        </section>
+
+
+
+
+
+
+
     </div>
 
     <script src="https://d3js.org/d3.v5.min.js"></script>

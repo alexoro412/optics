@@ -21,7 +21,7 @@ p:first-child {
     /* stroke-opacity: 1 !important; */
 }
 
-p:not(:first-child) {
+.explanation > p:not(:first-child) {
     text-indent: 3em;
 }
 
@@ -146,36 +146,15 @@ svg.sim.color {
     fill: none;
 }
 
-blockquote {
+/* blockquote {
     background-color: rgb(235, 235, 235);
     padding: 10px;
     border: 1px solid black;
-}
+} */
 
-blockquote>h6 {
+/* blockquote>h6 {
     text-align: center;
-}
-
-.container > .navbar {
-    background-color: rgba(211,211,211,0.4);
-    border: 1px solid black;
-    border-top: none;
-}
-
-.row.navbar {
-    padding-top: 0;
-    padding-bottom: 0;
-}
-
-.row.navbar > div {
-    padding-top: 0.5em;
-    text-align: center;
-}
-
-.row.navbar > div:first-child {
-    padding-left: 0.6em;
-    height: 100%;
-}
+} */
 
 .container > div:not(:first-child) {
     background-color: rgba(238, 238, 238, 0.4);
@@ -185,23 +164,16 @@ blockquote>h6 {
     /* box-shadow: 0px 0px 3px 5px rgba(0,0,0,0.3); */
 }
 
-h5.navbar{
-    line-height: 2.5;
-    padding: 0.7em;
-    vertical-align: 50%;
-
-    margin-bottom: 0;
+.section > .columns {
+    margin-top: 2em;
 }
 
-h2.navbar {
-    line-height: 1.6;
+.navbar-brand > .title {
+    line-height: 1.5;
+    padding-right: 0.4em;
+    padding-left: 0.1em;
 }
 
-a.navbar {
-    color: black;
-    text-decoration: none;
-}
-
-a.navbar:hover {
-    background-color: rgba(211,211,211,0.4);
+.sim-container {
+    text-align: center;
 }

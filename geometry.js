@@ -1094,7 +1094,7 @@ class Parabola {
 
         this.x[1] = (4 / 3) * (((2 * this.h - this.w) / 2) - (this.h - this.w)) + (this.h - this.w);
         this.y[1] = this.g(this.x[1]);
-        console.log("g(x1)", this.x[1], this.g(this.x[1]));
+        // console.log("g(x1)", this.x[1], this.g(this.x[1]));
 
         this.x[2] = 2 * this.h - this.x[1];
         this.y[2] = this.y[1];
@@ -1109,7 +1109,7 @@ class Parabola {
     }
 
     shape(){
-        console.log(this.x, this.y);
+        // console.log(this.x, this.y);
         return new Bezier(
             this.x[0], this.y[0],
             this.x[1], this.y[1],
