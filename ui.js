@@ -147,7 +147,8 @@ default_beam = {
     y2: 100,
     num_rays: 10,
     width: 20,
-    strength: 0.5
+    strength: 0.5,
+    second_handle: true
 }
 
 class Beam {
@@ -166,25 +167,31 @@ class Beam {
 
 
             if (typeof this.angle != "number") {
-                this.handle2 = new Point(opts.ui);
-                this.handle2.x = this.x2;
-                this.handle2.y = this.y2;
-
                 this.handle1.callback = (function (x, y) {
                     this.x1 = x;
                     this.y1 = y;
                     this.updateRays();
                     this.drawRays();
+                    if(this.ui.callback != null){
+                        this.ui.callback(x,y);
+                    }
                 }).bind(this);
 
-                this.handle2.callback = (function (x, y) {
-                    this.x2 = x;
-                    this.y2 = y;
-                    this.updateRays();
-                    this.drawRays();
-                }).bind(this);
+                if(this.second_handle){
+                    this.handle2 = new Point(opts.ui);
+                    this.handle2.x = this.x2;
+                    this.handle2.y = this.y2;
 
-                this.handles = [this.handle1, this.handle2]
+                    this.handle2.callback = (function (x, y) {
+                        this.x2 = x;
+                        this.y2 = y;
+                        this.updateRays();
+                        this.drawRays();
+                    }).bind(this);
+                    this.handles = [this.handle1, this.handle2]
+                }else {
+                    this.handles = [this.handle1]
+                }                    
             } else {
                 this.x2 = this.x1 + 10 * Math.cos(this.angle);
                 this.y2 = this.y1 + 10 * Math.sin(this.angle);

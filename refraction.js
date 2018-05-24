@@ -61,8 +61,7 @@
         num_rays: 10,
         width: 20,
         strength: 0.8,
-        ui: {},
-        max_bounce: 2
+        ui: {}
     })
 
     sim.add_light(beam);

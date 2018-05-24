@@ -35,20 +35,39 @@
                         (IOR).
                     </p>
                     <p>
-                        This slowing down causes light to bend, or refract, at the surface of the material. The angle at which light bends can be
-                        found using Snell's law.
+                        This slowing down causes light to bend, or refract, at the surface of the material. 
+                        The angles for refraction can be calculated with Snell's Law.
                     </p>
-                    <br/>
                     <blockquote class="notification">
                         <h3 class="subtitle has-text-centered">Snell's Law</h3>
-                        <p>When passing from one material to another, the angle at which light refracts (θ
-                            <sub>r</sub>) can be found with this equation:</p>
+                        <p>
+                            n<sub>1</sub> and n<sub>2</sub> are the indices of refraction for the two materials. 
+                            θ<sub>i</sub> is the angle of incidence, and θ<sub>r</sub> is the angle of refraction. 
+                            <!-- The following equation can be used to calculate θ<sub>r</sub> -->
+                        </p>
                         <h6 class="subtitle has-text-centered">
                             <pre>n<sub>1</sub>sin(θ<sub>i</sub>) = n<sub>2</sub>sin(θ<sub>r</sub>)</pre>
                         </h6>
                     </blockquote>
+                    <p>
+                        Additionally, a small amount of light is also reflected. This is called <b>partial reflection</b>, and it's strength is determined by the
+                        <a href="https://en.wikipedia.org/wiki/Fresnel_equations#Power_(intensity)_reflection_and_transmission_coefficients">Fresnel equations.</a>
+                        They are rather complicated, 
+                        so just know that there is more partial reflection when light hits a material with a high IOR at a shallow angle. 
+                        This is why when you look straight down at the ocean, it appears clear, but from a shallow angle, it appears reflective.
+                    </p>
+                    <p>
+                        Snell's law does not always give an answer. For example, when light starts in a material with a higher IOR than the surroundings, 
+                        and hits the surface at a shallow enough angle, Snell's law provides no answer. 
+                        In that case, all of the light is reflected. This is called <b>total internal reflection.</b>
+                    </p>
+                    <p>
+
+                    </p>
+                    <br/>
+
                 </div>
-                <div class="column sim-container" id="ior">
+                <div class="column sim-container" id="refraction_flat">
                 </div>
             </div>
             <div class="columns">
@@ -59,31 +78,29 @@
             </div>
             <div class="columns">
                 <div class="explanation column">
-                    <h3 class="title">Alternate Lens</h3>
+                    <h3 class="title">Alternate Lenses</h3>
+                    <h3 class="subtitle">Refraction</h3>
                 </div>
                 <div class="column" id="focus_lens"></div>
             </div>
             <div class="columns">
                 <div class="explanation column">
-                    <h3 class="title">Reflection and Refraction</h3>
+                    <h3 class="title">Partial Reflection</h3>
+                    <h3 class="subtitle">One way glass</h3>
                 </div>
                 <div class="column"></div>
             </div>
             <div class="columns">
                 <div class="explanation column">
-                    <h3 class="title">Fiber Optics</h3>
+                    <h3 class="title">Total Internal Reflection</h3>
+                    <h3 class="subtitle">Fiber Optics</h3>
                 </div>
                 <div class="column"></div>
             </div>
+            
             <div class="columns">
                 <div class="explanation column">
-                    <h3 class="title">One Way Glass</h3>
-                </div>
-                <div class="column"></div>
-            </div>
-            <div class="columns">
-                <div class="explanation column">
-                    <h3 class="title">Playground</h3>
+                    <h3 class="title">Playground (maybe)</h3>
                 </div>
                 <div class="column sim-container" id="refraction_test"></div>
             </div>
@@ -97,6 +114,7 @@
     <script src="ior.js"></script>
     <script src="focus_lens.js"></script>
     <script src="refraction.js"></script>
+    <script src="refraction_flat.js"></script>
 </body>
 
 </html>

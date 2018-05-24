@@ -117,12 +117,10 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
             let refraction;
             let next_ior;
             if (ior == intersections[0].opts.ior) {
-                // Probably return to vacuum
-                // TODO check for interfaces between two non-vacuum materials
                 if (intersections.length > 1 && close_enough(0, distance(intersections[0].x, intersections[0].y, intersections[1].x, intersections[1].y))) {
                     // Interface between two materials, leaving refractive
-                    // console.log("ran", intersections[0].opts.ior, intersections[1].opts.ior);
                     if (intersections[1].opts.reflective) {
+                        // TODO, does this part work?
                         // reflective surface on refractive one
                         phi = reflect(ray.angle(), intersections[1].n)
                         let reflected_ray = new Line(intersections[1].x, intersections[1].y, 0, 0, false);
@@ -976,7 +974,8 @@ class Space {
 }
 
 function dragstarted(d) {
-    d3.select(this).raise().classed("active", true);
+    d3.select(this).raise()
+    // .classed("active", true);
 }
 
 function dragged(d, w, h) {
@@ -986,7 +985,8 @@ function dragged(d, w, h) {
 }
 
 function dragended(d) {
-    d3.select(this).classed("active", false);
+    d3.select(this)
+    // .classed("active", false);
 }
 
 class Bezier {

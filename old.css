@@ -52,7 +52,7 @@ svg.sim.color {
 
 .mirror {
     stroke: gray;
-    stroke-width: 1;
+    stroke-width: 0.5;
     stroke-linecap: round;
 }
 
@@ -145,7 +145,7 @@ svg.sim.color {
     stroke: black;
     fill-opacity: 0.6;
     stroke-opacity: 1;
-    stroke-width: 1px;
+    stroke-width: 0.5px;
     transition: stroke-width 0.3s;
 }
 
@@ -154,11 +154,11 @@ svg.sim.color {
     transition: stroke-width 0.3s;
 }
 
-.handle:active {
-    /* fill-opacity: 1; */
+/* .handle:active {
+    fill-opacity: 0.1 !important;
     stroke-width: 2px;
     transition: stroke-width 0.3s;
-}
+} */
 
 .arc {
     stroke: black;
