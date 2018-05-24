@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <title>Optics</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="bulma.min.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="old.css" />
 </head>
@@ -24,25 +24,27 @@
 
             </div>
         </nav>
-        <section class="section">
+    </div>
+    <section class="section">
+        <div class="container">
             <div class="columns">
                 <div class="explanation column">
                     <h3 class="title">Reflection</h3>
                     <p>When light hits a mirror, it reflects out at the same angle that it hit the mirror at. This angle is
                         measured off of the normal vector, which is perpendicular to the surface of the mirror. Try moving
                         the light ray to the right to see reflection in action. </p>
-                        <br/>
+                    <br/>
                     <blockquote class="notification">
                         <h6 class="has-text-centered subtitle">Law of Reflection</h6>
 
-                        The angle with which light hits the mirror 
-                        (θ<sub>i</sub>) is the same as the angle it reflects out at 
-                        (θ<sub>r</sub>).
+                        The angle with which light hits the mirror (θ
+                        <sub>i</sub>) is the same as the angle it reflects out at (θ
+                        <sub>r</sub>).
 
                         <br/>
                         <br/>
-<h6 class="subtitle has-text-centered">
-    <pre>θ<sub>i</sub> = θ<sub>r</sub></pre>
+                        <h6 class="subtitle has-text-centered">
+                            <pre>θ<sub>i</sub> = θ<sub>r</sub></pre>
                         </h6>
 
                     </blockquote>
@@ -167,20 +169,14 @@
                         In reality, the rays would keep bouncing, but to keep your computer happy, these ones can only bounce 10 times.
                     </p>
                     <p>
-                        Once you're done, you can move onto <a href="refraction.html">refraction!</a>
+                        Once you're done, you can move onto
+                        <a href="refraction.html">refraction!</a>
                     </p>
                 </div>
                 <div id="reflection_circle" class="column sim-container"></div>
             </div>
-        </section>
-
-
-
-
-
-
-
-    </div>
+        </div>
+    </section>
 
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>

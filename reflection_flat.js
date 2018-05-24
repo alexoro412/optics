@@ -97,6 +97,12 @@
         .attr("font-size", "10")
         .text("r");
 
+    svg.append("path")
+        .attrs({
+            d: "M 0 0 L 0 350 L 400 350 L 400 0 L 0 0",
+            class: "border"
+        })
+
     let angle_text = svg.append("text")
         .attrs({
             x: coords.x3 - 40,

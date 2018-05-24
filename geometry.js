@@ -689,13 +689,17 @@ class Space {
 
     add_borders() {
         return this.add_thins([
-            new Line(-this.w, -this.h, 2 * this.w, -this.h),
-            new Line(2 * this.w, -this.h, 2 * this.w, 2 * this.h),
-            new Line(2 * this.w, 2 * this.h, -this.w, 2 * this.h),
-            new Line(-this.w, 2 * this.h, -this.w, -this.h)
+            // new Line(-this.w, -this.h, 2 * this.w, -this.h),
+            // new Line(2 * this.w, -this.h, 2 * this.w, 2 * this.h),
+            // new Line(2 * this.w, 2 * this.h, -this.w, 2 * this.h),
+            // new Line(-this.w, 2 * this.h, -this.w, -this.h)
+            new Line(0,0,this.w,0),
+            new Line(this.w,0,this.w,this.h),
+            new Line(this.w,this.h,0,this.h),
+            new Line(0,this.h,0,0)
         ], {
             reflective: false,
-            style: ""
+            style: "border"
         })
     }
 
@@ -1128,7 +1132,9 @@ class Sim {
             .attrs({
                 class: "sim",
                 height: h,
-                width: w
+                viewBox: `0 0 ${w} ${h}`,
+                width: w,
+                
             })
 
         this.ui_elems = {}
