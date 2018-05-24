@@ -62,33 +62,116 @@
                         In that case, all of the light is reflected. This is called <b>total internal reflection.</b>
                     </p>
                     <p>
+                        We'll look into each of these phenomena separately below.
+                    </p>
+                    <p>
 
                     </p>
                     <br/>
 
                 </div>
-                <div class="column sim-container" id="refraction_flat">
+                <div class="column sim-container">
+                    <div id="refraction_flat"></div>
+                    <table align="center" class="table is-bordered">
+                        <thead>
+                            <tr style="background-color:rgba(211,211,211,0.4)">
+                                <td colspan="2">
+                                    <b>Some Common Indices of Refraction</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>Material </b></td>
+                                <td><b>IOR</b></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Vacuum</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td>Air</td>
+                                <td>1.0003</td>
+                            </tr>
+                            <tr>
+                                <td>Water</td>
+                                <td>1.333</td>
+                            </tr>
+                            <tr>
+                                <td>Glass</td>
+                                <td>~1.5</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <div class="columns">
                 <div class="explanation column">
-                    <h3 class="title">Focusing Light, Part 2</h3>
+                    <h3 class="title">Refraction</h3>
+                    <h3 class="subtitle">Focusing Light, Part 2</h3>
+                    <p>
+                        To the right is a lens made out of two arcs of a circle. 
+                        A horizontal beam entering this lens gets refracted at each surface, 
+                        and focused onto a point. You'll notice that if the beam doesn't hit the center of the lens, 
+                        it is not focused as well. This is called <b>spherical aberration</b>
+                    </p>
+                    <p>
+                        By changing the thickness, height, and IOR of the lens, you can change where the focal point is.
+                        If you then take the cone lamp, and place it at the focal point, it will be focused into a horizontal beam.
+                        This is how the lens in a laser point creates a beam.
+                        
+                    </p>
+                    <p>
+                        This also shows a magnifying glass can be used to light things on fire. 
+                        Simply focus the light from the sun onto the surface of the object,
+                        and it will absorb the light as heat and catch fire.
+                    </p>
                 </div>
                 <div class="column sim-container" id="focus_lens"></div>
             </div>
-            <div class="columns">
+            <!-- <div class="columns">
                 <div class="explanation column">
                     <h3 class="title">Alternate Lenses</h3>
                     <h3 class="subtitle">Refraction</h3>
                 </div>
-                <div class="column" id="focus_lens"></div>
-            </div>
+                <div class="column sim-container" id="alt_lens"></div>
+            </div> -->
             <div class="columns">
                 <div class="explanation column">
                     <h3 class="title">Partial Reflection</h3>
                     <h3 class="subtitle">One way glass</h3>
+                    <p>
+                        All glass is one way glass, to some degree.
+                        In order to have one way glass, you just need 
+                        one side to be very bright, and the other very dark. 
+                        On the bright side, 
+                        the partial reflection from the bright light 
+                        will outshine any light transmitted through the glass 
+                        from the dark side, making that side look metallic.
+                        One the dark side, the bright light transmitted through 
+                        the glass will outshine the partial reflection 
+                        from the dark light.
+                         
+                        You can try this to the right, and see that the brighter 
+                        light tends to be more visible on both sides of the glass.
+                    </p>
+                    <p>
+                        For actual one way glass, like in interrogation rooms,
+                        they often boost the partial reflection 
+                        of the glass by either coating it with a thin layer of metal, or encasing 
+                        the metal inside the glass (as shown to the right). 
+                        This metal is so thin that it's translucent, but still quite reflective, 
+                        which helps reflect the light from the bright side.
+                        
+                    </p>
+                    <p>
+                        Of course, if you're ever stuck in an interrogation room,
+                        and need to see through the one way glass, 
+                        you could put your eyes right up on the glass, and cup 
+                        your hands around them for a bit of shade. 
+                    </p>
                 </div>
-                <div class="column"></div>
+                <div class="column sim-container" id="oneway"></div>
             </div>
             <div class="columns">
                 <div class="explanation column">
@@ -115,6 +198,8 @@
     <script src="focus_lens.js"></script>
     <script src="refraction.js"></script>
     <script src="refraction_flat.js"></script>
+    <!-- <script src="alt_lens.js"></script> -->
+    <script src="oneway.js"></script>
 </body>
 
 </html>

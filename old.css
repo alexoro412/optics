@@ -6,7 +6,7 @@ svg.sim {
     background-color:rgb(255, 255, 255);
 }
 
-svg.sim {
+svg.sim, .sim-container > .table {
     width:100%;
     max-width:400px;
 }

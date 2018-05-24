@@ -296,12 +296,12 @@ class Beam {
 }
 
 let default_lamp = {
-    color: "",
     strength: 0.5,
     x: 100,
     y: 100,
     num_rays: 20,
-    radius: 10
+    radius: 10,
+    ray_style: "ray"
 }
 
 class PointLamp {
@@ -386,7 +386,7 @@ class PointLamp {
             y2: function (d) {
                 return d.y2;
             },
-            class: "ray",
+            class: this.ray_style,
             "stroke-opacity": function (d) {
                 return +precisionRound(d.strength, 3);
             }
@@ -413,7 +413,8 @@ default_conelamp = {
     radius: 10,
     fixed: false,
     handle_gap: 30,
-    max_bounce: 10
+    max_bounce: 10,
+    ray_style: "ray"
 }
 
 class ConeLamp {
@@ -521,7 +522,7 @@ class ConeLamp {
             y2: function (d) {
                 return d.y2;
             },
-            class: "ray",
+            class: this.ray_style,
             "stroke-opacity": function (d) {
                 return +precisionRound(d.strength, 3);
             }

@@ -109,7 +109,7 @@
     let rect1 = sim.add_rect(0,0,w,h/2 - y_shift, {
         refractive: true,
         ior: 1.5,
-        style: "solid glass"
+        style: "hollow glass"
     });
 
     let rect2 = sim.add_rect(0,h/2 - y_shift,w,h/2 + y_shift, {
@@ -187,7 +187,6 @@
     sim.add_ui(slider1);
     sim.add_ui(slider2);
 
-    console.log(beam);
 
     function updateAngles(){
         let rays = beam.rays[0];
@@ -203,7 +202,6 @@
 
         theta1_text.text(Math.abs(90 - thetai * 180 / Math.PI).toFixed(1));
         theta2_text.text(Math.abs(90 - thetar * 180 / Math.PI).toFixed(1));
-        console.log(thetar);
 
         if(rays[0].x1 < w/2) {
             thetai_text.attr("x", w / 2 - angle_radius / 2)
