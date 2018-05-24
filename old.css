@@ -6,7 +6,9 @@ svg.sim {
 }
 
 div.row {
-    padding-top: 5em;
+    /* padding-top: 5em; */
+    padding-top:1em; 
+    padding-bottom: 1em;
 }
 
 p:first-child {
@@ -147,8 +149,59 @@ svg.sim.color {
 blockquote {
     background-color: rgb(235, 235, 235);
     padding: 10px;
+    border: 1px solid black;
 }
 
 blockquote>h6 {
     text-align: center;
+}
+
+.container > .navbar {
+    background-color: rgba(211,211,211,0.4);
+    border: 1px solid black;
+    border-top: none;
+}
+
+.row.navbar {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.row.navbar > div {
+    padding-top: 0.5em;
+    text-align: center;
+}
+
+.row.navbar > div:first-child {
+    padding-left: 0.6em;
+    height: 100%;
+}
+
+.container > div:not(:first-child) {
+    background-color: rgba(238, 238, 238, 0.4);
+    padding-left: 1em;
+    border: 1px solid black;
+    margin-top: 3em;
+    /* box-shadow: 0px 0px 3px 5px rgba(0,0,0,0.3); */
+}
+
+h5.navbar{
+    line-height: 2.5;
+    padding: 0.7em;
+    vertical-align: 50%;
+
+    margin-bottom: 0;
+}
+
+h2.navbar {
+    line-height: 1.6;
+}
+
+a.navbar {
+    color: black;
+    text-decoration: none;
+}
+
+a.navbar:hover {
+    background-color: rgba(211,211,211,0.4);
 }

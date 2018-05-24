@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Optics</title>
+
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="normalize.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="skeleton.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="old.css" />
+</head>
+
+<body>
+    <div class="container">
+<h3>
+    <a href="reflection.html">Reflection</a>
+</h3>
+        <div class="row">
+            <div class="one-half column" style="margin-top: 10%">
+                <h3>Reflection</h3>
+                <p>When light hits a mirror, it reflects out at the same angle that it hit the mirror at. Try moving the light
+                    ray to see this --> </p>
+
+                <blockquote>
+                    <h5>Law of Reflection</h5>
+
+                    The angle with which light hits the mirror (θ
+                    <sub>i</sub>) is the same as the angle it reflects out at (θ
+                    <sub>r</sub>).
+
+                    <br/>
+                    <br/>
+                    <h6> θ
+                        <sub>i</sub> = θ
+                        <sub>r</sub>
+                    </h6>
+
+                </blockquote>
+                <p>
+                    Next:
+                    <ul>
+                        <li>Reflection on a curved surface (dome)</li>
+                        <li>Reflection on concave mirrors (different options)</li>
+                    </ul>
+
+                </p>
+            </div>
+            <div id="reflection_flat" class="one-half column" style="margin-top: 10%;"></div>
+        </div>
+        <div class="row">
+            <div class="one-half column">
+                <p>
+                    Reflection on a curved surface
+                </p>
+            </div>
+            <div id="reflection_dome" class="one-half column"></div>
+        </div>
+        <div class="row">
+            <div class="one-half column">
+                <p>
+                    Reflection on a half sphere
+                </p>
+            </div>
+            <div id="reflection_dish" class="one-half column"></div>
+        </div>
+        <div class="row">
+            <div class="one-half column">
+                <p>
+                    Reflection in a circle
+                </p>
+            </div>
+            <div id="reflection_circle" class="one-half column"></div>
+        </div>
+        <div class="row">
+            <div class="one-half column">
+                <p>
+                    Reflection on a parabola
+                </p>
+            </div>
+            <div id="reflection_parabola" class="one-half column"></div>
+        </div>
+        <div class="row">
+            <div class="one-half column">
+                <p>
+                    Refraction and total internal reflection
+                </p>
+            </div>
+            <div id="refraction_test" class="one-half column"></div>
+        </div>
+        <div class="row">
+            <div class="one-half column">
+                <p>
+                    Variable IOR
+                </p>
+            </div>
+            <div id="ior" class="one-half column"></div>
+        </div>
+        <div class="row">
+            <div class="one-half column">
+                <p>
+                    Focusing Lens
+                </p>
+            </div>
+            <div id="focus_lens" class="one-half column"></div>
+        </div>
+        <div class="row">
+            <div class="one-half column">
+                <p>
+                     Bezier Curve Mirror
+                </p>
+            </div>
+            <div id="bezier" class="one-half column"></div>
+        </div>
+    </div>
+
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+    <script src="geometry.js"></script>
+    <script src="ui.js"></script>
+    <script src="reflection_flat.js"></script>
+    <script src="reflection_dome.js"></script>
+    <script src="reflection_dish.js"></script>
+    <script src="reflection_circle.js"></script>
+    <script src="parabola.js"></script>
+    <script src="refraction.js"></script>
+    <script src="ior.js"></script>
+    <script src="focus_lens.js"></script>
+    <script src="bezier.js"></script>
+</body>
+
+</html>

@@ -1073,6 +1073,52 @@ function make_sim(id, h, w) {
         })
 }
 
+class Parabola {
+    constructor(h,k,a,w){
+        this.x = [];
+        this.y = [];
+        this.a = a;
+        this.h = h;
+        this.k = k;
+        this.w = w;
+
+        this.recalc();
+    }
+
+    recalc(){
+        this.x[0] = this.h - this.w;
+        this.y[0] = this.f(this.x[0]);
+
+        this.x[3] = this.h + this.w;
+        this.y[3] = this.f(this.x[3]);
+
+        this.x[1] = (4 / 3) * (((2 * this.h - this.w) / 2) - (this.h - this.w)) + (this.h - this.w);
+        this.y[1] = this.g(this.x[1]);
+        console.log("g(x1)", this.x[1], this.g(this.x[1]));
+
+        this.x[2] = 2 * this.h - this.x[1];
+        this.y[2] = this.y[1];
+    }
+
+    f(x){
+        return this.a * (x-this.h)*(x-this.h) + this.k;
+    }
+
+    g(x){
+        return 2 * this.a * (this.x[0] - this.h) * (x - this.x[0]) + this.y[0]
+    }
+
+    shape(){
+        console.log(this.x, this.y);
+        return new Bezier(
+            this.x[0], this.y[0],
+            this.x[1], this.y[1],
+            this.x[2], this.y[2],
+            this.x[3], this.y[3]
+        )
+    }
+}
+
 class Sim {
     constructor(div_id, h = 350, w = 400) {
         this.lights = {};
@@ -1093,6 +1139,7 @@ class Sim {
         this.ray_group.attr("class", "ray-group");
 
         this.space = new Space();
+        this.space.setBounds(w, h);
 
         this.add_borders();
 
