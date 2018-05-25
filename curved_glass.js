@@ -42,8 +42,8 @@
     sim.add_light(beam);
 
     let slider = new Slider({
-        x: 10,
-        y: 320,
+        x: 20,
+        y: 315,
         length: 120,
         angle: 0,
         style: "slider",
@@ -67,8 +67,8 @@
     sim.add_ui(slider);
 
     let ior_slider = new Slider({
-        x: 270,
-        y: 320,
+        x: 260,
+        y: 315,
         length: 120,
         angle: 0,
         style: "slider",
