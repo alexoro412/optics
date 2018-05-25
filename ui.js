@@ -438,20 +438,32 @@ class ConeLamp {
                 this.handles = [this.handle1]
             } else {
                 this.handle2 = new Point(opts.ui);
+                
+                this.handle2.min_x = this.handle2.min_x - this.handle_gap;
+                this.handle2.max_x = this.handle2.max_x + this.handle_gap;
+                this.handle2.min_y = this.handle2.min_y - this.handle_gap;
+                this.handle2.max_y = this.handle2.max_y + this.handle_gap;
+
                 this.handle2.x = this.x + this.handle_gap * Math.cos(this.angle);
                 this.handle2.y = this.y + this.handle_gap * Math.sin(this.angle);
 
                 this.handle1.callback = (function (x, y) {
-                    this.handle2.x = x + this.handle_gap * Math.cos(this.angle);
-                    this.handle2.y = y + this.handle_gap * Math.sin(this.angle);
+                    // this.handle2.x = x + this.handle_gap * Math.cos(this.angle);
+                    // this.handle2.y = y + this.handle_gap * Math.sin(this.angle);
                     this.handle2.move(x + this.handle_gap * Math.cos(this.angle), y + this.handle_gap * Math.sin(this.angle))
                     this.move(x, y);
+                    if(this.callback != undefined) {
+                        this.callback(1,this.handle1.x,this.handle1.y);
+                    }
                 }).bind(this);
 
                 this.handle2.callback = (function (x, y) {
                     this.angle = Math.atan2(y - this.y, x - this.x)
                     this.handle2.move(this.x + this.handle_gap * Math.cos(this.angle), this.y + this.handle_gap * Math.sin(this.angle));
                     this.move(this.x, this.y);
+                    if(this.callback != undefined){
+                        this.callback(2,this.handle2.x,this.handle2.y);
+                    }
                 }).bind(this)
 
                 this.handles = [this.handle1, this.handle2]
@@ -462,6 +474,7 @@ class ConeLamp {
     move(x, y) {
         this.x = x;
         this.y = y;
+        // this.angle = Math.atan2(this.handle2.y - this.y, this.handle2.x - this.x)
         this.updateRays();
         this.drawRays();
     }
