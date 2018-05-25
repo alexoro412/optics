@@ -48,7 +48,7 @@ function merge(o, defaults) {
 const max_bounce = 10;
 
 function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
-    if (bounce == 0 || strength < 0.05) return [];
+    if (bounce == 0 || strength < 0.01) return [];
 
     if (ior == 0) {
         // console.log("getting ior")

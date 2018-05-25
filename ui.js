@@ -148,7 +148,8 @@ default_beam = {
     num_rays: 10,
     width: 20,
     strength: 0.5,
-    second_handle: true
+    second_handle: true,
+    max_bounce: 10
 }
 
 class Beam {
@@ -222,7 +223,7 @@ class Beam {
                 this.y1 - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle),
                 this.x2 + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
                 this.y2 - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle)
-            ), this.space.get_geometry(), max_bounce, 0, this.strength));
+            ), this.space.get_geometry(), this.max_bounce, 0, this.strength));
         }
 
     }

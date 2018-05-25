@@ -29,7 +29,7 @@
 
     let red_lamp = new ConeLamp({
         x: 70, y: 20, strength: 1,
-        num_rays: 30,
+        num_rays: 20,
         angle: Math.PI/3,
         ray_style: "ray",
         ui: {}
@@ -59,7 +59,7 @@
         y: 20,
         strength: 0.07,
         angle: 2 * Math.PI / 3,
-        num_rays: 30,
+        num_rays: 20,
         ray_style: "blue ray",
         ui: {}
     })

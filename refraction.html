@@ -42,7 +42,7 @@
                         <h3 class="subtitle has-text-centered">Snell's Law</h3>
                         <p>
                             n<sub>1</sub> and n<sub>2</sub> are the indices of refraction for the two materials. 
-                            θ<sub>i</sub> is the angle of incidence, and θ<sub>r</sub> is the angle of refraction. 
+                            θ<sub>i</sub> is the angle of incidence, and θ<sub>r</sub> is the angle of refraction. (see diagram)
                             <!-- The following equation can be used to calculate θ<sub>r</sub> -->
                         </p>
                         <h6 class="subtitle has-text-centered">
@@ -57,9 +57,9 @@
                         This is why when you look straight down at the ocean, it appears clear, but from a shallow angle, it appears reflective.
                     </p>
                     <p>
-                        Snell's law does not always give an answer. For example, when light starts in a material with a higher IOR than the surroundings, 
+                        Snell's law does not always give an answer. For example, when light starts in a material with a higher IOR than its surroundings, 
                         and hits the surface at a shallow enough angle, Snell's law provides no answer. 
-                        In that case, all of the light is reflected. This is called <b>total internal reflection.</b>
+                        When that happens, all of the light is reflected, which is called <b>total internal reflection.</b>
                     </p>
                     <p>
                         We'll look into each of these phenomena separately below.
@@ -114,12 +114,15 @@
                         To the right is a lens made out of two arcs of a circle. 
                         A horizontal beam entering this lens gets refracted at each surface, 
                         and focused onto a point. You'll notice that if the beam doesn't hit the center of the lens, 
-                        it is not focused as well. This is called <b>spherical aberration</b>
+                        it is not focused very well. This is called <b>spherical aberration.</b> Unfortunately, 
+                        the parabola cannot save us from this aberration like it did with mirrors. 
+                        When spherical aberration needs to be eliminated, people will often turn 
+                        to a more complicated lens, like a <a href="https://en.wikipedia.org/wiki/Fresnel_lens">Fresnel lens</a>
                     </p>
                     <p>
                         By changing the thickness, height, and IOR of the lens, you can change where the focal point is.
                         If you then take the cone lamp, and place it at the focal point, it will be focused into a horizontal beam.
-                        This is how the lens in a laser point creates a beam.
+                        This is how the lens in a laser point creates a tight beam.
                         
                     </p>
                     <p>
@@ -130,13 +133,32 @@
                 </div>
                 <div class="column sim-container" id="focus_lens"></div>
             </div>
-            <!-- <div class="columns">
+            <div class="columns">
                 <div class="explanation column">
-                    <h3 class="title">Alternate Lenses</h3>
-                    <h3 class="subtitle">Refraction</h3>
+                    <h3 class="title">Refraction</h3>
+                    <h3 class="subtitle">Planetary Shadows</h3>
+                    <p>
+                        To the right is a very simplified model of a moon (below), and a planet like Earth (above).
+                        The atmosphere has a slightly higher 
+                        refractive index than the vacuum around it. This causes 
+                        it to bend the light that hits the atmosphere but misses the planet.
+                    </p>
+                    <p>
+                        This refraction causes two phenomena. First, you can see the 
+                        sun before it is rises. This is because some of the light rays 
+                        coming from the sun get bent around the planet, and hit your eyes before 
+                        the sun is really there.
+                    </p>
+                    <p>
+                        The other phenomena is the shape of Earth's shadow. 
+                        For most objects, like the moon, their shadows get larger as they get farther away.
+                        But by bending the light, the darkest part of Earth's shadow (the umbra) actually gets smaller.
+                        The area where the bent light travels, instead of being a full shadow,
+                        is now only a partial shadow (the penumbra).
+                    </p>
                 </div>
-                <div class="column sim-container" id="alt_lens"></div>
-            </div> -->
+                <div class="column sim-container" id="planet_shadows"></div>
+            </div>
             <div class="columns">
                 <div class="explanation column">
                     <h3 class="title">Partial Reflection</h3>
@@ -149,7 +171,7 @@
                         the partial reflection from the bright light 
                         will outshine any light transmitted through the glass 
                         from the dark side, making that side look metallic.
-                        One the dark side, the bright light transmitted through 
+                        On the dark side, the bright light transmitted through 
                         the glass will outshine the partial reflection 
                         from the dark light.
                          
@@ -162,13 +184,12 @@
                         of the glass by either coating it with a thin layer of metal, or encasing 
                         the metal inside the glass (as shown to the right). 
                         This metal is so thin that it's translucent, but still quite reflective, 
-                        which helps reflect the light from the bright side.
-                        
+                        which helps to reflect the light from the bright side.
                     </p>
                     <p>
                         Of course, if you're ever stuck in an interrogation room,
                         and need to see through the one way glass, 
-                        you could put your eyes right up on the glass, and cup 
+                        you could try to put your eyes right up on the glass, and cup 
                         your hands around them for a bit of shade. 
                     </p>
                 </div>
@@ -208,6 +229,7 @@
     <script src="refraction_flat.js"></script>
     <!-- <script src="alt_lens.js"></script> -->
     <script src="oneway.js"></script>
+    <script src="planet_shadows.js"></script>
 </body>
 
 </html>

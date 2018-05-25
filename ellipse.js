@@ -4,12 +4,16 @@
 
     let sim = new Sim("#ellipse", h, w);
 
+    // sim.svg.attrs({
+    //     "id": "ellipse"
+    // })
+
     let e = new Ellipse(50,25,300,400);
 
-    sim.add_thins(e.shapes, 
+    sim.add_solid(e.shapes, 
     {
         reflective: true,
-        style: "hollow mirror"
+        style: "solid white"
     })
 
     let beam = new PointLamp({

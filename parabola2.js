@@ -13,7 +13,7 @@
     let para1_id = sim.add_thin(
         para1.shape(), {
         reflective: true,
-        style: "hollow mirror",
+        style: "thick hollow mirror",
         reflectance: 1.0
     });
 
@@ -44,7 +44,7 @@
         para2.shape(), 
         {
             reflective: true,
-            style: "hollow mirror", 
+            style: "thick hollow mirror", 
             reflectance: 1.0
         }
     )

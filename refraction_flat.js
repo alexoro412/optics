@@ -124,6 +124,7 @@
         width: 20,
         strength: 1,
         second_handle: false,
+        max_bounce: 2,
         ui: {
             max_y: h/2 - y_shift - 10,
             min_y: 1,

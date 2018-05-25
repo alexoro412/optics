@@ -198,8 +198,23 @@ svg.sim.color {
     /* overflow: scroll; */
 }
 
-/* @media(max-width: 440px){
-    .container {
-        width: 100vw !important;
-    }
-} */
+#ellipse > svg{
+    background-color: rgba(211,211,211,0.4);
+}
+
+.solid.white {
+    fill: #fff;
+    stroke: gray;
+    stroke-width: 0.5;
+}
+
+.solid.atmos {
+    /* fill: url(#atmosGradient); */
+    fill: rgba(231, 242, 252, 0.4);
+}
+
+.solid.moon {
+    fill: lightgray;
+    stroke: gray;
+    stroke-width: 0.5;
+}

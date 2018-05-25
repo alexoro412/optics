@@ -7,21 +7,31 @@
 
     let circle = new Circle(w / 2, h / 2, circle_radius);
 
-    sim.add_circle(circle, {
-        reflective: true,
+    let border_width = 150;
+
+    sim.add_solid([
+        new Line(0, border_width, border_width, 0),
+        new Line(border_width, 0, w - border_width, 0),
+        new Line(w - border_width, 0, w, border_width),
+        new Line(w, border_width, w, h - border_width),
+        new Line(w, h - border_width, w - border_width, h),
+        new Line(w - border_width, h, border_width, h),
+        new Line(border_width, h, 0, h - border_width),
+        new Line(0, h - border_width, 0, border_width)
+        // new Line(0,h-border_width,border_width,h),
+        // new Line(w-border_width,h,w,h-border_width)
+    ], {
         style: "solid mirror"
     })
 
-    let border_width = 150;
-
-    sim.add_thins([
-        new Line(0,border_width,border_width,0),
-        new Line(w-border_width, 0, w, border_width),
-        new Line(0,h-border_width,border_width,h),
-        new Line(w-border_width,h,w,h-border_width)
-    ], {
-        style: "mirror"
+    sim.add_circle(circle, {
+        reflective: true,
+        style: "solid white"
     })
+
+    
+
+    
 
     // let beam = new Beam(116, 111, 200, 200, 10, 20);
     let beam = new Beam({
