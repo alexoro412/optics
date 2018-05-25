@@ -41,6 +41,7 @@
         width: Math.PI / 4,
         num_rays: 30,
         angle: 0,
+        handle_gap: 60,
         ui: {}
     })
 

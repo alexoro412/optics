@@ -108,13 +108,13 @@
 
     let rect1 = sim.add_rect(0,0,w,h/2 - y_shift, {
         refractive: true,
-        ior: 1.5,
+        ior: 1.33,
         style: "hollow glass"
     });
 
     let rect2 = sim.add_rect(0,h/2 - y_shift,w,h/2 + y_shift, {
         refractive: true,
-        ior: 1.333,
+        ior: 1.5,
         style: "solid water"
     });
 
@@ -143,7 +143,7 @@
         angle: 0,
         style: "slider",
         handle_style: "slider-handle handle",
-        value: 1.5,
+        value: 1.33,
         num_decimals: 2,
         callback: function(value){
             sim.update_shape_opts(rect1, {
@@ -167,7 +167,7 @@
         angle: 0,
         style: "slider",
         handle_style: "slider-handle handle",
-        value: 1.33,
+        value: 1.5,
         num_decimals: 2,
         callback: function (value) {
             sim.update_shape_opts(rect2, {

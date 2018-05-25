@@ -123,7 +123,8 @@ svg.sim.color {
 
 .ray {
     fill: none;
-    stroke: #e74c3c;
+    /* stroke: #e74c3c; */
+    stroke: #f14633;
     stroke-width: 1;
     stroke-linecap: round;
     stroke-linejoin: round;

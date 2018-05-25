@@ -28,7 +28,6 @@
         style: "solid mirror"
     })
 
-    // let beam = new Beam(100, 100, 200, 200, 10, 20);
     let beam = new Beam({
         x1: 100,
         y1: 100,

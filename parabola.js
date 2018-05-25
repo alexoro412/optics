@@ -106,9 +106,9 @@
                     P1x, P1y,
                     P2x, P2y,
                     P3x, P3y),
-                new Line(300, 216, 300, h),
-                new Line(300, h, 100, h),
-                new Line(100, h, 100, 216)
+                new Line(P3x, P3y, P3x, h),
+                new Line(P3x, h, P0x, h),
+                new Line(P0x, h, P0x, P0y)
             ]);
             return `Focal Length: ${(-1/(4*value)).toFixed(0)} px`
         },
