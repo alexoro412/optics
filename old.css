@@ -227,3 +227,13 @@ svg.sim.color {
     stroke: gray;
     stroke-width: 0.5;
 }
+
+sup.tooltip {
+    text-decoration: underline;
+}
+
+.tooltip::before {
+    width: 12rem;
+}
+
+

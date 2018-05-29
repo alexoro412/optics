@@ -85,7 +85,7 @@
 
     // console.log(50 + fiber.thickness, 260, 50 + fiber.thickness + 40, 300, 50 + fiber.thickness + 40 - root2over2 * 40, 300 - root2over2 * 40);
 
-    sim.add_solid([
+    let fiber_shape = sim.add_solid([
         new Line(fiber.x1, fiber.y1, fiber.x1 + fiber.thickness, fiber.y1),
         new Line(fiber.x1 + fiber.thickness, fiber.y1, fiber.x1 + fiber.thickness, fiber.y1 + fiber.l1),
 
@@ -117,7 +117,7 @@
         thickness: 40,
     }
         
-    sim.add_thins([
+    let mirror_shape = sim.add_thins([
         // new Line(fiber.x1, fiber.y1, fiber.x1 + fiber.thickness, fiber.y1),
         new Line(mirror.x1 + mirror.thickness, mirror.y1, mirror.x1 + mirror.thickness, mirror.y1 + mirror.l1),
 
@@ -137,7 +137,7 @@
         new Line(mirror.x1, mirror.y1 + mirror.l1, 
             mirror.x1, mirror.y1)
     ], {
-        style: "hollow mirror",
+        style: "thick hollow mirror",
         reflective: true,
         reflectance: 0.6,
         // refractive: true,
@@ -166,18 +166,7 @@
     ], {
         style: "solid mirror nostroke",
         transparent: true,
-        // refractive: true,
-        // ior: 1.5
     })
-
-    // sim.add_thins([
-    //     new Line(100,60,100,310),
-    //     new Line(100+fiber.thickness,60,100+fiber.thickness,310)
-    // ],{
-    //     style: "mirror",
-    //     reflective: true,
-    //     reflectance: 0.4
-    // })
 
     let beam = new Beam({
         x1: 130, y1: 43,
@@ -185,6 +174,52 @@
         num_rays: 10,
         ui: {}
     })
+
+    let slider = new Slider({
+        x: 230,
+        y: 70,
+        length: 120,
+        angle: 0,
+        style: "slider",
+        handle_style: "slider-handle handle",
+        value: 1.5,
+        num_decimals: 2,
+        callback: function (value) {
+            sim.update_shape_opts(fiber_shape, {
+                ior: value
+            })
+            return "IOR: " + value;
+        },
+        text_dx: 0,
+        text_dy: 25,
+        min: 1,
+        max: 4
+    })
+
+    sim.add_ui(slider);
+
+    let slider2 = new Slider({
+        x: 230,
+        y: 140,
+        length: 120,
+        angle: 0,
+        style: "slider",
+        handle_style: "slider-handle handle",
+        value: 0.6,
+        num_decimals: 2,
+        callback: function (value) {
+            sim.update_shape_opts(mirror_shape, {
+                reflectance: value
+            })
+            return `Reflectance: ${(value*100).toFixed(0)}%`;
+        },
+        text_dx: 0,
+        text_dy: 25,
+        min: 0,
+        max: 1
+    })
+
+    sim.add_ui(slider2);
 
 
 
