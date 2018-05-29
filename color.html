@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Optics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="bulma.min.css" />
+    <link rel="stylesheet" type="text/css" href="bulma-tooltip.min.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="old.css" />
+</head>
+
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <h3 class="title">Optics</h3>
+            </div>
+            <div class="navbar-menu is-active">
+                <div class="navbar-start">
+                    <a class="navbar-item" href="index.html">Home</a>
+                    <a class="navbar-item" href="reflection.html">Reflection</a>
+                    <a class="navbar-item" href="refraction.html">Refraction</a>
+                    <a class="navbar-item" href="color.html">Color</a>
+                </div>
+
+            </div>
+        </nav>
+    </div>
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="explanation column">
+                    <h3 class="title">Color</h3>
+                    <h3 class="subtitle">Additive Mixing</h3>
+
+                </div>
+                <div class="column sim-container">
+                    <div id="color_mixing"></div>
+                </div>
+            </div>
+            <div class="columns">
+                <div class="explanation column">
+                    <h3 class="title">Dispersion</h3>
+                    <h3 class="subtitle">Prisms</h3>
+
+                </div>
+                <div class="column sim-container">
+                    <div id="dispersion"></div>
+                </div>
+            </div>
+            <div class="columns">
+                <div class="explanation column">
+                    <h3 class="title">Reflection</h3>
+                    <h3 class="subtitle">Mirrors, revisited</h3>
+
+                </div>
+                <div class="column sim-container">
+                    <div id="color_mirrors"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+    <script src="geometry.js"></script>
+    <script src="ui.js"></script>
+    <script src="color_mixing.js"></script>
+</body>
+
+</html>

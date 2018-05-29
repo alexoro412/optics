@@ -47,12 +47,12 @@ function merge(o, defaults) {
 
 const max_bounce = 10;
 
-function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
+function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1, color = "red") {
     if (bounce == 0 || strength < 0.01) return [];
 
     if (ior == 0) {
         // console.log("getting ior")
-        ior = get_ior(geometry, ray.x1, ray.y1);
+        ior = get_ior(geometry, ray.x1, ray.y1, color);
         // console.log("ior:", ior);
     }
 
@@ -87,7 +87,8 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
             y1: ray.y1,
             x2: intersections[0].x,
             y2: intersections[0].y,
-            strength: strength
+            strength: strength,
+            color: color
         });
         // console.log(intersections);
         if (intersections.length > 1 && !(intersections[0].opts.refractive && intersections[1].opts.refractive) && close_enough(0, distance(intersections[0].x, intersections[0].y, intersections[1].x, intersections[1].y), 0.1)) {
@@ -106,17 +107,24 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
                 let transmitted_ray = new Line(intersections[0].x, intersections[0].y, 0, 0);
                 transmitted_ray.polar(10, ray.angle());
                 let t_strength = strength * intersections[0].opts.transmission;
-                lines = lines.concat(raycast(transmitted_ray, geometry, bounce - 1, ior, t_strength));
+                lines = lines.concat(raycast(transmitted_ray, geometry, bounce - 1, ior, t_strength, color));
             }
 
             return lines
-                .concat(raycast(reflected_ray, geometry, bounce - 1, ior, r_strength))
+                .concat(raycast(reflected_ray, geometry, bounce - 1, ior, r_strength, color))
         } else if (intersections[0].opts.refractive) {
             let phi;
             let partial_strength;
             let refraction;
             let next_ior;
-            if (ior == intersections[0].opts.ior) {
+            let i_ior;
+            if(typeof intersections[0].opts.ior === "object"){
+                i_ior = intersections[0].opts.ior[color];
+            }else{
+                i_ior = intersections[0].opts.ior;
+            }
+
+            if (ior == i_ior) {
                 if (intersections.length > 1 && close_enough(0, distance(intersections[0].x, intersections[0].y, intersections[1].x, intersections[1].y))) {
                     // Interface between two materials, leaving refractive
                     if (intersections[1].opts.reflective) {
@@ -132,7 +140,7 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
                             let transmitted_ray = new Line(intersections[1].x, intersections[1].y, 0, 0);
                             transmitted_ray.polar(10, ray.angle());
                             let t_strength = strength * intersections[1].opts.transmission;
-                            lines = lines.concat(raycast(transmitted_ray, geometry, bounce - 1, ior, t_strength));
+                            lines = lines.concat(raycast(transmitted_ray, geometry, bounce - 1, ior, t_strength, color));
                         }
 
                         return lines
@@ -141,16 +149,22 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
                     } else {
                         // two refractive materials
                         // console.log("red", ior, intersections[0].opts.ior, intersections[1].opts.ior)
-                        if (intersections[0].opts.ior == ior) {
-                            refraction = refract(ray.angle(), intersections[1].n, ior, intersections[1].opts.ior);
+                        let i2_ior;
+                        if(typeof intersections[1].opts.ior === "object"){
+                            i2_ior = intersections[1].opts.ior[color]
+                        }else{
+                            i2_ior = intersections[1].opts.ior;
+                        }
+                        if (i_ior == ior) {
+                            refraction = refract(ray.angle(), intersections[1].n, ior, i2_ior);
                         } else {
                             // woops, flipped
-                            refraction = refract(ray.angle(), intersections[1].n, ior, intersections[0].opts.ior);
+                            refraction = refract(ray.angle(), intersections[1].n, ior, i_ior);
                         }
 
                         phi = refraction[0];
                         partial_strength = refraction[1];
-                        next_ior = intersections[1].opts.ior;
+                        next_ior = i2_ior;
                     }
                 } else {
                     // return to vacuum
@@ -161,10 +175,10 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
                 }
 
             } else {
-                refraction = refract(ray.angle(), intersections[0].n, ior, intersections[0].opts.ior);
+                refraction = refract(ray.angle(), intersections[0].n, ior, i_ior);
                 phi = refraction[0];
                 partial_strength = refraction[1];
-                next_ior = intersections[0].opts.ior;
+                next_ior = i_ior;
             }
 
             let refracted_ray = new Line(intersections[0].x, intersections[0].y, 0, 0);
@@ -176,7 +190,7 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
 
                 refracted_ray.polar(10, phi);
 
-                return lines.concat(raycast(refracted_ray, geometry, bounce - 1, next_ior, strength));
+                return lines.concat(raycast(refracted_ray, geometry, bounce - 1, next_ior, strength, color));
 
             } else {
                 // Refraction, and partial reflection
@@ -192,8 +206,8 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1) {
                 let t_strength = strength * (1 - partial_strength);
 
                 return lines
-                    .concat(raycast(refracted_ray, geometry, bounce - 1, next_ior, t_strength))
-                    .concat(raycast(reflected_ray, geometry, bounce - 1, ior, r_strength));
+                    .concat(raycast(refracted_ray, geometry, bounce - 1, next_ior, t_strength, color))
+                    .concat(raycast(reflected_ray, geometry, bounce - 1, ior, r_strength, color));
             }
 
         } else {
@@ -502,12 +516,8 @@ class Arc {
 
         let angle = Math.acos(cos_value);
 
-        console.log("angle", angle, cos_value);
-
         let K = .5 * A * B * Math.sin(angle);
         this.r = A * B * C / 4 / K
-
-        console.log(K,this.r);
 
         this.x1 = x1;
         this.y1 = y1;
@@ -625,7 +635,7 @@ function set_default_opts(opts) {
 
 // fair warning
 // probably won't with clipped/overlapped objects
-function get_ior(geometry, x, y) {
+function get_ior(geometry, x, y, color) {
     intersections = [];
 
     // Cast a ray from a point off screen :D
@@ -643,7 +653,11 @@ function get_ior(geometry, x, y) {
         if (distance(intersection.x, intersection.y, x, y) < 0.01) return false;
         return intersection.opts.refractive && intersection.x <= x && intersection.y <= y;
     }).map(function (intersection) {
-        return intersection.opts.ior;
+        if(typeof intersection.opts.ior === "object"){
+            return intersection.opts.ior[color];
+        }else{
+            return intersection.opts.ior;
+        }
     });
 
     if (intersections.length == 0) {
@@ -1227,9 +1241,20 @@ class Sim {
         this.space = new Space();
         this.space.setBounds(w, h);
 
+        this.dark = false;
+
         this.add_borders();
 
         this.space.install(this.svg);
+    }
+
+    darken(){
+        if(this.dark){
+            this.svg.attr("class", "sim")
+        }else{
+            this.svg.attr("class", "sim dark")
+        }
+        this.dark = !this.dark;
     }
 
     update_lights() {

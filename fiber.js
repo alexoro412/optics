@@ -4,74 +4,6 @@
 
     let sim = new Sim("#fiber", h, w);
 
-    // let handles = [{
-    //         x: 22,
-    //         y: 153
-    //     },
-    //     {
-    //         x: 144,
-    //         y: 32
-    //     },
-    //     {
-    //         x: 218,
-    //         y: 237
-    //     },
-    //     {
-    //         x: 375,
-    //         y: 92
-    //     }
-    // ];
-
-    // let bezier = sim.add_solid([
-    //     new Bezier(handles[0].x, handles[0].y, handles[1].x, handles[1].y,
-    //         handles[2].x, handles[2].y,
-    //         handles[3].x, handles[3].y),
-    //     new Line(handles[3].x, handles[3].y, handles[3].x, handles[3].y + fiber.thickness),
-    //     new Bezier(handles[3].x, handles[3].y + fiber.thickness, 
-    //         handles[2].x, handles[2].y + fiber.thickness,
-    //         handles[1].x, handles[1].y + fiber.thickness,
-    //         handles[0].x, handles[0].y + fiber.thickness),
-    //     new Line(handles[0].x, handles[0].y + fiber.thickness, handles[0].x, handles[0].y)], {
-    //         refractive: true,
-    //         ior: 1.5,
-    //         style: "solid glass",
-    //         reflectance: 0.5
-    //     })
-
-    // function update_fiber(x,y){
-    //     sim.update_shape_geometry(bezier, [new Bezier(handles[0].x, handles[0].y, handles[1].x, handles[1].y,
-    //             handles[2].x, handles[2].y,
-    //             handles[3].x, handles[3].y),
-    //         new Line(handles[3].x, handles[3].y, handles[3].x, handles[3].y + fiber.thickness),
-    //         new Bezier(handles[3].x, handles[3].y + fiber.thickness,
-    //             handles[2].x, handles[2].y + fiber.thickness,
-    //             handles[1].x, handles[1].y + fiber.thickness,
-    //             handles[0].x, handles[0].y + fiber.thickness),
-    //         new Line(handles[0].x, handles[0].y + fiber.thickness, handles[0].x, handles[0].y)
-    //     ])
-    // }
-
-    // for (let i = 0; i < 4; i++) {
-    //     handles[i] = new Point({
-    //         x: handles[i].x,
-    //         y: handles[i].y,
-    //         max_x: w,
-    //         max_y: h,
-    //         num_decimals: 2,
-    //         callback: update_fiber,
-    //         radius: 7,
-    //         style: "slider-handle handle"
-    //     })
-    //     sim.add_ui(handles[i])
-    // }
-
-    // sim.add_rect(50,60,fiber.thickness,250,{
-    //     style: "solid glass",
-    //     refractive: true,
-    //     ior: 1.5
-    // })
-
-    // let fiber.thickness = 40;
     let fiber = {
         x1: 50,
         y1: 60,
@@ -82,8 +14,6 @@
     }
 
     let root2over2 = Math.sqrt(2) / 2;
-
-    // console.log(50 + fiber.thickness, 260, 50 + fiber.thickness + 40, 300, 50 + fiber.thickness + 40 - root2over2 * 40, 300 - root2over2 * 40);
 
     let fiber_shape = sim.add_solid([
         new Line(fiber.x1, fiber.y1, fiber.x1 + fiber.thickness, fiber.y1),

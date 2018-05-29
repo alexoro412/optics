@@ -242,3 +242,60 @@ sup.tooltip {
 }
 
 
+/* DARK */
+
+svg.sim.dark {
+    background-color: rgb(31, 30, 30);
+}
+
+svg.dark .ray-group {
+    mix-blend-mode: lighten;
+}
+
+svg.dark  text {
+    fill: white;
+}
+
+.color-circle {
+    fill-opacity: 1;
+    mix-blend-mode: lighten;
+}
+
+.red-circle {
+    fill: red;
+}
+
+.blue-circle {
+    fill: blue;
+}
+
+.green-circle {
+    fill: rgb(0, 255, 0);
+}
+
+.green-slider.slider {
+    stroke: rgb(0, 255, 0);
+}
+
+.green-handle.handle {
+    fill: rgb(0,255,0);
+    fill-opacity: 1;
+}
+
+.red-slider.slider {
+    stroke: rgb(255, 0, 0);
+}
+
+.red-handle.handle {
+    fill: rgb(255, 0, 0);
+    fill-opacity: 1;
+}
+
+.blue-slider.slider {
+    stroke: rgb(0, 0, 255);
+}
+
+.blue-handle.handle {
+    fill: rgb(0, 0, 255);
+    fill-opacity: 1;
+}

@@ -30,7 +30,7 @@ class Slider {
         this.slider_value = map(this.value, this.min, this.max, 0, this.length)
     }
 
-    set(value){
+    set(value) {
 
         this.value = +precisionRound(value, this.num_decimals);
         this.slider_value = map(value, this.min, this.max, 0, this.length);
@@ -149,7 +149,8 @@ default_beam = {
     width: 20,
     strength: 0.5,
     second_handle: true,
-    max_bounce: 10
+    max_bounce: 10,
+    color: ["red"]
 }
 
 class Beam {
@@ -173,12 +174,12 @@ class Beam {
                     this.y1 = y;
                     this.updateRays();
                     this.drawRays();
-                    if(this.ui.callback != null){
-                        this.ui.callback(x,y);
+                    if (this.ui.callback != null) {
+                        this.ui.callback(x, y);
                     }
                 }).bind(this);
 
-                if(this.second_handle){
+                if (this.second_handle) {
                     this.handle2 = new Point(opts.ui);
                     this.handle2.x = this.x2;
                     this.handle2.y = this.y2;
@@ -190,9 +191,9 @@ class Beam {
                         this.drawRays();
                     }).bind(this);
                     this.handles = [this.handle1, this.handle2]
-                }else {
+                } else {
                     this.handles = [this.handle1]
-                }                    
+                }
             } else {
                 this.x2 = this.x1 + 10 * Math.cos(this.angle);
                 this.y2 = this.y1 + 10 * Math.sin(this.angle);
@@ -218,12 +219,26 @@ class Beam {
         this.rays = [];
 
         for (let i = 0; i < this.num_rays; i++) {
-            this.rays.push(raycast(new Line(
-                this.x1 + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
-                this.y1 - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle),
-                this.x2 + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
-                this.y2 - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle)
-            ), this.space.get_geometry(), this.max_bounce, 0, this.strength));
+            if (Array.isArray(this.color)) {
+                // Polychrome beam
+                for (let c of this.color) {
+                    this.rays.push(raycast(new Line(
+                        this.x1 + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
+                        this.y1 - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle),
+                        this.x2 + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
+                        this.y2 - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle)
+                    ), this.space.get_geometry(), this.max_bounce, 0, this.strength, c));
+                }
+            } else {
+                // Monochrome beam
+                this.rays.push(raycast(new Line(
+                    this.x1 + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
+                    this.y1 - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle),
+                    this.x2 + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
+                    this.y2 - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle)
+                ), this.space.get_geometry(), this.max_bounce, 0, this.strength));
+            }
+
         }
 
     }
@@ -258,6 +273,13 @@ class Beam {
             y2: function (d) {
                 return d.y2;
             },
+            class: function (d) {
+                if (d.color != "") {
+                    return `ray ${d.color}`
+                } else {
+                    return "ray"
+                }
+            },
             "stroke-opacity": function (d) {
                 return +precisionRound(d.strength, 3);
             }
@@ -276,7 +298,13 @@ class Beam {
             y2: function (d) {
                 return d.y2;
             },
-            class: "ray",
+            class: function (d) {
+                if (d.color != "") {
+                    return `ray ${d.color}`
+                } else {
+                    return "ray"
+                }
+            },
             "stroke-opacity": function (d) {
                 return +precisionRound(d.strength, 3);
             }
@@ -302,8 +330,8 @@ let default_lamp = {
     y: 100,
     num_rays: 20,
     radius: 10,
-    ray_style: "ray",
-    max_bounce: 10
+    max_bounce: 10,
+    color: ["red"]
 }
 
 class PointLamp {
@@ -334,9 +362,18 @@ class PointLamp {
     updateRays() {
         this.rays = [];
         for (let i = 0; i < this.num_rays; i++) {
-            this.rays.push(raycast(new Line(this.x, this.y,
-                    this.x + 10 * Math.cos(i * this.ray_gap), this.y + 10 * Math.sin(i * this.ray_gap)),
-                this.space.get_geometry(), this.max_bounce, 0, this.strength))
+            if (Array.isArray(this.color)) {
+                for (let c of this.color) {
+                    this.rays.push(raycast(new Line(this.x, this.y,
+                            this.x + 10 * Math.cos(i * this.ray_gap), this.y + 10 * Math.sin(i * this.ray_gap)),
+                        this.space.get_geometry(), this.max_bounce, 0, this.strength, c))
+                }
+            } else {
+                this.rays.push(raycast(new Line(this.x, this.y,
+                        this.x + 10 * Math.cos(i * this.ray_gap), this.y + 10 * Math.sin(i * this.ray_gap)),
+                    this.space.get_geometry(), this.max_bounce, 0, this.strength))
+            }
+
         }
     }
 
@@ -370,6 +407,13 @@ class PointLamp {
             y2: function (d) {
                 return d.y2;
             },
+            class: function(d){
+                if(d.color != ""){
+                    return `ray ${d.color}`
+                }else{
+                    return "ray"
+                }
+            },
             "stroke-opacity": function (d) {
                 return +precisionRound(d.strength, 3);
             }
@@ -388,7 +432,13 @@ class PointLamp {
             y2: function (d) {
                 return d.y2;
             },
-            class: this.ray_style,
+            class: function (d) {
+                if (d.color != "") {
+                    return `ray ${d.color}`
+                } else {
+                    return "ray"
+                }
+            },
             "stroke-opacity": function (d) {
                 return +precisionRound(d.strength, 3);
             }
@@ -416,7 +466,7 @@ default_conelamp = {
     fixed: false,
     handle_gap: 30,
     max_bounce: 10,
-    ray_style: "ray"
+    color: ["red"]
 }
 
 class ConeLamp {
@@ -438,7 +488,7 @@ class ConeLamp {
                 this.handles = [this.handle1]
             } else {
                 this.handle2 = new Point(opts.ui);
-                
+
                 this.handle2.min_x = this.handle2.min_x - this.handle_gap;
                 this.handle2.max_x = this.handle2.max_x + this.handle_gap;
                 this.handle2.min_y = this.handle2.min_y - this.handle_gap;
@@ -452,8 +502,8 @@ class ConeLamp {
                     // this.handle2.y = y + this.handle_gap * Math.sin(this.angle);
                     this.handle2.move(x + this.handle_gap * Math.cos(this.angle), y + this.handle_gap * Math.sin(this.angle))
                     this.move(x, y);
-                    if(this.callback != undefined) {
-                        this.callback(1,this.handle1.x,this.handle1.y);
+                    if (this.callback != undefined) {
+                        this.callback(1, this.handle1.x, this.handle1.y);
                     }
                 }).bind(this);
 
@@ -461,8 +511,8 @@ class ConeLamp {
                     this.angle = Math.atan2(y - this.y, x - this.x)
                     this.handle2.move(this.x + this.handle_gap * Math.cos(this.angle), this.y + this.handle_gap * Math.sin(this.angle));
                     this.move(this.x, this.y);
-                    if(this.callback != undefined){
-                        this.callback(2,this.handle2.x,this.handle2.y);
+                    if (this.callback != undefined) {
+                        this.callback(2, this.handle2.x, this.handle2.y);
                     }
                 }).bind(this)
 
@@ -482,10 +532,20 @@ class ConeLamp {
     updateRays() {
         this.rays = [];
         for (let i = 0; i < this.num_rays; i++) {
-            this.rays.push(raycast(new Line(this.x, this.y,
-                    this.x + 10 * Math.cos(this.angle + (i - this.num_rays / 2 + 0.5) * this.ray_gap),
-                    this.y + 10 * Math.sin(this.angle + (i - this.num_rays / 2 + 0.5) * this.ray_gap)),
-                this.space.get_geometry(), this.max_bounce, 0, this.strength))
+            if(Array.isArray(this.color)){
+                for(let c of this.color){
+                    this.rays.push(raycast(new Line(this.x, this.y,
+                            this.x + 10 * Math.cos(this.angle + (i - this.num_rays / 2 + 0.5) * this.ray_gap),
+                            this.y + 10 * Math.sin(this.angle + (i - this.num_rays / 2 + 0.5) * this.ray_gap)),
+                        this.space.get_geometry(), this.max_bounce, 0, this.strength, c))
+                }
+            }else{
+                this.rays.push(raycast(new Line(this.x, this.y,
+                        this.x + 10 * Math.cos(this.angle + (i - this.num_rays / 2 + 0.5) * this.ray_gap),
+                        this.y + 10 * Math.sin(this.angle + (i - this.num_rays / 2 + 0.5) * this.ray_gap)),
+                    this.space.get_geometry(), this.max_bounce, 0, this.strength))
+            }
+            
         }
     }
 
@@ -519,6 +579,13 @@ class ConeLamp {
             y2: function (d) {
                 return d.y2;
             },
+            class: function(d){
+                if (d.color != "") {
+                    return `ray ${d.color}`
+                } else {
+                    return "ray"
+                }
+            },
             "stroke-opacity": function (d) {
                 return +precisionRound(d.strength, 3);
             }
@@ -537,7 +604,13 @@ class ConeLamp {
             y2: function (d) {
                 return d.y2;
             },
-            class: this.ray_style,
+            class: function(d){
+                if (d.color != "") {
+                    return `ray ${d.color}`
+                } else {
+                    return "ray"
+                }
+            },
             "stroke-opacity": function (d) {
                 return +precisionRound(d.strength, 3);
             }

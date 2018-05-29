@@ -60,7 +60,7 @@
         strength: 0.07,
         angle: 2 * Math.PI / 3,
         num_rays: 20,
-        ray_style: "blue ray",
+        color: ["blue"],
         ui: {}
     })
 
