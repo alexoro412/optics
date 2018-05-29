@@ -18,7 +18,7 @@
         ui: {
             max_y: h/2 - 40
         },
-        ray_style: "virtual ray",
+        color: ["virtual"],
         callback: function(num,x,y){
             if(num == 1){
                 virtual_lamp.handle1.move(x, h - y);
@@ -35,10 +35,10 @@
     let virtual_lamp = new ConeLamp({
         angle: -Math.PI/4,
         x: 60, y: h - 100,
-        ray_style: "virtual blue ray",
         ui: {
             min_y: h/2 + 40
         },
+        color: ["blue virtual"],
         callback: function (num, x, y) {
             if (num == 1) {
                 real_lamp.handle1.move(x, h - y);
