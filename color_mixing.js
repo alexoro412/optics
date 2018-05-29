@@ -33,7 +33,7 @@
         })
 
     let green_slider = new Slider({
-        x: 30,
+        x: 150,
         y: 330,
         length: 100,
         angle: 0,
@@ -54,7 +54,7 @@
     sim.add_ui(green_slider);
 
     let red_slider = new Slider({
-        x: 150,
+        x: 270,
         y: 330,
         length: 100,
         angle: 0,
@@ -75,7 +75,7 @@
     sim.add_ui(red_slider);
 
     let blue_slider = new Slider({
-        x: 270,
+        x: 30,
         y: 330,
         length: 100,
         angle: 0,

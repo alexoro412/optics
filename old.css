@@ -123,6 +123,10 @@ svg.sim.color {
     stroke: rgb(21, 221, 65) !important;
 }
 
+.orange {
+    stroke: rgb(248, 179, 30) !important;
+}
+
 .ray {
     fill: none;
     /* stroke: #e74c3c; */
