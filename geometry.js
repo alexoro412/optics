@@ -493,10 +493,21 @@ class Arc {
             B = distance(x3, y3, x1, y1),
             C = distance(x1, y1, x2, y2);
 
-        let angle = Math.acos((A * A + B * B - C * C) / (2 * A * B))
+        let cos_value = (A * A + B * B - C * C) / (2 * A * B);
+        if(close_enough(cos_value, -1, 0.001)){
+            cos_value = -1;
+        }else if(close_enough(cos_value, 1, 0.001)){
+            cos_value = 1;
+        }
+
+        let angle = Math.acos(cos_value);
+
+        console.log("angle", angle, cos_value);
 
         let K = .5 * A * B * Math.sin(angle);
         this.r = A * B * C / 4 / K
+
+        console.log(K,this.r);
 
         this.x1 = x1;
         this.y1 = y1;

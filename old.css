@@ -69,6 +69,10 @@ svg.sim.color {
     fill-opacity: 0.4;
 }
 
+.solid.mirror.nostroke {
+    stroke: none !important;
+}
+
 .hollow {
     fill: none;
 }

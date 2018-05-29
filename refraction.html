@@ -102,6 +102,10 @@
                                 <td>Glass</td>
                                 <td>~1.5</td>
                             </tr>
+                            <tr>
+                                <td>Diamond</td>
+                                <td>2.4</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -219,24 +223,55 @@
                 </div>
                 <div class="column sim-container" id="oneway"></div>
             </div>
-            <div class="columns">
+            <!-- <div class="columns">
                 <div class="explanation column">
                     <h3 class="title">Total Internal Reflection</h3>
                     <h3 class="subtitle">Binoculars</h3>
                 </div>
                 <div class="column"></div>
-            </div>
+            </div> -->
             <div class="columns">
                 <div class="explanation column">
                     <h3 class="title">Total Internal Reflection</h3>
                     <h3 class="subtitle">Fiber Optics</h3>
+                    <p>
+                        One nice aspect of total internal reflection is the word total. Unlike mirrors, which absorb a 
+                        bit of light with every reflection, no light is absorbed in total internal reflection.
+                    </p>
+                    <p>
+                        To the right are two potential designs for cables that can carry light, much like 
+                        how wires can carry electricity. You could use these cables to send information quickly 
+                        over long distances. 
+                        On the right is one made of mirrors, and on the left is one of glass. 
+                        The mirror cable has a bit higher of absorption than normal, just to show what would 
+                        happen over long distances. 
+                    </p>
+                    <p>
+                        As you can see, the cable made of mirrors will start to absorb 
+                        so much light that barely any makes it through. The glass cable, on the other hand, lets the 
+                        light through at full strength, though it can lose some around the bend.  
+                    </p>
+                    <p>
+                        The glass cable, because it loses so little light, is the preferred one for communication uses. 
+                        These kinds of glass cables are called fiber optic cables, and they are 
+                        used to connect large portions of the internet. 
+                        This very website could easily have arrived on your computer via a fiber optic cable.
+                    </p>
                 </div>
-                <div class="column"></div>
+                <div class="column sim-container" id="fiber"></div>
             </div>
             
             <div class="columns">
                 <div class="explanation column">
-                    <h3 class="title">Playground (maybe)</h3>
+                    <h3 class="title">The End</h3>
+                    <p>
+                        Well, that's all for now. Hopefully we'll have new pages soon,
+                        covering topics like color, metamaterials, etc...
+                    </p>
+                    <p>
+                        Until then, feel free to play around with the simulation to the right, 
+                        or any of the others on this site.
+                    </p>
                 </div>
                 <div class="column sim-container" id="refraction_test"></div>
             </div>
@@ -251,10 +286,11 @@
     <script src="focus_lens.js"></script>
     <script src="refraction.js"></script>
     <script src="refraction_flat.js"></script>
-    <!-- <script src="alt_lens.js"></script> -->
+
     <script src="oneway.js"></script>
     <script src="planet_shadows.js"></script>
     <script src="curved_glass.js"></script>
+    <script src="fiber.js"></script>
 </body>
 
 </html>
