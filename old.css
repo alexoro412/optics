@@ -28,16 +28,6 @@ p:first-child {
     padding-top: 3em;
 }
 
-.single-ray:hover > .ray:not(.virtual){
-    stroke-width: 2;
-    stroke: red;
-    /* stroke-opacity: 1 !important; */
-}
-
-.single-ray > .virtual.ray:nth-child(2){
-    stroke: rgb(188, 48, 216) !important;
-}
-
 .explanation > p:not(:first-child) {
     text-indent: 3em;
 }
@@ -129,6 +119,10 @@ svg.sim.color {
     stroke: rgb(77, 178, 236) !important;
 }
 
+.green {
+    stroke: rgb(21, 221, 65) !important;
+}
+
 .ray {
     fill: none;
     /* stroke: #e74c3c; */
@@ -138,6 +132,17 @@ svg.sim.color {
     stroke-linejoin: round;
     mix-blend-mode: lighten;
 }
+
+.single-ray:hover>.ray:not(.virtual) {
+    stroke-width: 2;
+    stroke: red;
+    /* stroke-opacity: 1 !important; */
+}
+
+.single-ray>.virtual.ray:nth-child(2) {
+    stroke: rgb(188, 48, 216) !important;
+}
+
 
 .ray-group {
     mix-blend-mode: darken;
