@@ -42,7 +42,9 @@
         x2: 125, y2: 156,
         ui: {},
         num_rays: 10,
-        color: ["red", "green", "blue"]
+        color: ["red", "green", "blue"],
+        strength: 0.8,
+        min_strength: 0.1
     })
 
     sim.add_light(beam);

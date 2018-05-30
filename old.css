@@ -123,10 +123,6 @@ svg.sim.color {
     stroke: rgb(21, 221, 65) !important;
 }
 
-.orange {
-    stroke: rgb(248, 179, 30) !important;
-}
-
 .ray {
     fill: none;
     /* stroke: #e74c3c; */
@@ -302,4 +298,16 @@ svg.dark  text {
 .blue-handle.handle {
     fill: rgb(0, 0, 255);
     fill-opacity: 1;
+}
+
+sim.dark .blue {
+    stroke: rgb(0,0,255) !important;
+}
+
+sim.dark .green {
+    stroke: rgb(0,255,0) !important;
+}
+
+sim.dark .red {
+    stroke: rgb(255,0,0) !important;
 }

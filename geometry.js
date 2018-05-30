@@ -47,8 +47,8 @@ function merge(o, defaults) {
 
 const max_bounce = 10;
 
-function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1, color = "red") {
-    if (bounce == 0 || strength < 0.01) return [];
+function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1, color = "red", min_strength = 0.05) {
+    if (bounce == 0 || strength < min_strength) return [];
 
     if (ior == 0) {
         // console.log("getting ior")
@@ -101,9 +101,21 @@ function raycast(ray, geometry, bounce = max_bounce, ior = 0, strength = 1, colo
             let reflected_ray = new Line(intersections[0].x, intersections[0].y, 0, 0, false);
             reflected_ray.polar(10, phi);
 
-            let r_strength = strength * intersections[0].opts.reflectance;
+            let i_reflectance;
+            if(typeof intersections[0].opts.reflectance === "object"){
+                i_reflectance = intersections[0].opts.reflectance[color];
+            } else{
+                i_reflectance = intersections[0].opts.reflectance;
+            }
 
-            if (intersections[0].opts.transmission != 0) {
+            let r_strength = strength * i_reflectance;
+
+            if(typeof intersections[0].opts.transmission === "object"){
+                let transmitted_ray = new Line(intersections[0].x, intersections[0].y, 0, 0);
+                transmitted_ray.polar(10, ray.angle());
+                let t_strength = strength * intersections[0].opts.transmission[color];
+                lines = lines.concat(raycast(transmitted_ray, geometry, bounce - 1, ior, t_strength, color));
+            }else if (intersections[0].opts.transmission != 0) {
                 let transmitted_ray = new Line(intersections[0].x, intersections[0].y, 0, 0);
                 transmitted_ray.polar(10, ray.angle());
                 let t_strength = strength * intersections[0].opts.transmission;

@@ -49,7 +49,8 @@
         ui: {
             max_y: h
         },
-        color: ["red", "green", "blue"]
+        color: ["red", "green", "blue"],
+        min_strength: 0.1
     })
     sim.add_light(beam);
 
@@ -63,7 +64,8 @@
             max_y: h,
             style: "thandle handle"
         },
-        color: ["red", "green", "blue"]
+        color: ["red", "green", "blue"],
+        min_strength: 0.1
     })
 
     sim.add_light(cone);

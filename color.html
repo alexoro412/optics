@@ -32,13 +32,13 @@
             <div class="columns">
                 <div class="explanation column">
                     <h3 class="title">Color</h3>
-                    <h3 class="subtitle">Additive Mixing</h3>
+                    <h3 class="subtitle">Additive Blending</h3>
                     <p>
                         Now we're gonna start to look at different colors to the right. 
                         You'll notice that all the simulations now have dark backgrounds. 
                         This is because when you mix color with light, it gets 
                         brighter, and harder to see on a white background. 
-                        This is called additive blending.<sup class="tooltip is-tooltip-multiline is-tooltip-right" data-tooltip="It's the opposite with paint, where mixing colors makes the paint darker. We call that subtractive blending">*</sup>
+                        This is called <b>additive blending.</b><sup class="tooltip is-tooltip-multiline is-tooltip-right" data-tooltip="It's the opposite with paint, where mixing colors makes the paint darker. We call that subtractive blending">*</sup>
                     </p>
                     <p>
                         To the right you'll see three circles. These each represent 
@@ -48,9 +48,9 @@
                     <p>
                         We're using red, green, and blue because they are the primary 
                         colors for light. You can make any other color with them. 
-                        Throughout these other simulations, we'll stick with just red, green, and blue 
+                        Throughout these other simulations, we'll stick with just red, green, and blue, 
                         so that it can be simulated relatively quickly. In reality, color is on 
-                        a continuous spectrum from red to violet.
+                        a continuous spectrum from red to violet.<sup class="tooltip is-tooltip-multiline is-tooltip-right" data-tooltip="The spectrum is also called the rainbow!">*</sup>
                     </p>
                 </div>
                 <div class="column sim-container" id="color_mixing">
@@ -102,22 +102,34 @@
                         For large telescopes, though, the aberration that would be caused by the large lens 
                         would render any pictures unusable. Instead of overcoming this problem with advancements in lenses, 
                         large telescopes simply use mirrors to focus 
-                        light instead.<sup class="tooltip is-tooltip-multiline is-tooltip-right" data-tooltip="There is also a small amount of chromatic aberration cause by the atmosphere, which is why some telescopes are placed in space.">*</sup>
+                        light instead.<sup class="tooltip is-tooltip-multiline is-tooltip-right" data-tooltip="There is also a small amount of chromatic aberration caused by the atmosphere, which is why some telescopes are placed in space.">*</sup>
                     </p>
                 </div>
                 <div class="column sim-container" id="chromatic_aberration">
                 </div>
             </div>
-            <!-- <div class="columns">
+            <div class="columns">
                 <div class="explanation column">
                     <h3 class="title">Reflection</h3>
                     <h3 class="subtitle">Mirrors, revisited</h3>
+                    <p>
+                        While focusing light with mirrors may save you from chromatic aberration, 
+                        mirrors still have a problem with color.
 
+                        They reflect more of some colors, and less of others. 
+                        You can try this by changing the reflectance of the mirror for 
+                        each individual color.
+                    </p>
+                    <p>
+                        Most mirrors tend to reflect more green light than anything else. 
+                        This is why if you stand between two mirrors, and look into the distance, 
+                        the image slowly fades into a green mist. This is also why some people 
+                        will answer green when asked what color a mirror is.
+                    </p>
                 </div>
-                <div class="column sim-container">
-                    <div id="color_mirrors"></div>
+                <div class="column sim-container" id="color_mirrors">
                 </div>
-            </div> -->
+            </div>
         </div>
     </section>
 
@@ -128,6 +140,7 @@
     <script src="color_mixing.js"></script>
     <script src="dispersion.js"></script>
     <script src="chromatic_aberration.js"></script>
+    <script src="color_mirrors.js"></script>
 </body>
 
 </html>

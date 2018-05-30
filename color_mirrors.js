@@ -1,36 +1,44 @@
 (function(){
-    let w = 400, h= 350;
+    let w = 400, h = 350;
 
-    let sim = new Sim("#color_mixing", h, w);
+    let sim = new Sim("#color_mirrors",h,w);
 
     sim.darken();
 
-    let c_group = sim.svg.append("g")
-        .attr("class", "ray-group")
+    let walls = sim.add_thins([
+        new Line(130,30,130,270),
+        new Line(270,30,270,270)
+    ],{
+        style: "mirror thick",
+        reflective: true,
+        reflectance: {
+            red: 0.8,
+            green: 1.0,
+            blue: 0.8
+        }
+    })
 
-    c_group.append("circle")
-        .attrs({
-            cx: 150,
-            cy: 100,
-            r: 90,
-            class: "color-circle red-circle"
-        })
+    let beam = new Beam({
+        x1: 158, y1: 60,
+        x2: 229, y2: 76,
+        ui: {},
+        color: ["red", "green", "blue"],
+        strength: 0.8
+    })
 
-    c_group.append("circle")
-        .attrs({
-            cx: 400-150,
-            cy: 100,
-            r: 90,
-            class: "color-circle blue-circle"
-        })
+    sim.add_light(beam);
 
-    c_group.append("circle")
-        .attrs({
-            cx: 200,
-            cy: 200,
-            r: 90,
-            class: "color-circle green-circle"
+    reflectances = {
+        red: 0.8,
+        green: 1.0,
+        blue: 0.8
+    }
+
+    function update_reflectances(){
+        sim.update_shape_opts(walls, {
+            reflectance: reflectances
         })
+    }
 
     let green_slider = new Slider({
         x: 150,
@@ -39,11 +47,11 @@
         angle: 0,
         style: "green-slider slider",
         handle_style: "green-handle handle",
-        value: 0.3,
+        value: 0.9,
         num_decimals: 2,
         callback: function (value) {
-            d3.select(".green-circle")
-                .style("fill-opacity", value)
+            reflectances.green = value;
+            update_reflectances();
             return `${(value*100).toFixed(0)}%`
         },
         text_dx: 35,
@@ -51,7 +59,7 @@
         min: 0,
         max: 1
     });
-    
+
     sim.add_ui(green_slider);
 
     let red_slider = new Slider({
@@ -61,11 +69,11 @@
         angle: 0,
         style: "red-slider slider",
         handle_style: "red-handle handle",
-        value: 0.4,
+        value: 0.8,
         num_decimals: 2,
         callback: function (value) {
-            d3.select(".red-circle")
-                .style("fill-opacity", value);
+            reflectances.red = value;
+            update_reflectances();
             return `${(value*100).toFixed(0)}%`
         },
         text_dx: 35,
@@ -83,11 +91,11 @@
         angle: 0,
         style: "blue-slider slider",
         handle_style: "blue-handle handle",
-        value: 0.4,
+        value: 0.8,
         num_decimals: 2,
         callback: function (value) {
-            d3.select(".blue-circle")
-                .style("fill-opacity", value)
+            reflectances.blue = value;
+            update_reflectances();
             return `${(value*100).toFixed(0)}%`
         },
         text_dx: 35,

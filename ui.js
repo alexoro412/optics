@@ -150,7 +150,8 @@ default_beam = {
     strength: 0.5,
     second_handle: true,
     max_bounce: 10,
-    color: ["red"]
+    color: ["red"],
+    min_strength: 0.05
 }
 
 class Beam {
@@ -227,16 +228,17 @@ class Beam {
                         this.y1 - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle),
                         this.x2 + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
                         this.y2 - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle)
-                    ), this.space.get_geometry(), this.max_bounce, 0, this.strength, c));
+                    ), this.space.get_geometry(), this.max_bounce, 0, this.strength, c, this.min_strength));
                 }
             } else {
                 // Monochrome beam
+                // Does this part ever actually run?
                 this.rays.push(raycast(new Line(
                     this.x1 + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
                     this.y1 - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle),
                     this.x2 + (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.sin(this.angle),
                     this.y2 - (i - (this.num_rays / 2) + 0.5) * this.ray_gap * Math.cos(this.angle)
-                ), this.space.get_geometry(), this.max_bounce, 0, this.strength));
+                ), this.space.get_geometry(), this.max_bounce, 0, this.strength, "red", this.min_strength));
             }
 
         }
@@ -331,7 +333,8 @@ let default_lamp = {
     num_rays: 20,
     radius: 10,
     max_bounce: 10,
-    color: ["red"]
+    color: ["red"],
+    min_strength: 0.05
 }
 
 class PointLamp {
@@ -366,12 +369,13 @@ class PointLamp {
                 for (let c of this.color) {
                     this.rays.push(raycast(new Line(this.x, this.y,
                             this.x + 10 * Math.cos(i * this.ray_gap), this.y + 10 * Math.sin(i * this.ray_gap)),
-                        this.space.get_geometry(), this.max_bounce, 0, this.strength, c))
+                        this.space.get_geometry(), this.max_bounce, 0, this.strength, c, this.min_strength))
                 }
             } else {
+                // Does this part ever run?
                 this.rays.push(raycast(new Line(this.x, this.y,
                         this.x + 10 * Math.cos(i * this.ray_gap), this.y + 10 * Math.sin(i * this.ray_gap)),
-                    this.space.get_geometry(), this.max_bounce, 0, this.strength))
+                    this.space.get_geometry(), this.max_bounce, 0, this.strength, "red", this.min_strength))
             }
 
         }
@@ -466,7 +470,8 @@ default_conelamp = {
     fixed: false,
     handle_gap: 30,
     max_bounce: 10,
-    color: ["red"]
+    color: ["red"],
+    min_strength: 0.05
 }
 
 class ConeLamp {
@@ -537,13 +542,14 @@ class ConeLamp {
                     this.rays.push(raycast(new Line(this.x, this.y,
                             this.x + 10 * Math.cos(this.angle + (i - this.num_rays / 2 + 0.5) * this.ray_gap),
                             this.y + 10 * Math.sin(this.angle + (i - this.num_rays / 2 + 0.5) * this.ray_gap)),
-                        this.space.get_geometry(), this.max_bounce, 0, this.strength, c))
+                        this.space.get_geometry(), this.max_bounce, 0, this.strength, c, this.min_strength))
                 }
             }else{
+                // Does this part ever run?
                 this.rays.push(raycast(new Line(this.x, this.y,
                         this.x + 10 * Math.cos(this.angle + (i - this.num_rays / 2 + 0.5) * this.ray_gap),
                         this.y + 10 * Math.sin(this.angle + (i - this.num_rays / 2 + 0.5) * this.ray_gap)),
-                    this.space.get_geometry(), this.max_bounce, 0, this.strength))
+                    this.space.get_geometry(), this.max_bounce, 0, this.strength, "red", this.min_strength))
             }
             
         }

@@ -32,7 +32,8 @@
         num_rays: 20,
         angle: Math.PI/3,
         ray_style: "ray",
-        ui: {}
+        ui: {},
+        min_strength: 0.01
     })
 
     let red_slider = new Slider({
@@ -61,7 +62,8 @@
         angle: 2 * Math.PI / 3,
         num_rays: 20,
         color: ["blue"],
-        ui: {}
+        ui: {},
+        min_strength: 0.01
     })
 
     let blue_slider = new Slider({
