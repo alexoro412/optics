@@ -33,7 +33,25 @@
                 <div class="explanation column">
                     <h3 class="title">Color</h3>
                     <h3 class="subtitle">Additive Mixing</h3>
-
+                    <p>
+                        Now we're gonna start to look at different colors to the right. 
+                        You'll notice that all the simulations now have dark backgrounds. 
+                        This is because when you mix color with light, it gets 
+                        brighter, and harder to see on a white background. 
+                        This is called additive blending.<sup class="tooltip is-tooltip-multiline is-tooltip-right" data-tooltip="It's the opposite with paint, where mixing colors makes the paint darker. We call that subtractive blending">*</sup>
+                    </p>
+                    <p>
+                        To the right you'll see three circles. These each represent 
+                        spot lights shining on your screen. You can change each ones 
+                        strength to see how the colors mix.
+                    </p>
+                    <p>
+                        We're using red, green, and blue because they are the primary 
+                        colors for light. You can make any other color with them. 
+                        Throughout these other simulations, we'll stick with just red, green, and blue 
+                        so that it can be simulated relatively quickly. In reality, color is on 
+                        a continuous spectrum from red to violet.
+                    </p>
                 </div>
                 <div class="column sim-container" id="color_mixing">
                 </div>
@@ -42,7 +60,24 @@
                 <div class="explanation column">
                     <h3 class="title">Dispersion</h3>
                     <h3 class="subtitle">Prisms</h3>
-
+                    <p>
+                        On the previous page, you learned that each material has an index of refraction
+                        that determines how much light is bent. But that was only for light of one color. 
+                        In reality, the index of refraction for a material varies with the color of the light.
+                        This is called <b>dispersion.</b> 
+                    </p>
+                    <p>
+                        To the right, there is a prism, with different indices of refraction for red, green, and blue. 
+                        You can see how it splits the white beam into it's three colors. 
+                        In reality, it would split into a continous rainbow, but we're only showing 
+                        three colors because of how the simulator is programmed. 
+                    </p>
+                    <p>
+                        It is important to note that all conventional materials have a maximum index of refraction 
+                        for red light, and the IOR steadily decreases as you reach blue light. But in this simulation, 
+                        you can play around with what it would be like if the glass had a higher IOR for blue light 
+                        than it did for red light. 
+                    </p>
                 </div>
                 <div class="column sim-container" id="dispersion">
                 </div>
@@ -51,12 +86,29 @@
                 <div class="explanation column">
                     <h3 class="title">Dispersion</h3>
                     <h3 class="subtitle">Lenses, revisited</h3>
-
+                    <p>
+                        Dispersion causes issues with lenses. As you can see to the right, 
+                        each color of light is focused onto a different point. 
+                        This causes an issue called <b>chromatic aberration,</b> which can make 
+                        images taken through a lens appear distorted.
+                    </p>
+                    <p>
+                        Chromatic aberration can be overcome by using a lens with a more constant IOR,
+                        or by using thin, small lenses. For everyday applications of lenses, 
+                        like cameras and small telescopes,
+                        the amount of aberration is too small to matter, or can be corrected with software.
+                    </p>
+                    <p>
+                        For large telescopes, though, the aberration that would be caused by the large lens 
+                        would render any pictures unusable. Instead of overcoming this problem with advancements in lenses, 
+                        large telescopes simply use mirrors to focus 
+                        light instead.<sup class="tooltip is-tooltip-multiline is-tooltip-right" data-tooltip="There is also a small amount of chromatic aberration cause by the atmosphere, which is why some telescopes are placed in space.">*</sup>
+                    </p>
                 </div>
                 <div class="column sim-container" id="chromatic_aberration">
                 </div>
             </div>
-            <div class="columns">
+            <!-- <div class="columns">
                 <div class="explanation column">
                     <h3 class="title">Reflection</h3>
                     <h3 class="subtitle">Mirrors, revisited</h3>
@@ -65,7 +117,7 @@
                 <div class="column sim-container">
                     <div id="color_mirrors"></div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </section>
 
@@ -75,6 +127,7 @@
     <script src="ui.js"></script>
     <script src="color_mixing.js"></script>
     <script src="dispersion.js"></script>
+    <script src="chromatic_aberration.js"></script>
 </body>
 
 </html>
