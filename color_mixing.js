@@ -39,7 +39,7 @@
         angle: 0,
         style: "green-slider slider",
         handle_style: "green-handle handle",
-        value: 0.3,
+        value: 0.8,
         num_decimals: 2,
         callback: function (value) {
             d3.select(".green-circle")
@@ -61,7 +61,7 @@
         angle: 0,
         style: "red-slider slider",
         handle_style: "red-handle handle",
-        value: 0.4,
+        value: 0.8,
         num_decimals: 2,
         callback: function (value) {
             d3.select(".red-circle")
@@ -83,7 +83,7 @@
         angle: 0,
         style: "blue-slider slider",
         handle_style: "blue-handle handle",
-        value: 0.4,
+        value: 0.8,
         num_decimals: 2,
         callback: function (value) {
             d3.select(".blue-circle")
